@@ -4,7 +4,9 @@ class EN
 {
     static public var langTran:Map<String, String> = [
         'LangName' => 'English',
-        
+
+        'Reset' => 'Reset',
+
         'FontName' => 'montserrat',
         //==General==\\
         'General' => 'General',
@@ -69,6 +71,7 @@ class EN
 
             //==Game UI==\\
         'GameUI' => 'Game UI',
+        'Game UI' => 'Game UI',
         ////////
         'Visble' => 'Visble',
         ////////
@@ -145,6 +148,7 @@ class EN
 
         //==User Interface==\\
         'UserInterface' => 'User Interface',
+        'User Interface' => 'User Interface',
         ////////
         'CustomFade' => 'Custom tade type',
         'CustomFadeSound' => 'Custom fade sound volume',
