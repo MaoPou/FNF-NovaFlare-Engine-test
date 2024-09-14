@@ -8,166 +8,166 @@ class EN
         'FontName' => 'montserrat',
         //==General==\\
         'General' => 'General',
-        'framerate' => 'framerate',
-        'colorblindMode' => 'colorblindMode',
-        'lowQuality' => 'lowQuality',
-        'gameQuality' =>'gameQuality',
-        'antialiasing' => 'antialiasing',
-        'flashing' => 'flashing',
-        'shaders' => 'shaders',
-        'cacheOnGPU' => 'cacheOnGPU',
-        'autoPause' => 'autoPause',
+        'framerate' => 'Change your FPS cap',
+        'colorblindMode' => 'Colorblind filter more playable for colorblind people',
+        'lowQuality' => 'Turn off some object on stages',
+        'gameQuality' =>'Change game quality for screen',
+        'antialiasing' => 'Toggle antialiasing, improving graphics quality at a slight performance penalty',
+        'flashing' => 'Toggle flashing lights that can cause epileptic seizures and strain',
+        'shaders' => 'Shaders used for some visual effects',
+        'cacheOnGPU' => 'Allows the GPU to be used for caching textures, decreasing RAM usage',
+        'autoPause' => 'Stops game, when its unfocused',
 
 
 
         //==Gameplay==\\
         'Gameplay' => 'Gameplay',
         ////////
-        'downScroll' =>'downScroll',
-        'middleScroll' => 'middleScroll',
-        'flipChart' => 'flipChart',
-        'ghostTapping' => 'ghostTapping',
-        'guitarHeroSustains' => 'guitarHeroSustains',
-        'noReset' => 'noReset',
+        'downScroll' =>'Notes go Down instead of Up, simple enough',
+        'middleScroll' => 'Put your lane in the center or on the right',
+        'flipChart' => 'Flip chart for playing',
+        'ghostTapping' => 'Toggle counting pressing a directional input when no arrow is there as a miss',
+        'guitarHeroSustains' => "Hold Notes can't be pressed if you miss",
+        'noReset' => 'Toggle pressing R to gameover',
         ////////
         'Opponent' => 'Opponent',
         ////////
-        'playOpponent' => 'playOpponent',
-        'opponentCodeFix' => 'opponentCodeFix',
-        'botOpponentFix' => 'botOpponentFix',
-        'HealthDrainOPPO' => '你处于对手模式时的生命消耗',
-        'HealthDrainOPPOMult' => '对手模式的生命消耗乘数',
+        'playOpponent' => 'Playing as opponent',
+        'opponentCodeFix' => 'GoodNoteHit and opponentNoteHit function exchange effort',
+        'botOpponentFix' => 'Script will thought you open the bot',
+        'HealthDrainOPPO' => 'Health Drain on opponent mode',
+        'HealthDrainOPPOMult' => 'Health drain multiplier on opponent mode',
 
         //==Backend==\\
-        'Backend' => '后端设置',
-        'Gameplaybackend' => '游戏后端设置',
-        'fixLNL' => '减少长音符长度',
-        'pauseMusic' => '暂停界面播放的歌曲',
-        'hitsoundType' => '选择你的打击音效',
-        'hitsoundVolume' =>'打击音效的声音大小',
-        'oldHscriptVersion' => '简化版本以使用 hscript 为 runhaxecode 工作',
-        'pauseButton' => '在游戏中添加暂停按钮',
-        'gameOverVibration' => '设备将在游戏结束时振动',
-        'ratingOffset' => '更改sick击中的延迟',
-        'NoteOffsetState' => '更改音乐偏移和判断贴图的位置',
-        'safeFrames' => '更改提前或延迟敲击音符的帧数',
-        'marvelousWindow' => '更改按下音符的延迟在所设置的范围内判定为Marvelous',
-        'sickWindow' => '更改按下音符的延迟在所设置的范围内判定为Sick',
-        'goodWindow' => '更改按下音符的延迟在所设置的范围内判定为Good',
-        'badWindow' => '更改按下音符的延迟在所设置的范围内判定为Bad',
-        'marvelousRating' => '增加一个Marvelous的判定',
-        'marvelousSprite' => 'Marvelous评分使用Sick的贴图',
+        'Backend' => 'Backend',
+        'Gameplaybackend' => 'Gameplay backend',
+        'fixLNL' => 'Reduce Long Note length',
+        'pauseMusic' => 'Pause Screen song type',
+        'hitsoundType' => 'Choose sound type for hitSound',
+        'hitsoundVolume' =>'Hitsound Volume',
+        'oldHscriptVersion' => 'Reduced version to use hscript work for runhaxecode',
+        'pauseButton' => 'Add pauseButton in game',
+        'gameOverVibration' => 'Device will vibrate at game over',
+        'ratingOffset' => 'Changes rate offset',
+        'NoteOffsetState' => 'Changes music offset and judgement position',
+        'safeFrames' => 'Changes how many frames you have for hitting a note earlier or late',
+        'marvelousWindow' => 'How many milliseconds are in the MARVELOUS judge',
+        'sickWindow' => 'How many milliseconds are in the SICK judge',
+        'goodWindow' => 'How many milliseconds are in the GOOD judge',
+        'badWindow' => 'How many milliseconds are in the BAD judge',
+        'marvelousRating' => 'Extend marvelous judge for playing',
+        'marvelousSprite' => 'Marvelous judge will also use "sick!" judge sprite',
         ////////
-        'Appbackend' => '软件后端设置',
+        'Appbackend' => 'App backend',
         ////////
-        'discordRPC' => '从 Discord 上的“正在播放”框中显示应用程序',
-        'checkForUpdates' => '检查应用程序版本',
-        'screensaver' => '手机将在几秒钟处于非活动状态后进入休眠状态',
-        'filesCheck' => '检查游戏是否丢失文件',
+        'discordRPC' => 'Show the Application from your \"Playing\" box on Discord',
+        'checkForUpdates' => 'Check app version',
+        'screensaver' => 'Phone will sleep after going inactive for few seconds',
+        'filesCheck' => 'Check game whether miss files',
 
 
 
             //==Game UI==\\
-        'GameUI' => '游戏界面设置',
+        'GameUI' => 'Game UI',
         ////////
-        'Visble' => '显示设置',
+        'Visble' => 'Visble',
         ////////
-        'hideHud' => '隐藏UI',
-        'showComboNum' => '连击数字显示',
-        'showRating' => '评级贴图显示',
-        'opponentStrums' => '显示对手的箭头',
-        'judgementCounter' => '显示计数板',
-        'keyboardDisplay' => '显示小键盘',
+        'hideHud' => 'Shows hud',
+        'showComboNum' => 'Combo sprite appearance',
+        'showRating' => 'Rating sprite appearance',
+        'opponentStrums' => 'Shows opponent strums on screen',
+        'judgementCounter' => 'Show your judgements',
+        'keyboardDisplay' => 'Feedback the key you pressed',
         ////////
-        'TimeBar' => '时长条',
+        'TimeBar' => 'TimeBar',
         ////////
-        'timeBarType' => '时长条显示类型',
+        'timeBarType' => 'Display type',
         ////////
-        'HealthBar' => '生命条',
-        'healthBarAlpha' => '生命条透明度',
-        'oldHealthBarVersion' => '简化版 psych 0.63h',
+        'HealthBar' => 'HealthBar',
+        'healthBarAlpha' => 'HealthBar Alpha',
+        'oldHealthBarVersion' => 'Reduced version to psych 0.63h',
         ////////
-        'Combo' => '连击设置',
+        'Combo' => 'Combo',
         ////////
-        'comboColor' => '允许获取和使用评级颜色',
-        'comboOffsetFix' => '修复Combo的偏移',
+        'comboColor' => 'Allow to get and use rating color',
+        'comboOffsetFix' => 'Fix position offset',
         ////////
-        'KeyBoard' => '小键盘',
+        'KeyBoard' => 'KeyBoard',
         ////////
-        'keyboardAlpha' => '小键盘透明度',
-        'keyboardTime' =>'显示长键',
-        'keyboardBGColor' => '背景颜色',
-        'keyboardTextColor' => '文字颜色',
+        'keyboardAlpha' => 'KeyBoard Alpha',
+        'keyboardTime' =>'Display sustain',
+        'keyboardBGColor' => 'BG color',
+        'keyboardTextColor' => 'Text color',
         ////////
-        'Camera' => '摄像机',
+        'Camera' => 'Camera',
         ////////
-        'camZooms' => '更改在游戏里摄像机的缩放',
-        'scoreZoom' => '分数栏会随着打击音符缩放',
+        'camZooms' => 'Toggle the camera zoom in-game',
+        'scoreZoom' => 'Score beat when you hit note',
 
 
 
         //==Skin==\\
-        'Skin' => '皮肤设置',
+        'Skin' => 'Skin',
         ////////
-        'noteSkin' => '选择你的箭头皮肤',
-        'noteRGB' => '给箭头染色',
-        'NotesSubState' => '箭头颜色设置',
+        'noteSkin' => 'Change your current noteSkin',
+        'noteRGB' => 'RGB for Note',
+        'NotesSubState' => 'Note color setup',
         ////////
-        'Splash' => '喷浆皮肤设置',
+        'Splash' => 'Splash',
         ////////
-        'splashSkin' => '选择你的箭头喷溅皮肤',
-        'splashRGB' => '给喷溅皮肤染色',
-        'showSplash' => '显示在sick/marvelous贴图之上',
-        'splashAlpha' => '喷溅透明度',
+        'splashSkin' => 'Change your current splashSkin',
+        'splashRGB' => 'RGB for Splash',
+        'showSplash' => 'Show on sick/marvelous judge',
+        'splashAlpha' => 'Splash Alpha',
 
 
 
         //==Input==\\
-        'Input' => '按键设置',
+        'Input' => 'Input',
         ////////
-        'ControlsSubState' => '键位设置',
+        'ControlsSubState' => 'Controls setup',
         ////////
-        'TouchMain' => '主要触摸按键设置',
+        'TouchMain' => 'Touch-Main',
         ////////
-        'needMobileControl' => '触摸支持',
-        'controlsAlpha' => '按键透明度',
+        'needMobileControl' => 'Touch control support',
+        'controlsAlpha' => 'Control alpha',
         ////////
-        'TouchGame' => '游戏触摸按键设置',
+        'TouchGame' => 'Touch-Game',
         ////////
-        'MobileControlSelectSubState' => '控件类型，就是十字键钢琴键啥的',
-        'dynamicColors' => '动态颜色',
-        'hitboxLocation' => 'Hitbox 额外键位置',
-        'playControlsAlpha' => '按键透明度',
-        'extraKey' => 'ExtraKey 用于特殊键',
-        'MobileExtraControl' => '特殊按键设置',
+        'MobileControlSelectSubState' => 'Controls type',
+        'dynamicColors' => 'Dynamic Colors',
+        'hitboxLocation' => 'Hitbox extra key location',
+        'playControlsAlpha' => 'Control alpha',
+        'extraKey' => 'ExtraKey for special key',
+        'MobileExtraControl' => 'ExtraKey setup',
 
 
 
         //==User Interface==\\
-        'UserInterface' => '用户界面设置',
+        'UserInterface' => 'User Interface',
         ////////
-        'CustomFade' => '自定义过场动画类型',
-        'CustomFadeSound' => '自定义过场动画音量',
-        'CustomFadeText' => '自定义过场动画文本是否可见',
-        'skipTitleVideo' => '跳过游戏启动时的动画',
-        'freeplayOld' => '使用Psych的FreePlay',
-        'resultsScreen' => '在结尾歌曲处打开结算界面',
-        'loadingScreen' => '为 PlayState 添加 LoadingScreen 并更快地加载，如果遇到问题，请禁用它',
+        'CustomFade' => 'Custom tade type',
+        'CustomFadeSound' => 'Custom fade sound volume',
+        'CustomFadeText' => 'Custom fade text visible',
+        'skipTitleVideo' => 'Skip intro video',
+        'freeplayOld' => 'Use psych freeplay',
+        'resultsScreen' => 'Open Results Screen at end song',
+        'loadingScreen' => 'Add a LoadingScreen for PlayState and load faster\nif have some problem please disable it',
 
 
 
         //==Watermark==\\
-        'Watermark' => '水印设置',
+        'Watermark' => 'Watermark',
         ////////
-        'FPScounter' => 'FPS 计数器',
+        'FPScounter' => 'FPS counter',
         ////////
-        'showFPS' => '显示FPS',
-        'showExtra' => '显示更多性能方面的数值',
-        'rainbowFPS' => '彩虹FPS',
-        'memoryType' => '运存展示数据',
-        'FPSScale' => 'FPS的显示大小',
+        'showFPS' => 'Show your FPS',
+        'showExtra' => 'Show more data',
+        'rainbowFPS' => 'Change color with FPS',
+        'memoryType' => 'memory showcase data',
+        'FPSScale' => 'Size',
 
-        'showWatermark' => '显示水印',
-        'WatermarkScale' => '水印大小'
+        'showWatermark' => 'Visible',
+        'WatermarkScale' => 'Size'
     ];
 }
