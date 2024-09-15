@@ -3,7 +3,7 @@ package language.locales;
 class ENold 
 {
     static public var langTran:Map<String, String> = [
-        'LangName' => 'English (Old)',
+        'LangName' => 'English-Old',
         'languageName' => 'Language',
         'FontName' => 'montserrat',
     
