@@ -458,6 +458,13 @@ class FunkinLua {
 			PlayState.SONG = Song.loadFromJson(poop, name);
 			PlayState.storyDifficulty = difficultyNum;
 			game.persistentUpdate = false;
+
+                        if (ClientPrefs.data.loadingScreen) 
+			{
+			    FlxTransitionableState.skipNextTransIn = true;
+			    FlxTransitionableState.skipNextTransOut = true;
+                        }
+			
 			LoadingState.loadAndSwitchState(new PlayState());
 
 			FlxG.sound.music.pause();
