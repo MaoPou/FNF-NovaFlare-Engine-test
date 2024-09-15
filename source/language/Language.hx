@@ -8,7 +8,7 @@ class Language
         [
             EN.langTran.get('LangName'),
             ZH.langTran.get('LangName'),
-            ENold.langTran.get('LangName')
+            ENbutold.langTran.get('LangName')
         ];
 
     static public function getStr(name:String):String
