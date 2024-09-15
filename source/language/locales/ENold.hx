@@ -1,6 +1,6 @@
 package language.locales;
 
-class ENold 
+class ENbutold 
 {
     static public var langTran:Map<String, String> = [
         'LangName' => 'English-Old',
