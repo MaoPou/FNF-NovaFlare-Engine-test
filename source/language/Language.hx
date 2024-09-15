@@ -21,7 +21,7 @@ class Language
                 return ZH.langTran.get(name);
             case 'English-Old':
                 return ENold.langTran.get(name)
-        }
+        };
         return  EN.langTran.get(name);
     }    
 }
