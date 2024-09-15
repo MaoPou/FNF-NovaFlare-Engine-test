@@ -20,7 +20,7 @@ class Language
             case '简体中文':
                 return ZH.langTran.get(name);
             case 'English-Old':
-                return ENold.langTran.get(name);
+                return ENbutold.langTran.get(name);
         }
         return  EN.langTran.get(name);
     }    
