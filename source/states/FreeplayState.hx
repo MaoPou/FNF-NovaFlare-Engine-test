@@ -394,10 +394,10 @@ class FreeplayState extends MusicBeatState
 		if (Math.abs(lerpPosition - position) > 1) return;
 		if (!musicMutex.tryAcquire()) return;
 
-		var songLowercase:String = Paths.formatToSongPath(songs[curSelected].songName);
-		var poop:String = Highscore.formatSong(songLowercase, curDifficulty);
 		try
 		{
+			var songLowercase:String = Paths.formatToSongPath(songs[curSelected].songName);
+			var poop:String = Highscore.formatSong(songLowercase, curDifficulty);
 			PlayState.SONG = Song.loadFromJson(poop, songLowercase);
 			PlayState.isStoryMode = false;
 			PlayState.storyDifficulty = curDifficulty;
@@ -457,6 +457,12 @@ class FreeplayState extends MusicBeatState
 				if (Math.abs(lerpPosition - position) > 1) return;
 				if (!musicMutex.tryAcquire()) return;
 				ignoreCheck = true;
+				destroyFreeplayVocals();
+				FlxG.sound.music.stop();
+
+				FlxG.sound.playMusic(Paths.music('freakyMenu'), 1);
+				
+				ModsMenuState.isFreePlay = true;
 				MusicBeatState.switchState(new ModsMenuState());
 			case 2:
 				if (Math.abs(lerpPosition - position) > 1) return;
@@ -470,6 +476,7 @@ class FreeplayState extends MusicBeatState
 					eventPressCheck = true;
 					destroyFreeplayVocals();
 					FlxG.sound.music.stop();
+					ChartingState.isFreePlay = true;
 					LoadingState.loadAndSwitchState(new ChartingState());
 				}
 			case 4: 
@@ -610,11 +617,18 @@ class FreeplayState extends MusicBeatState
 
 	var rateMutex:Mutex = new Mutex();
 	function updateInfo() {
-	    var poop:String = Highscore.formatSong(songs[curSelected].songName.toLowerCase(), curDifficulty);
-
-		var jsonData = Song.loadFromJson(poop, songs[curSelected].songName.toLowerCase());
-		var speed:Float = jsonData.speed;
+		
+		var poop:String = Highscore.formatSong(songs[curSelected].songName.toLowerCase(), curDifficulty);
+		var jsonData:SwagSong = null;
+		var speed:Float = 0;
 		var count:Int = 0;
+		try
+		{
+		jsonData = Song.loadFromJson(poop, songs[curSelected].songName.toLowerCase());
+		speed = jsonData.speed;
+		} catch(a:Any){
+			return;
+		}
 
 		Thread.create(() -> {			
 			rateMutex.acquire();
@@ -741,21 +755,27 @@ class FreeplayState extends MusicBeatState
 				voiceDis.audioDis.stopUpdate = true;
 				instDis.audioDis.stopUpdate = true;
 				
-				var poop:String = Highscore.formatSong(songs[curSelected].songName.toLowerCase(), curDifficulty);
-				PlayState.SONG = Song.loadFromJson(poop, songs[curSelected].songName.toLowerCase());
+				try
+				{
+					var poop:String = Highscore.formatSong(songs[curSelected].songName.toLowerCase(), curDifficulty);
+					PlayState.SONG = Song.loadFromJson(poop, songs[curSelected].songName.toLowerCase());
 
-				if (PlayState.SONG.needsVoices)
-				{
-					vocals = new FlxSound().loadEmbedded(Paths.voices(PlayState.SONG.song));
-					FlxG.sound.list.add(vocals);
-					vocals.persist = vocals.looped = true;
-					vocals.volume = 0.8;
-				}
-				else if (vocals != null)
-				{
-					vocals.stop();
-					vocals.destroy();
-					vocals = null;
+					if (PlayState.SONG.needsVoices)
+					{
+						vocals = new FlxSound().loadEmbedded(Paths.voices(PlayState.SONG.song));
+						FlxG.sound.list.add(vocals);
+						vocals.persist = vocals.looped = true;
+						vocals.volume = 0.8;
+					}
+					else if (vocals != null)
+					{
+						vocals.stop();
+						vocals.destroy();
+						vocals = null;
+					}
+				}catch(e:Any){
+					musicMutex.release();
+					return;
 				}
 
 				FlxG.sound.playMusic(Paths.inst(PlayState.SONG.song), 0.8);

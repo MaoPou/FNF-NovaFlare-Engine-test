@@ -81,7 +81,7 @@ class ChartingState extends MusicBeatState
 	var _file:FileReference;
 
 	var UI_box:FlxUITabMenu;
-
+	public static var isFreePlay:Bool = false;
 	public static var goToPlayState:Bool = false;
 	/**
 	 * Array of notes showing when each section STARTS in STEPS
@@ -1931,7 +1931,12 @@ class ChartingState extends MusicBeatState
 				// Protect against lost data when quickly leaving the chart editor.
 				autosaveSong();
 				PlayState.chartingMode = false;
-				MusicBeatState.switchState(new states.editors.MasterEditorMenu());
+				if (!isFreePlay) MusicBeatState.switchState(new states.editors.MasterEditorMenu());
+				else {
+					if (!ClientPrefs.data.freeplayOld) MusicBeatState.switchState(new states.FreeplayState());
+					else MusicBeatState.switchState(new states.FreeplayStatePsych());
+				}
+				isFreePlay = false;
 				FlxG.sound.playMusic(Paths.music('freakyMenu'));
 				FlxG.mouse.visible = false;
 				return;

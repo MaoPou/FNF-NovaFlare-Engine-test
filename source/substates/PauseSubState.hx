@@ -12,7 +12,6 @@ import states.FreeplayStatePsych;
 import states.StoryMenuState;
 
 import options.OptionsState;
-//import options.OptionsSubstate;
 
 import flixel.util.FlxStringUtil;
 import flixel.addons.transition.FlxTransitionableState;
@@ -62,12 +61,6 @@ class PauseSubState extends MusicBeatSubstate
 	var holdTime:Float = 0;
 	var skipTimeText:FlxText;
 	var curTime:Float = Math.max(0, Conductor.songPosition);
-	
-	public static var moveType:Int = 0; 
-	//0 is close pause, 1 is open option, 2 is back to pause
-	
-	public static var curOptions:Bool = false; // curSelected fix
-	public static var curGameplayChangers:Bool = false; // curSelected fix
 
 	var stayinMenu:String = 'isChanging'; // base, difficulty, debug, isChanging or options
 	// isChanging = in transition animation
@@ -86,10 +79,6 @@ class PauseSubState extends MusicBeatSubstate
 	var debugCurSelected:Int = 0;
 	var debugAlphabet:Array<FlxText> = [];
 	var debugBars:Array<FlxSprite> = [];
-
-	var optionsCurSelected:Int = 0;
-	var optionsOptionsAlphabet:Array<FlxText> = [];
-	var optionsOptionsBars:Array<FlxSprite> = [];
 
 	var menuColor:Array<Int> = [
 		0xFFFF26C0,
@@ -138,15 +127,15 @@ class PauseSubState extends MusicBeatSubstate
 			}
 		} catch(e:Dynamic) {}		
 		pauseMusic.play(false, FlxG.random.int(0, Std.int(pauseMusic.length / 2)));
-       // pauseMusic.volume = moveType != 0 ? OptionsSubstate.pauseMusic.volume : 0;
-		//pauseMusic.time = moveType != 0 ? OptionsSubstate.pauseMusic.time : FlxG.random.int(0, Std.int(pauseMusic.length / 2));
+        pauseMusic.volume = 0;
+		pauseMusic.time = FlxG.random.int(0, Std.int(pauseMusic.length / 2));
 		
 		FlxG.sound.list.add(pauseMusic);
 	
 		blackback = new FlxSprite(0, 0).makeGraphic(FlxG.width, FlxG.height, FlxColor.BLACK);
 		add(blackback);
 		blackback.antialiasing = ClientPrefs.data.antialiasing;
-		blackback.alpha = moveType != 0 ? 0.5 : 0;
+		blackback.alpha = 0;
 		blackbackTween = FlxTween.tween(blackback, {alpha: 0.5}, 0.75, {ease: FlxEase.quartOut});	
 	    
 		backShadow = new FlxSprite(-800).loadGraphic(Paths.image(filePath + 'backShadow'));
@@ -380,8 +369,6 @@ class PauseSubState extends MusicBeatSubstate
 		
 		cameras = [FlxG.cameras.list[FlxG.cameras.list.length - 1]];
 		
-		moveType = 0;
-		
 		super.create();
 	}
 
@@ -498,9 +485,6 @@ class PauseSubState extends MusicBeatSubstate
 		
 		if (accept)
 			doEvent();
-			
-		alphaCheck();
-				
 	}
 
 	function changeOptions(num:Int) {
@@ -577,6 +561,7 @@ class PauseSubState extends MusicBeatSubstate
 				case 'Options':
 					PlayState.instance.paused = true; // For lua
 					PlayState.instance.vocals.volume = 0;
+					OptionsState.stateType = 2;
 					MusicBeatState.switchState(new OptionsState());
 					if(ClientPrefs.data.pauseMusic != 'None')
 					{
@@ -584,7 +569,6 @@ class PauseSubState extends MusicBeatSubstate
 						FlxTween.tween(FlxG.sound.music, {volume: 1}, 0.8);
 						FlxG.sound.music.time = pauseMusic.time;
 					}
-					OptionsState.onPlayState = true;
 				case 'Continue':
 					closeMenu(
 						function(tmr:FlxTimer) close()
@@ -726,13 +710,7 @@ class PauseSubState extends MusicBeatSubstate
 			FlxTween.tween(i, {x: -1000}, 0.5, {ease: FlxEase.quartIn});
 				
 		for (i in difficultyAlphabet)
-			FlxTween.tween(i, {x: -1000}, 0.5, {ease: FlxEase.quartIn});
-		
-		for (i in optionsOptionsBars)
-			FlxTween.tween(i, {x: -1000}, 0.5, {ease: FlxEase.quartIn});
-						
-		for (i in optionsOptionsAlphabet)
-			FlxTween.tween(i, {x: -1000}, 0.5, {ease: FlxEase.quartIn});
+			FlxTween.tween(i, {x: -1000}, 0.5, {ease: FlxEase.quartIn});						
 						
 		var curText = 0;
 		
@@ -774,17 +752,6 @@ class PauseSubState extends MusicBeatSubstate
 			FlxTween.tween(backButton, {x: 1080}, 0.5, {ease: FlxEase.quartIn});
 		}
 	}
-	
-	function alphaCheck(){/*
-		for (i in 0...Std.int(optionsBars.length/2))
-			if (optionsBars[i*2].alpha > 0.7) optionsBars[i*2].alpha = 0.7;
-		for (i in 0...Std.int(debugBars.length/2))
-			if (debugBars[i*2].alpha > 0.7) debugBars[i*2].alpha = 0.7;
-		for (i in 0...Std.int(difficultyBars.length/2))
-			if (difficultyBars[i*2].alpha > 0.7) difficultyBars[i*2].alpha = 0.7;
-		for (i in 0...Std.int(optionsOptionsBars.length/2))
-			if (optionsOptionsBars[i*2].alpha > 0.7) optionsOptionsBars[i*2].alpha = 0.7;*/
-	}
 
 	override function destroy()
 	{
@@ -817,8 +784,6 @@ class PauseSubState extends MusicBeatSubstate
 			colorTweenShadow = FlxTween.color(debugBars[i*2], 2, debugBars[i*2].color, menuShadowColor[curColor]);
 		for (i in 0...Std.int(difficultyBars.length/2))
 			colorTweenShadow = FlxTween.color(difficultyBars[i*2], 2, difficultyBars[i*2].color, menuShadowColor[curColor]);
-		for (i in 0...Std.int(optionsOptionsBars.length/2))
-			colorTweenShadow = FlxTween.color(optionsOptionsBars[i*2], 2, optionsOptionsBars[i*2].color, menuShadowColor[curColor]);
 		
 		colorTween = FlxTween.color(back, 2, menuColor[curColorAgain], menuColor[curColor]);
 		colorTweenShadow = FlxTween.color(backShadow, 2, menuShadowColor[curColorAgain], menuShadowColor[curColor]);

@@ -65,7 +65,7 @@ class CreditsSubState extends MusicBeatSubstate
 
 		var bgwidth = 230;
 
-        camIcons = new FlxCamera(0, 0, bgwidth, FlxG.height - 120);
+        camIcons = new FlxCamera(0, 0, bgwidth, FlxG.height - 150);
 		camIcons.bgColor = 0x00;
 
 		camHUD = new FlxCamera();
@@ -122,10 +122,10 @@ class CreditsSubState extends MusicBeatSubstate
 			RectPos(i);
         }
 
-		backShape = new BackButton(0, 600, 230, 120, 'back', 0x53b7ff, backMenu);
+		backShape = new BackButton(0, 570, 230, 150, 'back', 0x53b7ff, backMenu);
 		add(backShape);
 
-		var BG:Rect = new Rect(0, FlxG.height - 120, bgwidth, 5, 0, 0, FlxColor.BLACK, 1);
+		var BG:Rect = new Rect(0, FlxG.height - 150, bgwidth, 5, 0, 0, FlxColor.BLACK, 1);
 		BG.cameras = [camHUD];
 		add(BG);
 

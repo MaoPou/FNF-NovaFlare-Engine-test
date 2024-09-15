@@ -4,10 +4,10 @@ class EN
 {
     static public var langTran:Map<String, String> = [
         'LangName' => 'English',
-
-        'Reset' => 'Reset',
-
+        'languageName' => 'Choose language',
         'FontName' => 'montserrat',
+    
+        'Reset' => 'Reset',
         //==General==\\
         'General' => 'General',
         'framerate' => 'Change your FPS cap',
@@ -42,10 +42,10 @@ class EN
 
         //==Backend==\\
         'Backend' => 'Backend',
-        'Gameplaybackend' => 'Gameplay backend',
+        'Gameplaybackend' => 'Gameplay Backend',
         'fixLNL' => 'Reduce Long Note length',
         'pauseMusic' => 'Pause Screen song type',
-        'hitsoundType' => 'Choose sound type for hitSound',
+        'hitsoundType' => 'Hitsound Type',
         'hitsoundVolume' =>'Hitsound Volume',
         'oldHscriptVersion' => 'Reduced version to use hscript work for runhaxecode',
         'pauseButton' => 'Add pauseButton in game',
@@ -63,19 +63,19 @@ class EN
         'Appbackend' => 'App backend',
         ////////
         'discordRPC' => 'Show the Application from your \"Playing\" box on Discord',
-        'checkForUpdates' => 'Check app version',
+        'checkForUpdates' => 'checkForUpdates',
         'screensaver' => 'Phone will sleep after going inactive for few seconds',
         'filesCheck' => 'Check game whether miss files',
 
 
 
-            //==Game UI==\\
-        'GameUI' => 'Game UI',
+        //==Game UI==\\
+        'GameUI' => 'GameUI',
         'Game UI' => 'Game UI',
         ////////
         'Visble' => 'Visble',
         ////////
-        'hideHud' => 'Shows hud',
+        'hideHud' => 'Hide hud',
         'showComboNum' => 'Combo sprite appearance',
         'showRating' => 'Rating sprite appearance',
         'opponentStrums' => 'Shows opponent strums on screen',
@@ -87,7 +87,7 @@ class EN
         'timeBarType' => 'Display type',
         ////////
         'HealthBar' => 'HealthBar',
-        'healthBarAlpha' => 'HealthBar Alpha',
+        'healthBarAlpha' => 'Alpha',
         'oldHealthBarVersion' => 'Reduced version to psych 0.63h',
         ////////
         'Combo' => 'Combo',
@@ -97,10 +97,10 @@ class EN
         ////////
         'KeyBoard' => 'KeyBoard',
         ////////
-        'keyboardAlpha' => 'KeyBoard Alpha',
+        'keyboardAlpha' => 'Alpha',
         'keyboardTime' =>'Display sustain',
-        'keyboardBGColor' => 'BG color',
-        'keyboardTextColor' => 'Text color',
+        'keyboardBGColor' => 'keyboardBGColor',
+        'keyboardTextColor' => 'keyboardTextColor',
         ////////
         'Camera' => 'Camera',
         ////////
@@ -112,6 +112,7 @@ class EN
         //==Skin==\\
         'Skin' => 'Skin',
         ////////
+        'Note' => 'Note',
         'noteSkin' => 'Change your current noteSkin',
         'noteRGB' => 'RGB for Note',
         'NotesSubState' => 'Note color setup',
@@ -121,7 +122,7 @@ class EN
         'splashSkin' => 'Change your current splashSkin',
         'splashRGB' => 'RGB for Splash',
         'showSplash' => 'Show on sick/marvelous judge',
-        'splashAlpha' => 'Splash Alpha',
+        'splashAlpha' => 'Alpha',
 
 
 
@@ -138,16 +139,16 @@ class EN
         'TouchGame' => 'Touch-Game',
         ////////
         'MobileControlSelectSubState' => 'Controls type',
-        'dynamicColors' => 'Dynamic Colors',
+        'dynamicColors' => 'dynamicColors',
         'hitboxLocation' => 'Hitbox extra key location',
         'playControlsAlpha' => 'Control alpha',
-        'extraKey' => 'ExtraKey for special key',
-        'MobileExtraControl' => 'ExtraKey setup',
+        'extraKey' => 'ExtraKey for special input',
+        'MobileExtraControl' => 'ExtraKey input setup',
 
 
 
         //==User Interface==\\
-        'UserInterface' => 'User Interface',
+        'UserInterface' => 'UserInterface',
         'User Interface' => 'User Interface',
         ////////
         'CustomFade' => 'Custom tade type',
@@ -172,6 +173,6 @@ class EN
         'FPSScale' => 'Size',
 
         'showWatermark' => 'Visible',
-        'WatermarkScale' => 'Size'
+        'WatermarkScale' => 'WatermarkScale'
     ];
 }

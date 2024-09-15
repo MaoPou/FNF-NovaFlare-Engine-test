@@ -12,12 +12,12 @@ class CreditsState extends MusicBeatState
 	private var iconArray:Array<AttachedSprite> = [];
 
 	private var nameSave:Array<String> = [
-		"NovaFlare", 
-		"Psych", 
+		"NovaFlare Engine", 
+		"Psych Engine", 
 		#if moblie
-		"moblie",
+		"moblie Team",
 		#end
-		"Funkin"
+		"Funkin Team"
 	];
 
 	private var NucreditsStuff:Array<Array<Array<String>>> = [

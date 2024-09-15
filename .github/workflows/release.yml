@@ -234,8 +234,8 @@ jobs:
         with:
           repo_token: "${{ secrets.GITHUB_TOKEN }}"
           prerelease: false
-          automatic_release_tag: "V1.1.5"
-          title: "V1.1.5"
+          automatic_release_tag: "V1.1.5-HOTFIX"
+          title: "V1.1.5 HOTFIX"
           files: |
             /home/runner/*.apk
             /home/runner/*.zip

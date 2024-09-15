@@ -1804,19 +1804,7 @@ class PlayState extends MusicBeatState
 	{
 		stagesFunc(function(stage:BaseStage) stage.closeSubState());
 		if (paused)
-		{
-		    if (PauseSubState.moveType == 1){
-		        PauseSubState.moveType = 2; //really back to pause
-		        super.closeSubState();
-		        //openSubState(new OptionsSubstate());
-		        return;
-		    }
-		    else if (PauseSubState.moveType == 2){		
-		        super.closeSubState();        
-		        openSubState(new PauseSubState());		        
-		        return;
-		    }
-		    
+		{	    
 			if(FlxG.sound.music != null && !startingSong)
 				resyncVocals(true);
 	

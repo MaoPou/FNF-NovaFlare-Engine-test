@@ -23,14 +23,13 @@ class PirateState extends MusicBeatState
 		var guh:String = "
 		This is pirate version\n
 		You are banned from entering the game\n
-		please use the legitimate version\n
-                MaoPou left a message :)\n
-		If you use Tencent QQ China,\n
-		Then please join the following group chat:\n
-		QQ:723948450
-		";
+		please use the legitimate version\n\n
+                此版本为盗版\n
+                你已被禁止进入游戏\n
+                请使用正版进行游玩\n
+                ";
 		warnText = new FlxText(0, 0, FlxG.width, guh, 32);
-		warnText.setFormat("VCR OSD Mono", 32, FlxColor.RED, CENTER);
+		warnText.setFormat(Paths.font("Lang-ZH.ttf"), 32, FlxColor.RED, CENTER);
 		warnText.screenCenter(Y);
 		add(warnText);
 

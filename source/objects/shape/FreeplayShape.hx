@@ -303,6 +303,7 @@ class MusicLine extends FlxSpriteGroup
 	}
 
     var holdTime:Float = 0;
+    var canHold:Bool = false;
     override function update(e:Float) {
         super.update(e);
 
@@ -314,10 +315,15 @@ class MusicLine extends FlxSpriteGroup
 
         if (FreeplayState.instance.ignoreCheck) return;
 
-        if (FlxG.mouse.justReleased) holdTime = 0;
+        if (FlxG.mouse.justReleased) 
+        {
+            holdTime = 0;
+            canHold = false;
+        }
 
         if (FlxG.mouse.overlaps(timeAddRect) || FlxG.mouse.overlaps(timeReduceRect) || FlxG.mouse.overlaps(rateAddRect) || FlxG.mouse.overlaps(rateReduceRect)) {
             if (FlxG.mouse.justPressed) {
+                canHold = true;
                 if (FlxG.mouse.overlaps(timeAddRect)) FreeplayState.instance.updateMusicTime(1, false);
                 else if (FlxG.mouse.overlaps(timeReduceRect)) FreeplayState.instance.updateMusicTime(-1, false);
                 else if (FlxG.mouse.overlaps(rateAddRect)) FreeplayState.instance.updateMusicRate(1);
@@ -328,7 +334,7 @@ class MusicLine extends FlxSpriteGroup
                 holdTime += e;
             }
 
-            if (holdTime > 0.5) {
+            if (holdTime > 0.5 && canHold) {
                 holdTime -= 0.1;
                 if (FlxG.mouse.overlaps(timeAddRect)) FreeplayState.instance.updateMusicTime(1, true);
                 else if (FlxG.mouse.overlaps(timeReduceRect)) FreeplayState.instance.updateMusicTime(-1, true);
@@ -363,6 +369,8 @@ class MusicRect extends FlxSpriteGroup
     var fouced:Bool = false;
     override function update(elapsed:Float) {
         super.update(elapsed);
+        if (FreeplayState.instance.ignoreCheck) return;
+        
         if (FlxG.mouse.overlaps(bg))
         {
             if (!fouced)

@@ -16,8 +16,6 @@ class OptionsState extends MusicBeatState
 {
 	public static var instance:OptionsState;
 
-	public static var onPlayState:Bool = false;
-
 	var filePath:String = 'menuExtend/OptionsState/';
 
 	private static var position:Float = 0;
@@ -223,13 +221,6 @@ class OptionsState extends MusicBeatState
 		if (!pressCheck){
 			pressCheck = true;
 			FlxG.sound.play(Paths.sound('cancelMenu'));
-			if(onPlayState)
-			{
-				StageData.loadDirectory(PlayState.SONG);
-				LoadingState.loadAndSwitchState(new PlayState());
-				FlxG.sound.music.volume = 0;
-			}
-			else MusicBeatState.switchState(new MainMenuState());
 			ClientPrefs.saveSettings();
 			Main.fpsVar.visible = ClientPrefs.data.showFPS;
 			Main.fpsVar.scaleX = Main.fpsVar.scaleY = ClientPrefs.data.FPSScale;

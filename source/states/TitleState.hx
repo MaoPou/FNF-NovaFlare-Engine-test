@@ -121,8 +121,12 @@ class TitleState extends MusicBeatState
 		
 		#if android
 		if (AppData.getVersionName() != Application.current.meta.get('version')
-		    || AppData.getAppName() != Lib.application.window.title //什么几把情况
-			//|| AppData.getPackageName() != Application.current.meta.get('packageName') 只不过是我的仁慈罢了 --狐月影
+		    || AppData.getAppName() != Application.current.meta.get('file')
+			|| (AppData.getPackageName() != Application.current.meta.get('packageName') 
+				&& AppData.getPackageName() != Application.current.meta.get('packageName') + 'Backup1' //共存
+				&& AppData.getPackageName() != Application.current.meta.get('packageName') + 'Backup2' //共存
+				&& AppData.getPackageName() != 'com.antutu.ABenchMark' //超频测试
+				)
 			)
 			FlxG.switchState(new PirateState());
 		#end
@@ -452,9 +456,17 @@ class TitleState extends MusicBeatState
 			if (touch.justPressed)
 			{
 				pressedEnter = true;
-			}
+			} 
 		}
 		#end
+		
+		#if android
+		if (videoBool){
+			pressedEnter = false;
+			if (FlxG.android.justReleased.BACK) pressedEnter = true;
+		}
+		#end
+		
 
 		var gamepad:FlxGamepad = FlxG.gamepads.lastActive;
 
@@ -577,12 +589,12 @@ class TitleState extends MusicBeatState
 			if(controls.UI_RIGHT) swagShader.hue += elapsed * 0.1;
 		}
 
-		if (videobool)
+		if (videoBool)
 		{
 			if(pressedEnter)
 			{
 				video.stop();
-				videobool = false;
+				videoBool = false;
 				skipVideo.visible = false;
 				startCutscenesOut();
 			}
@@ -661,7 +673,6 @@ class TitleState extends MusicBeatState
 				case 4:
 					#if PSYCH_WATERMARKS
 					addMoreText('Hoyou', 40);
-					addMoreText('MaoPou', 40);
 					#else
 					addMoreText('present');
 					#end
@@ -784,10 +795,10 @@ class TitleState extends MusicBeatState
 	
 	#if VIDEOS_ALLOWED
 	var video:FlxVideoSprite;
-	var videobool:Bool = false;
+	var videoBool:Bool = false;
 	function startVideo(name:String)
 	{
-	    skipVideo = new FlxText(0, FlxG.height - 26, 0, "Press " + #if android "" #else "Enter " #end + "to skip", 18);
+	    skipVideo = new FlxText(0, FlxG.height - 26, 0, "Press " + #if android "Back on your Phone " #else "Enter " #end + "to skip", 18);
 		skipVideo.setFormat(Assets.getFont("assets/fonts/montserrat.ttf").fontName, 18);
 		skipVideo.alpha = 0;
 		skipVideo.alignment = CENTER;
@@ -827,7 +838,7 @@ class TitleState extends MusicBeatState
 		add(video);
 		video.load(filepath);
 		video.play();
-		videobool = true;
+		videoBool = true;
 
 		video.bitmap.onEndReached.add(function() {
 			videoEnd();
@@ -844,10 +855,10 @@ class TitleState extends MusicBeatState
 	function videoEnd()
 	{
 	    skipVideo.visible = false;
-		video.stop();
+		if (video != null) video.stop();
 		//video.visible = false;
 		startCutscenesOut();
-		videobool = false;
+		videoBool = false;
 		trace("end");
 	}
 	

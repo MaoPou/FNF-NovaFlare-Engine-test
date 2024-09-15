@@ -11,6 +11,12 @@ class SkinGroup
 
         var reset:ResetRect = new ResetRect(450, 20, follow);
         follow.add(reset);
+
+        var option:Option = new Option(
+            Language.getStr('Note'),
+            TEXT
+        );
+        follow.addOption(option);
         
         var noteSkins:Array<String> = [];
         if(Mods.mergeAllTextsNamed('images/noteSkins/list.txt', 'shared').length > 0)

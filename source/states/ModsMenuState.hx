@@ -17,6 +17,8 @@ import flixel.addons.transition.FlxTransitionableState;
 
 class ModsMenuState extends MusicBeatState
 {
+	public static var isFreePlay:Bool = false;
+	
 	var bg:FlxSprite;
 	var icon:FlxSprite;
 	var modName:Alphabet;
@@ -329,8 +331,16 @@ class ModsMenuState extends MusicBeatState
     				}				
 				}
 				FlxG.camera.fade(FlxColor.BLACK, 0.5, false, FlxG.resetGame, false);
+				isFreePlay = false;
 			}
-			else MusicBeatState.switchState(new MainMenuState());
+			else {
+				if (!isFreePlay) MusicBeatState.switchState(new MainMenuState());
+				else {
+					if (!ClientPrefs.data.freeplayOld) MusicBeatState.switchState(new states.FreeplayState());
+					else MusicBeatState.switchState(new states.FreeplayStatePsych());
+				}
+				isFreePlay = false;
+			}
 
 			persistentUpdate = false;
 			FlxG.autoPause = ClientPrefs.data.autoPause;

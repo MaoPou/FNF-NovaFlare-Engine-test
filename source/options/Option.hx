@@ -146,6 +146,7 @@ class Option extends FlxSpriteGroup
 		text.font = Paths.font(Language.getStr('FontName') + '.ttf'); 	
         text.antialiasing = ClientPrefs.data.antialiasing;	
         text.y += saveHeight / 2 - text.height / 2;
+		text.color = 0xff8af3ff;
         add(text);
 	}
 
@@ -156,6 +157,7 @@ class Option extends FlxSpriteGroup
 		text.font = Paths.font(Language.getStr('FontName') + '.ttf'); 	
         text.antialiasing = ClientPrefs.data.antialiasing;	
         text.y += saveHeight / 2 - text.height / 2;
+		text.color = 0x63c1e8ff;
         add(text);
 	}
 

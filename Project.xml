@@ -180,11 +180,6 @@
 		<!--Undefinitions-->
 		<undefine name="openfl-disable-handle-error" if="debug" unless="${openfl &ge; 9.4.0}" />
 	</section>
-
-	<section if="android"> 
-		<config:android permission="android.permission.MANAGE_EXTERNAL_STORAGE" />
-		<config:android permission="android.permission.REQUEST_INSTALL_PACKAGES" />
-	</section>
 	
 	<!-- Do whatever you want I'm tired uninstall and install everytime -->
 	<certificate path="key.keystore" password="psychengine" alias="psychport" alias-password="psychengine" if="android" unless="debug" />
