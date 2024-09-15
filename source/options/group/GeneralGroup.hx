@@ -29,7 +29,7 @@ class GeneralGroup
         follow.addOption(option);
         option.onChange = onChangeFramerate;
 
-        var langArray:Array<String> = [Language.member[0], Language.member[1]];
+        var langArray:Array<String> = [Language.member[0], Language.member[1], Language.member[2]];
         var option:Option = new Option(
             Language.getStr('languageName'),
             'language',

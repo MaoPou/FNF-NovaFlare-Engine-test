@@ -27,7 +27,7 @@ class ENbutold
         ////////
         'downScroll' =>'DownScroll',
         'middleScroll' => 'MiddleScroll',
-        'flipChart' => 'Flip chart,
+        'flipChart' => 'Flip chart',
         'ghostTapping' => 'Ghost Tapping',
         'guitarHeroSustains' => "Sustains as One Note'",
         'noReset' => 'Disable Reset Button',
@@ -79,7 +79,7 @@ class ENbutold
         'showComboNum' => 'Show Combo Num',
         'showRatin' => 'show Rating',
         'opponentStrums' => 'Opponent Strums',
-        'judgementCounte' => 'Judgement Counter,
+        'judgementCounte' => 'Judgement Counter',
         'keyboardDisplay' => 'Little Keyboard',
         ////////
         'TimeBar' => 'TimeBar',
@@ -167,7 +167,7 @@ class ENbutold
         'FPScounter' => 'FPS counter',
         ////////
         'showFPS' => 'Show FPS',
-        'showExtra' => 'Show More,
+        'showExtra' => 'Show More',
         'rainbowFPS' => 'Rainbow FPS',
         'memoryType' => 'Memory Type',
         'FPSScale' => 'Size',
