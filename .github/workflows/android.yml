@@ -86,13 +86,12 @@ jobs:
 
       - name: Zip Assets
         run: |
-          powershell Compress-Archive -Path "assets\*" -DestinationPath ".NovaFlare Engine.zip"
-
+          powershell Compress-Archive -Path "assets\*" -DestinationPath ".\NovaFlare-Engine.zip"
       - name: Upload Zip File
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@main
         with:
-          name: NovaFlare-Engine
-          path: ".NovaFlare Engine.zip"
+          name: NovaFlare Engine.zip
+          path: ".NovaFlare-Engine.zip"
 
       - name: Setup Haxe
         uses: krdlab/setup-haxe@master
