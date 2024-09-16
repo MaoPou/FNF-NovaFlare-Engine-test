@@ -76,7 +76,7 @@
 	<section if="TITLE_SCREEN_EASTER_EGG">
 		<assets path="assets/secrets" rename="assets/shared" exclude="*.ogg" if="web"/>
 		<assets path="assets/secrets" rename="assets/shared" exclude="*.mp3"  unless="web"/>
-	-->
+	
 	</section>
         
 	<library name="videos"        preload="true" if="VIDEOS_ALLOWED"/>
