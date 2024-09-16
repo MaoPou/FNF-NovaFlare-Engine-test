@@ -520,12 +520,7 @@ class TitleState extends MusicBeatState
 					if (mustUpdate && !OutdatedState.leftState) {					   
 						MusicBeatState.switchState(new OutdatedState());
 					} else {
-						if(ClientPrefs.data.needpass)
-		                                {
-		                                    MusicBeatState.switchState(new PasswordState());
-		                                } else {
-						    MusicBeatState.switchState(new MainMenuState());
-					        }
+						MusicBeatState.switchState(new MainMenuState());
 					}
 					closedState = true;
 				});
@@ -678,7 +673,6 @@ class TitleState extends MusicBeatState
 				case 4:
 					#if PSYCH_WATERMARKS
 					addMoreText('Hoyou', 40);
-					addMoreText('MaoPou', 40);
 					#else
 					addMoreText('present');
 					#end

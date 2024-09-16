@@ -164,7 +164,6 @@ import states.TitleState;
 		'botplay' => false,
 		'opponentplay' => false
 	];
-	public var needpass:Bool = true;
 }
 
 class ClientPrefs {
