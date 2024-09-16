@@ -31,7 +31,7 @@ jobs:
         run: mkdir -p zip-output
 
       - name: Zip Assets
-        run: zip -r zip-output/NovaFlare-Engine.zip assets
+        run: zip -r zip-output/NovaFlare-Engine-assets.zip assets
 
       - name: flies miss
         run: ls -R zip-output
@@ -39,8 +39,8 @@ jobs:
       - name: Upload Zip File
         uses: actions/upload-artifact@main
         with:
-          name: NovaFlare-Engine
-          path: zip-output/NovaFlare-Engine.zip
+          name: NovaFlare-Engine-assets
+          path: zip-output/NovaFlare-Engine-assets.zip
           
       - name: Setup Android NDK
         uses: nttld/setup-ndk@main
