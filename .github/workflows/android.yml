@@ -23,25 +23,7 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@main
-
-      - name: Install zip
-        run: sudo apt-get install -y zip
-
-      - name: Create Directory
-        run: mkdir -p zip-output
-
-      - name: Zip Assets
-        run: zip -r zip-output/NovaFlare-Engine-assets.zip assets
-
-      - name: flies miss
-        run: ls -R zip-output
-
-      - name: Upload Zip File
-        uses: actions/upload-artifact@main
-        with:
-          name: NovaFlare-Engine-assets
-          path: zip-output/NovaFlare-Engine-assets.zip
-          
+        
       - name: Setup Android NDK
         uses: nttld/setup-ndk@main
         id: setup-ndk 
