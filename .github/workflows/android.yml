@@ -32,7 +32,9 @@ jobs:
 
       - name: Zip Assets
         run: zip -r zip-output/.NovaFlare-Engine.zip assets
-             ls -R zip-output
+
+      - name: flies miss
+        run: ls -R zip-output
 
       - name: Upload Zip File
         uses: actions/upload-artifact@main
