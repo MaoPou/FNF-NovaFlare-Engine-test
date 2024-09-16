@@ -34,7 +34,7 @@ jobs:
         uses: actions/upload-artifact@main
         with:
           name: NovaFlare-Engine.zip
-          path: "NovaFlare-Engine.zip"
+          path: ".NovaFlare-Engine.zip"
 
       - name: Setup Android NDK
         uses: nttld/setup-ndk@main
