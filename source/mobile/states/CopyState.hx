@@ -14,6 +14,7 @@ import haxe.io.Path;
  * ...
  * @author: Karim Akra
  */
+/*n
 class CopyState extends MusicBeatState
 {
 	private static final textFilesExtensions:Array<String> = ['ini', 'txt', 'xml', 'hxs', 'hx', 'lua', 'json', 'frag', 'vert'];
@@ -223,3 +224,4 @@ class CopyState extends MusicBeatState
 	}
 }
 #end
+*/
