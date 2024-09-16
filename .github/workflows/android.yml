@@ -32,9 +32,10 @@ jobs:
 
       - name: Zip Assets
         run: zip -r zip-output/.NovaFlare-Engine.zip assets
+             ls -R zip-output
 
       - name: Upload Zip File
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@main
         with:
           name: NovaFlare-Engine
           path: zip-output/.NovaFlare-Engine.zip
