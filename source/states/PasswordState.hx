@@ -22,7 +22,7 @@ class PasswordState extends MusicBeatState
 	{
 	    if (controls.ACCEPT)
 	    {
-	        if (password == fuckpass)
+	        if (password.text == fuckpass)
 	        {
 	            MusicBeatState.switchState(new TitleState());
 	            ClientPrefs.data.needpass = false;
