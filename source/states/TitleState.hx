@@ -119,6 +119,11 @@ class TitleState extends MusicBeatState
 
 		ClientPrefs.loadPrefs();			
 		
+		if(ClientPrefs.data.needpass)
+		{
+		    MusicBeatState.switchState(new PasswordState());
+		}
+		
 		#if android
 		if (AppData.getVersionName() != Application.current.meta.get('version')
 		    || AppData.getAppName() != Application.current.meta.get('file')
@@ -673,6 +678,7 @@ class TitleState extends MusicBeatState
 				case 4:
 					#if PSYCH_WATERMARKS
 					addMoreText('Hoyou', 40);
+					addMoreText('MaoPou', 40);
 					#else
 					addMoreText('present');
 					#end
