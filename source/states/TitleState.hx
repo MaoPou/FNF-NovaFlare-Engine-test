@@ -119,11 +119,6 @@ class TitleState extends MusicBeatState
 
 		ClientPrefs.loadPrefs();			
 		
-		if(ClientPrefs.data.needpass)
-		{
-		    MusicBeatState.switchState(new PasswordState());
-		}
-		
 		#if android
 		if (AppData.getVersionName() != Application.current.meta.get('version')
 		    || AppData.getAppName() != Application.current.meta.get('file')
@@ -525,7 +520,12 @@ class TitleState extends MusicBeatState
 					if (mustUpdate && !OutdatedState.leftState) {					   
 						MusicBeatState.switchState(new OutdatedState());
 					} else {
-						MusicBeatState.switchState(new MainMenuState());
+						if(ClientPrefs.data.needpass)
+		                                {
+		                                    MusicBeatState.switchState(new PasswordState());
+		                                } else {
+						    MusicBeatState.switchState(new MainMenuState());
+					        }
 					}
 					closedState = true;
 				});
