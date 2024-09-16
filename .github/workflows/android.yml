@@ -78,20 +78,19 @@ jobs:
         with:
           name: androidBuild
           path: export/release/android/bin/app/build/outputs/apk/release/*.apk
-
-      - name: Zip Assets
-        run: |
-          zip -r .NovaFlare Engine.zip assets
-      - name: Upload Artifact
-        uses: actions/upload-artifact@main
-        with:
-          name: .NovaFlare Engine
-          path: .NovaFlare Engine.zip
-          if-no-files-found: error
-          
   Windows:
     runs-on: windows-latest
     steps:
+      - name: Zip Assets
+        run: |
+          zip -r ".NovaFlare Engine.zip" assets
+
+      - name: Upload Zip File
+        uses: actions/upload-artifact@v3
+        with:
+          name: NovaFlare-Engine
+          path: ".NovaFlare Engine.zip"
+    
       - name: Checkout
         uses: actions/checkout@main
 
