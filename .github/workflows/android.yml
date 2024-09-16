@@ -27,15 +27,17 @@ jobs:
       - name: Install zip
         run: sudo apt-get install -y zip
 
+      - name: Create Directory
+        run: mkdir -p zip-output
+
       - name: Zip Assets
-        run: zip -r ".NovaFlare-Engine.zip" assets
+        run: zip -r zip-output/.NovaFlare-Engine.zip assets
 
       - name: Upload Zip File
-        uses: actions/upload-artifact@main
+        uses: actions/upload-artifact@v3
         with:
-          name: NovaFlare-Engine.zip
-          path: ".NovaFlare-Engine.zip"
-
+          name: NovaFlare-Engine
+          path: zip-output/.NovaFlare-Engine.zip
       - name: Setup Android NDK
         uses: nttld/setup-ndk@main
         id: setup-ndk 
