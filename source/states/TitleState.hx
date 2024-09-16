@@ -22,11 +22,11 @@ import shaders.ColorblindFilter;
 import states.StoryMenuState;
 import states.OutdatedState;
 import states.MainMenuState;
-/*
+
 #if mobile
 import mobile.states.CopyState;
 #end
-*/
+
 import lime.app.Application;
 
 #if hxvlc
@@ -130,7 +130,7 @@ class TitleState extends MusicBeatState
 			)
 			FlxG.switchState(new PirateState());
 		#end
-		/*
+		
 		#if mobile
 		if(!CopyState.checkExistingFiles() && !ignoreCopy && ClientPrefs.data.filesCheck){
 		    ClientPrefs.data.filesCheck = false;
@@ -139,7 +139,7 @@ class TitleState extends MusicBeatState
 			return;
 		}
 		#end
-                */
+
 		#if LUA_ALLOWED
         	#if (android && EXTERNAL || MEDIA)
         try {

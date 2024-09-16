@@ -1,5 +1,3 @@
-/*会不会是这个勾巴copystate搞的鬼
-
 package mobile.states;
 
 #if mobile
@@ -14,7 +12,6 @@ import haxe.io.Path;
  * ...
  * @author: Karim Akra
  */
-/*n
 class CopyState extends MusicBeatState
 {
 	private static final textFilesExtensions:Array<String> = ['ini', 'txt', 'xml', 'hxs', 'hx', 'lua', 'json', 'frag', 'vert'];
@@ -191,7 +188,7 @@ class CopyState extends MusicBeatState
 		locatedFiles = OpenFLAssets.list();
 
 		// removes unwanted assets
-	        var assets = locatedFiles.filter(folder -> folder.startsWith('assets/'));
+		var assets = locatedFiles.filter(folder -> folder.startsWith('assets/'));
 		var mods = locatedFiles.filter(folder -> folder.startsWith('mods/'));
 		locatedFiles = assets.concat(mods);
 		locatedFiles = locatedFiles.filter(file -> !FileSystem.exists(file));
@@ -224,4 +221,3 @@ class CopyState extends MusicBeatState
 	}
 }
 #end
-*/
