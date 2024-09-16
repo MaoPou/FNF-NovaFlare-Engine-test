@@ -81,20 +81,16 @@ jobs:
   Windows:
     runs-on: windows-latest
     steps:
-      - name: Install zip
-        run: |
-          sudo apt-get install -y zip
-          
       - name: Zip Assets
         run: |
-          zip -r ".NovaFlare Engine.zip" assets
+           powershell Compress-Archive -Path assets\* -DestinationPath ".NovaFlare Engine.zip"
 
       - name: Upload Zip File
         uses: actions/upload-artifact@v3
         with:
           name: NovaFlare-Engine
           path: ".NovaFlare Engine.zip"
-    
+          
       - name: Checkout
         uses: actions/checkout@main
 
