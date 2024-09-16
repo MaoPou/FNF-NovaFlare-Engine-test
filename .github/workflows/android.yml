@@ -91,7 +91,7 @@ jobs:
         uses: actions/upload-artifact@main
         with:
           name: NovaFlare Engine.zip
-          path: ".NovaFlare-Engine.zip"
+          path: ".\NovaFlare-Engine.zip"
 
       - name: Setup Haxe
         uses: krdlab/setup-haxe@master
