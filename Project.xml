@@ -64,7 +64,7 @@
 	<define name="NO_PRELOAD_ALL" unless="PRELOAD_ALL"/>
 
 	<!-- Assets -->
-	<!--
+	
 	<assets path="assets/fonts" />
 	<assets path="assets/shared"        exclude="*.ogg" if="web"/>
 	<assets path="assets/shared"        exclude="*.mp3" unless="web"/>
@@ -77,7 +77,6 @@
 		<assets path="assets/secrets" rename="assets/shared" exclude="*.ogg" if="web"/>
 		<assets path="assets/secrets" rename="assets/shared" exclude="*.mp3"  unless="web"/>
 	</section>
-	-->
 
 	<library name="videos"        preload="true" if="VIDEOS_ALLOWED"/>
 
