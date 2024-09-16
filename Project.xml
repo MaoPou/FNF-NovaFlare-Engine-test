@@ -64,14 +64,12 @@
 	<define name="NO_PRELOAD_ALL" unless="PRELOAD_ALL"/>
 
 	<!-- Assets -->
-
-	<!--
+	
 	<assets path="assets/fonts" />
+	<!--
 	<assets path="assets/shared"        exclude="*.ogg" if="web"/>
 	<assets path="assets/shared"        exclude="*.mp3" unless="web"/>
-	-->
 	<assets path="assets/videos"        library="videos"        if="VIDEOS_ALLOWED"/>
-	<!--
 	<assets path="assets/songs"         library="songs"         exclude="*.ogg" if="web"/>
 	<assets path="assets/songs"         library="songs"         exclude="*.mp3" unless="web"/>
 	<assets path="assets/week_assets"   library="week_assets"   rename="assets" exclude="*.ogg" if="web"/>
@@ -79,25 +77,21 @@
 	<section if="TITLE_SCREEN_EASTER_EGG">
 		<assets path="assets/secrets" rename="assets/shared" exclude="*.ogg" if="web"/>
 		<assets path="assets/secrets" rename="assets/shared" exclude="*.mp3"  unless="web"/>
-	-->
 	</section>
         
 	<library name="videos"        preload="true" if="VIDEOS_ALLOWED"/>
 
 	<section if="PRELOAD_ALL">
-		<!--
+
 	<library name="songs"         preload="true" />
 	<library name="week_assets"   preload="true" />
-		-->
 	</section>
 
 	<section if="NO_PRELOAD_ALL">
-		<!--
 	<library name="songs"         preload="false" />
 	<library name="week_assets"   preload="false" />
-		-->
 	</section>
-        
+        -->
 	<define name="CHECK_FOR_UPDATES" />
 
 	<section if="MODS_ALLOWED">
