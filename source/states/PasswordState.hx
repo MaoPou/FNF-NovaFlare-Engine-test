@@ -6,14 +6,13 @@ import states.MainMenuState;
 
 class PasswordState extends MusicBeatState
 {
-    public var needpass:Bool = true;
-
+    private var password:FlxUIInputText;
+	                                                                                                                                                                                              private var fuckpass = "immaopou";
     override function create()
 	{
 		super.create();
-		var password:FlxUIInputText;
-	                                                                                                                                                                                                var fuckpass = "immaopou";
 		password = new FlxUIInputText(200, 200, 500, "Please Enter PassWord");
+		add(password);
 		
 		addVirtualPad(NONE, A);
 	}
