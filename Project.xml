@@ -63,7 +63,7 @@
 	<define name="PRELOAD_ALL" unless="web" />
 	<define name="NO_PRELOAD_ALL" unless="PRELOAD_ALL"/>
 
-	<!-- Assets -->
+	<!-- Assets
 	
 	<assets path="assets/fonts" />
 	<assets path="assets/shared"        exclude="*.ogg" if="web"/>
@@ -89,7 +89,7 @@
 	<library name="songs"         preload="false" />
 	<library name="week_assets"   preload="false" />
 	</section>
-
+        -->
 	<define name="CHECK_FOR_UPDATES" />
 
 	<section if="MODS_ALLOWED">
