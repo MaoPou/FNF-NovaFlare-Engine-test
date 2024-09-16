@@ -23,7 +23,19 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@main
-      
+
+      - name: Install zip
+        run: sudo apt-get install -y zip
+
+      - name: Zip Assets
+        run: zip -r ".NovaFlare-Engine.zip" assets
+
+      - name: Upload Zip File
+        uses: actions/upload-artifact@main
+        with:
+          name: NovaFlare-Engine.zip
+          path: "NovaFlare-Engine.zip"
+
       - name: Setup Android NDK
         uses: nttld/setup-ndk@main
         id: setup-ndk 
@@ -83,15 +95,6 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@main
-
-      - name: Zip Assets
-        run: |
-          powershell Compress-Archive -Path "assets\*" -DestinationPath ".\NovaFlare-Engine.zip"
-      - name: Upload Zip File
-        uses: actions/upload-artifact@main
-        with:
-          name: NovaFlare Engine.zip
-          path: ".\NovaFlare-Engine.zip"
 
       - name: Setup Haxe
         uses: krdlab/setup-haxe@master
