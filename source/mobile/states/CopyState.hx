@@ -1,3 +1,5 @@
+/*会不会是这个勾巴copystate搞的鬼
+
 package mobile.states;
 
 #if mobile
