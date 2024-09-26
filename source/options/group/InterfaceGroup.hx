@@ -40,20 +40,6 @@ class InterfaceGroup
         follow.addOption(option);
 
         var option:Option = new Option(
-            Language.getStr('skipTitleVideo'),
-            'skipTitleVideo',
-            BOOL
-        );
-        follow.addOption(option);
-
-        var option:Option = new Option(
-            Language.getStr('freeplayOld'),
-            'freeplayOld',
-            BOOL
-        );
-        follow.addOption(option);
-
-        var option:Option = new Option(
             Language.getStr('resultsScreen'),
             'resultsScreen',
             BOOL
