@@ -37,13 +37,6 @@ class SkinGroup
         }
         
         var option:Option = new Option(
-            Language.getStr('noteRGB'),
-            'noteRGB',
-            BOOL
-        );
-        follow.addOption(option);
-
-        var option:Option = new Option(
             Language.getStr('NotesSubState'),
             'NotesSubState',
             STATE
@@ -76,29 +69,5 @@ class SkinGroup
             );
             follow.addOption(option);
         }
-
-        var option:Option = new Option(
-            Language.getStr('splashRGB'),
-            'splashRGB',
-            BOOL
-        );
-        follow.addOption(option);
-
-        var option:Option = new Option(
-            Language.getStr('showSplash'),
-            'showSplash',
-            BOOL
-        );
-        follow.addOption(option);
-
-        var option:Option = new Option(
-            Language.getStr('splashAlpha'),
-            'splashAlpha',
-            FLOAT,
-            0,
-            1,
-            1
-        );
-        follow.addOption(option);
     }
 }
