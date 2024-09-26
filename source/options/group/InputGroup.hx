@@ -85,21 +85,5 @@ class InputGroup
             1
         );
         follow.addOption(option);
-
-        var option:Option = new Option(
-            Language.getStr('extraKey'),
-            'extraKey',
-            INT,
-            0,
-            4
-        );
-        follow.addOption(option);
-
-        var option:Option = new Option(
-            Language.getStr('MobileExtraControl'),
-            'MobileExtraControl',
-            STATE
-        );
-        follow.addOption(option);
     }
 }
