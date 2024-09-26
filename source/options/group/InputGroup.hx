@@ -22,13 +22,6 @@ class InputGroup
         follow.addOption(option);
 
         var option:Option = new Option(
-            'password',
-            'PasswordState',
-            STATE
-        );
-        follow.addOption(option);
-
-        var option:Option = new Option(
             Language.getStr('TouchMain'),
             TEXT
         );
