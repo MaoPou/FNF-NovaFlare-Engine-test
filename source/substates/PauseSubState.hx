@@ -209,7 +209,7 @@ class PauseSubState extends MusicBeatSubstate
 			debugType.insert(1, 'Skip Time');
 	
 		for (i in 0...debugType.length) {
-			var optionText:FlxText = new FlxText(0, 0, 0, debugType[i], 50);
+			var optionText:FlxText = new FlxText(0, 0, 0, Language.get(debugType[i].toLowerCase(), 'pa'), 50);
 		
 			optionText.x = -1000;
 			optionText.y = (i - debugCurSelected) * 180 + 325;
@@ -276,7 +276,7 @@ class PauseSubState extends MusicBeatSubstate
 		missingText.antialiasing = ClientPrefs.data.antialiasing;
 		add(missingText);
 	
-		boolText = new FlxText(0, 720, 0, 'OFF', 24);
+		boolText = new FlxText(0, 720, 0, Language.get('off', 'pa'), 24);
 		boolText.setFormat(font, 24, FlxColor.BLACK);
 		boolText.antialiasing = ClientPrefs.data.antialiasing;
 		add(boolText);
@@ -306,25 +306,29 @@ class PauseSubState extends MusicBeatSubstate
 		songText.updateHitbox();
 		add(songText);
 		
-		ballText = new FlxText(0, 15, 0, 'Blueballed: ' + PlayState.deathCounter, 32);
+		ballText = new FlxText(0, 15, 0, Language.get('blueballed', 'pa') + ': ' + PlayState.deathCounter, 32);
 		ballText.setFormat(font, 25);
 		ballText.updateHitbox();
 		ballText.antialiasing = ClientPrefs.data.antialiasing;
 		add(ballText);
 		
-		practiceText = new FlxText(0, 15, 0, 'Practice Mode: ' + (PlayState.instance.practiceMode ? 'ON' : 'OFF'), 32);
+		
+		
+		practiceText = new FlxText(0, 15, 0, Language.get('practicemode', 'pa') + ': ' + (PlayState.instance.practiceMode ? 'ON' : 'OFF'), 32);
 		practiceText.setFormat(font, 25);
 		practiceText.updateHitbox();
 		practiceText.antialiasing = ClientPrefs.data.antialiasing;
 		add(practiceText);
 		
-		botText = new FlxText(0, 15, 0, 'Botplay: ' + (PlayState.instance.cpuControlled ? 'ON' : 'OFF'), 32);
+		botText = new FlxText(0, 15, 0, Language.get('botplay', 'pa') + ': ' + (PlayState.instance.cpuControlled ? 'ON' : 'OFF'), 32);
 		botText.setFormat(font, 25);
 		botText.updateHitbox();
 		botText.antialiasing = ClientPrefs.data.antialiasing;
 		add(botText);
 		
-		cheatingText = new FlxText(0, 15, 0, 'Cheating: ' + (PlayState.chartingMode ? 'ON' : 'OFF'), 32);
+		
+		
+		cheatingText = new FlxText(0, 15, 0, Language.get('cheating', 'pa') + ': ' + (PlayState.chartingMode ? Language.get('on', 'pa') : Language.get('off', 'pa')), 32);
 		cheatingText.setFormat(font, 25);
 		cheatingText.updateHitbox();
 		cheatingText.antialiasing = ClientPrefs.data.antialiasing;
@@ -383,13 +387,14 @@ class PauseSubState extends MusicBeatSubstate
 		
 		songText.text = PlayState.SONG.song + ' - ' + Difficulty.getString().toUpperCase();
 		
-		ballText.text = 'Blueballed: ' + PlayState.deathCounter;
+		ballText.text = Language.get('blueballed', 'pa') + ': ' + PlayState.deathCounter;
 		
-		practiceText.text = 'Practice Mode: ' + (PlayState.instance.practiceMode ? 'ON' : 'OFF');
+		practiceText.text = Language.get('practicemode', 'pa') + ': ' + (PlayState.instance.practiceMode ? Language.get('on', 'pa') : Language.get('off', 'pa'));
 		
-		botText.text = 'Botplay: ' + (PlayState.instance.cpuControlled ? 'ON' : 'OFF');
+		botText.text = Language.get('botplay', 'pa') + ': ' + (PlayState.instance.cpuControlled ? Language.get('on', 'pa') : Language.get('off', 'pa'));
 
-		cheatingText.text = 'Chart editor debug: ' + (PlayState.chartingMode ? 'ON' : 'OFF');
+		cheatingText.text = Language.get('charteditordebug', 'pa') + ': ' + (PlayState.chartingMode ? Language.get('on', 'pa') : Language.get('off', 'pa'));
+		
 		
 		
 		for (i in menuText)
