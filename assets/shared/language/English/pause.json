@@ -1,10 +1,18 @@
 {	
-	"restart": "Restart",
+    "restart": "Restart",
     "continues": "Continue",
     "difficulty": "Difficulty",
     "editor": "Editor",
     "options": "Options",
     "exit": "Exit",
     "back": "Back",
-    "debug": "Debug"
+    "debug": "Debug",
+    "off": "OFF",
+    "on": "ON",
+    "blueballed" :"BlueBalled",
+    "practice" :"Practice",
+    "practicemode" :"Practice Mode",
+    "botplay" :"Botplay",
+    "cheating" :"Chart Editor Debug",
+    "skiptime" :"Skip Time"
 }
