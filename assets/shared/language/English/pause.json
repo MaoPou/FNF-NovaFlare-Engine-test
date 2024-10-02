@@ -1,10 +1,14 @@
 {	
-	"restart": "Restart",
+    "restart": "Restart",
     "continues": "Continue",
     "difficulty": "Difficulty",
     "editor": "Editor",
     "options": "Options",
     "exit": "Exit",
     "back": "Back",
-    "debug": "Debug"
+    "debug": "Debug",
+    "leave": "Leave",
+    "practice": "Practice",
+    "botplay": "Botplay",
+    "back": "Back"
 }
