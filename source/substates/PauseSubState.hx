@@ -209,7 +209,7 @@ class PauseSubState extends MusicBeatSubstate
 			debugType.insert(1, 'Skip Time');
 	
 		for (i in 0...debugType.length) {
-			var optionText:FlxText = new FlxText(0, 0, 0, debugType[i], 50);
+			var optionText:FlxText = new FlxText(0, 0, 0, Language.get(debugType[i].toLowerCase(), 'pa'), 50);
 		
 			optionText.x = -1000;
 			optionText.y = (i - debugCurSelected) * 180 + 325;
