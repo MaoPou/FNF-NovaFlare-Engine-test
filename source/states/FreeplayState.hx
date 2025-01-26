@@ -699,6 +699,7 @@ class FreeplayState extends MusicBeatState
 			return;
 		}
 
+		var noteSeq:Array<Dynamic> = [];
 		Thread.create(() -> {			
 			rateMutex.acquire();
 			for (i in jsonData.notes) // sections
@@ -708,16 +709,27 @@ class FreeplayState extends MusicBeatState
 					var gottaHitNote:Bool = i.mustHitSection;
 					if ((ii[1] >= 4 && !gottaHitNote) || (ii[1] <= 3 && gottaHitNote))
 						count++;
+					var k = jsonData.notes[i].sectionNotes[ii][1];
+					var h = jsonData.notes[i].sectionNotes[ii][0];
+			
+					if (jsonData.notes[i].sectionNotes[ii][2] != 0){
+					    t = jsonData.notes[i].sectionNotes[ii][0] + jsonData.notes[i].sectionNotes[ii][2];
+					} else {
+						    t = -1;
+					} 
+					
+					var speedMultiplier = ClientPrefs.getGameplaySetting('songspeed') * ClientPrefs.getGameplaySetting('scrollspeed');
+					h = Math.floor(h * speedMultiplier);
+                    			t = (t != -1) ? Math.floor(t * speedMultiplier) : -1;
+
+                    			noteSeq.push({k: k, h: h, t: t});
 				}
 			}
-
-			var rate = DiffCalc.CalculateDiff(Song.loadFromJson(poop, songs[curSelected].songName.toLowerCase())) / 5;
-			rate = FlxMath.roundDecimal(rate, 2);
 			speed = FlxMath.roundDecimal(speed, 2);
 
 			infoNote.maxData = Math.floor(rate * 300);
 			infoNote.data = count;
-			infoRating.data = rate;
+			infoRating.data = DiffCalc.calculate(jsonData,noteSeq);
 			infoSpeed.data = speed;
 
 			rateMutex.release();
