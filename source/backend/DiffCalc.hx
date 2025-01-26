@@ -13,7 +13,7 @@ class Calculator {
 		
         var p = jsonData.notes.sectionNotes;
         
-        var x = 0.3 * Math.pow((64.5 - Math.ceil(18)) / 500, 0.5);
+        var x:Float = 0.3 * Math.pow((64.5 - Math.ceil(18)) / 500, 0.5);
         
         noteSeq.sort(function(a, b) {
             if (a.h == b.h) {
@@ -168,13 +168,14 @@ class Calculator {
         for (k in 0...K + 1) {
             var X_k:Array<Float> = [];
             for (s in 0...T) X_k.push(0);
+            var notesInPair:Array<Dynamic>;
             if (k == 0) {
-                var notesInPair = noteSeqByColumn[0];
+                notesInPair = noteSeqByColumn[0];
             } else if (k == K) {
                 notesInPair = noteSeqByColumn[K - 1];
             } else {
                 // Note: Haxe does not have a direct equivalent of heapq.merge. Sorting is handled differently.
-                var notesInPair:Array<Dynamic> = noteSeqByColumn[k - 1].concat(noteSeqByColumn[k]);
+                notesInPair = noteSeqByColumn[k - 1].concat(noteSeqByColumn[k]);
                 notesInPair.sort(function(a, b) {
                     return a.h - b.h;
                 });
@@ -344,7 +345,7 @@ class Calculator {
         var I:Array<Float> = [];
         for (i in 0...LNSeq.length) I.push(0);
         for (i in 0...LNSeq.length) {
-            var tail = tail_seq[i];
+            var tail = LNSeq[i];
             var nextNote = find_next_note_in_column(tail, noteSeqByColumn);
             var I_h:Float = 0.001 * Math.abs(tail.t - tail.h - 80) / x;
             var I_t:Float = 0.001 * Math.abs(nextNote.h - tail.t - 80) / x;
@@ -357,9 +358,9 @@ class Calculator {
             Is.push(0);
             R.push(0);
         }
-        for (i in 0...tail_seq.length - 1) {
-            var delta_r:Float = 0.001 * (tail_seq[i + 1].t - tail_seq[i].t);
-            for (s in tail_seq[i].t...tail_seq[i + 1].t) {
+        for (i in 0...LNSeq.length - 1) {
+            var delta_r:Float = 0.001 * (LNSeq[i + 1].t - LNSeq[i].t);
+            for (s in LNSeq[i].t...LNSeq[i + 1].t) {
                 Is[s] = 1 + I[i];
                 R[s] = 0.08 * Math.pow(delta_r, -0.5) * Math.pow(x, -1) * (1 + lambda4 * (I[i] + I[i + 1]));
             }
@@ -392,35 +393,55 @@ class Calculator {
             K_s.push(Math.max(count, 1));
         }
 
-        // Since Haxe does not have a built-in DataFrame like pandas, we use a custom structure or external library.
-        // For simplicity, we will assume a DataFrame-like structure exists.
-        var df = new DataFrame();
-        df.setColumn("Jbar", Jbar);
-        df.setColumn("Xbar", Xbar);
-        df.setColumn("Pbar", Pbar);
-        df.setColumn("Abar", Abar);
-        df.setColumn("Rbar", Rbar);
-        df.setColumn("C", C);
-        df.setColumn("Ks", K_s);
-        df.clipLower(0);
+        // Since Haxe does not have a built-in DataFrame like pandas, we use a StringMap as a replacement.
+        var df = new StringMap<Array<Float>>();
+        df.set("Jbar", Jbar);
+        df.set("Xbar", Xbar);
+        df.set("Pbar", Pbar);
+        df.set("Abar", Abar);
+        df.set("Rbar", Rbar);
+        df.set("C", C);
+        df.set("Ks", K_s);
+        // Assuming a clipLower function; implement accordingly if needed.
+        // df.clipLower(0);
 
-        df.setColumn("S", 
-            Math.pow(
-                (w0 * Math.pow(Math.pow(df.getColumn("Abar"), 3 / df.getColumn("Ks")) * df.getColumn("Jbar"), 1.5)) +
-                ((1 - w0) * Math.pow(Math.pow(df.getColumn("Abar"), 2 / 3) * (0.8 * df.getColumn("Pbar") + df.getColumn("Rbar")), 1.5)),
+        // Calculating column "S"
+        var S:Array<Float> = [];
+        for (i in 0...T) S.push(0);
+        for (s in 0...T) {
+            var term1:Float = Math.pow(Math.pow(df.get("Abar")[s], 3 / df.get("Ks")[s]) * df.get("Jbar")[s], 1.5);
+            var term2:Float = Math.pow(Math.pow(df.get("Abar")[s], 2 / 3) * (0.8 * df.get("Pbar")[s] + df.get("Rbar")[s]), 1.5);
+            S[s] = Math.pow(
+                (w0 * term1) +
+                ((1 - w0) * term2),
                 2 / 3
-            )
-        );
-        df.setColumn("T", (Math.pow(df.getColumn("Abar"), 3 / df.getColumn("Ks")) * df.getColumn("Xbar")) / 
-            (df.getColumn("Xbar") + df.getColumn("S") + 1));
-        df.setColumn("D", w1 * Math.pow(df.getColumn("S"), 0.5) * Math.pow(df.getColumn("T"), p1) + df.getColumn("S") * w2);
+            );
+        }
+        df.set("S", S);
+
+        // Calculating column "T"
+        var T_col:Array<Float> = [];
+        for (i in 0...T) T_col.push(0);
+        for (s in 0...T) {
+            T_col[s] = (Math.pow(df.get("Abar")[s], 3 / df.get("Ks")[s]) * df.get("Xbar")[s]) / 
+                (df.get("Xbar")[s] + df.get("S")[s] + 1);
+        }
+        df.set("T", T_col);
+
+        // Calculating column "D"
+        var D:Array<Float> = [];
+        for (i in 0...T) D.push(0);
+        for (s in 0...T) {
+            D[s] = w1 * Math.pow(df.get("S")[s], 0.5) * Math.pow(df.get("T")[s], p1) + df.get("S")[s] * w2;
+        }
+        df.set("D", D);
 
         // Calculating SR
         var sumDlambdaN_C:Float = 0;
         var sumC:Float = 0;
         for (i in 0...T) {
-            sumDlambdaN_C += Math.pow(df.get("D", i), lambdaN) * df.get("C", i);
-            sumC += df.get("C", i);
+            sumDlambdaN_C += Math.pow(df.get("D")[i], lambdaN) * df.get("C")[i];
+            sumC += df.get("C")[i];
         }
         var SR:Float = Math.pow(sumDlambdaN_C / Math.max(Math.pow(10, -9), sumC), 1 / lambdaN);
         SR = Math.pow(SR, p0) / Math.pow(8, p0) * 8;
@@ -435,17 +456,17 @@ class Calculator {
         /*
         var plt = new Matplotlib();
         plt.figure(10, 6);
-        // plt.plot(df.getColumn("Jbar"), label="Jbar", marker="o", linewidth=0.5, markersize=1, color="orange");
-        // plt.plot(df.getColumn("Xbar"), label="Xbar", marker="o", linewidth=0.5, markersize=1, color="#3333FF");
-        // plt.plot(df.getColumn("Pbar"), label="Pbar", marker="o", linewidth=0.5, markersize=1, color="green");
-        // plt.plot(df.getColumn("Rbar"), label="Rbar", marker="o", linewidth=0.5, markersize=1, color="purple");
-        // plt.plot(df.getColumn("S"), label="S", marker="o", linewidth=0.5, markersize=4);
-        plt.plot(df.getColumn("D"), label="D", marker="o", linewidth=0.5, markersize=2, color="orange");
-        plt.plot(df.getColumn("Ks"), label="Ks", marker="o", linewidth=0.5, markersize=2, color="red");
+        // plt.plot(df.get("Jbar"), label="Jbar", marker="o", linewidth=0.5, markersize=1, color="orange");
+        // plt.plot(df.get("Xbar"), label="Xbar", marker="o", linewidth=0.5, markersize=1, color="#3333FF");
+        // plt.plot(df.get("Pbar"), label="Pbar", marker="o", linewidth=0.5, markersize=1, color="green");
+        // plt.plot(df.get("Rbar"), label="Rbar", marker="o", linewidth=0.5, markersize=1, color="purple");
+        // plt.plot(df.get("S"), label="S", marker="o", linewidth=0.5, markersize=4);
+        plt.plot(df.get("D"), label="D", marker="o", linewidth=0.5, markersize=2, color="orange");
+        plt.plot(df.get("Ks"), label="Ks", marker="o", linewidth=0.5, markersize=2, color="red");
 
         var ax1 = plt.gca();
         var ax2 = ax1.twinx();
-        ax2.plot(df.getColumn("Abar"), label="Abar (Right Axis)", color="r", marker="o", linewidth=0.5, markersize=1);
+        ax2.plot(df.get("Abar"), label="Abar (Right Axis)", color="r", marker="o", linewidth=0.5, markersize=1);
         // Set the limits for the secondary y-axis
         ax2.set_ylim(0, 1);
 
