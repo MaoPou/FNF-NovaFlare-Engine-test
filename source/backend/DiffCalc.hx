@@ -13,7 +13,7 @@ class Calculator {
 		
         var p = jsonData.notes.sectionNotes;
         
-        var x:Int = 6;
+        var x = 0.3 * Math.pow((64.5 - Math.ceil(18)) / 500, 0.5);
         
         noteSeq.sort(function(a, b) {
             if (a.h == b.h) {
