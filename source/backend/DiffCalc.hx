@@ -64,7 +64,7 @@ class Calculator {
             return a[0].k - b[0].k;
         });
 
-        var K:Int = 4
+        var K:Int = 4;
         var T:Int = 1;
         for (s in noteSeq) {
             if (s.h > T) T = s.h + 1;
