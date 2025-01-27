@@ -30,7 +30,7 @@ class Main {
             noteDict.get(value.k).push(value);
         }
         
-        noteSeq.sort(function(a, b:(Int, Int, Int))):Int {
+        noteSeq.sort(function(a, b:(Int, Int, Int)):Int {
             if (a[1] != b[1]) return a[1] - b[1];
             return a[0] - b[0];
         });
