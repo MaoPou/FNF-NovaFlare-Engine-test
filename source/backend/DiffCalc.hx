@@ -30,10 +30,10 @@ class Main {
             noteDict.get(value.k).push(value);
         }
         
-        noteSeq.sort(function(a, b:(Int, Int, Int):Int {
+        noteSeq.sort(function(a, b:(Int, Int, Int)):Int {
             if (a[1] != b[1]) return a[1] - b[1];
             return a[0] - b[0];
-        }));
+        });
 
         var noteDict:IntMap< Vector<(Int, Int, Int)> > = new IntMap();
         for (value in noteSeq) {
