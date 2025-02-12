@@ -183,7 +183,7 @@ class ResultsScreen extends MusicBeatSubstate
 		var formattedSong:String = Paths.formatToSongPath(poop);
 			    
 	    if (FileSystem.exists(Paths.modsJson(formattedFolder + '/' + formattedSong))){
-            var rate:Float = DiffCalc.CalculateDiff(Song.loadFromJson(poop, game.songName.toLowerCase())) / 5;	
+            var rate:Float = DiffCalc.calculate(Song.loadFromJson(poop, game.songName.toLowerCase()));	
             mesTextAdd('Difficult: ' + Math.ceil(rate * 100) / 100);				
 		}else{
 		    mesTextAdd('Difficult: N/A');				
