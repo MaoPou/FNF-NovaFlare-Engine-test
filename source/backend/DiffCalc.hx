@@ -33,7 +33,9 @@ class Calculator {
         // Preprocessing
         var noteSeqByColumn:Array<Array<Dynamic>> = [];
         for (column in noteDict) {
-            noteSeqByColumn.push(column.value);
+            if (column != null && column.hasOwnProperty("value")) {
+                noteSeqByColumn.push(column.value);
+            }
         }
         noteSeqByColumn.sort(function(a, b) {
             return a[0].k - b[0].k;
