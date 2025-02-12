@@ -711,7 +711,7 @@ class FreeplayState extends MusicBeatState
 				}
 			}
 
-			var rate = DiffCalc.CalculateDiff(Song.loadFromJson(poop, songs[curSelected].songName.toLowerCase())) / 5;
+			var rate = DiffCalc.calculate(Song.loadFromJson(poop, songs[curSelected].songName.toLowerCase()));
 			rate = FlxMath.roundDecimal(rate, 2);
 			speed = FlxMath.roundDecimal(speed, 2);
 
