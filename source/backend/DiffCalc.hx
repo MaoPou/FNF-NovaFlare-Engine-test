@@ -6,7 +6,7 @@ import haxe.ds.ArraySort;
 import Math;
 
 class Calculator {
-    public static function calculate(jsonData:Dynamic, noteSeq:Array<Dynamic> = [], lambda2:Float = 7.0, lambda4:Float = 0.1, w0:Float = 0.4, w1:Float = 2.7, p1:Float = 1.5, w2:Float = 0.27, p0:Float = 1.0):Float {
+    public static function calculate(jsonData:Dynamic, noteSeq:Array<Dynamic> = null, lambda2:Float = 7.0, lambda4:Float = 0.1, w0:Float = 0.4, w1:Float = 2.7, p1:Float = 1.5, w2:Float = 0.27, p0:Float = 1.0):Float {
         var lambdaN:Float = 5;
         var lambda1:Float = 0.11;
         var lambda3:Float = 24;
