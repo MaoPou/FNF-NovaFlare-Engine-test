@@ -6,29 +6,29 @@ import haxe.ds.ArraySort;
 import Math;
 
 class DataFrame {
-    private var data:Map<String, Array<Dynamic>>;
+    private var data:haxe.ds.StringMap<Array<Dynamic>>;
 
-    public function new(data:Map<String, Array<Dynamic>>) {
+    public function new(data:haxe.ds.StringMap<Array<Dynamic>>) {
         this.data = data;
     }
 
     public function print() {
-        var columns = data.keys().toArray();
-        var rows = data.values().toArray()[0].length;
+        var columns = haxe.ds.StringMap.keys(data).toArray();
+        var rows = haxe.ds.StringMap.values(data).toArray()[0].length;
 
         trace(columns.join("\t"));
-
+	    
         for (i in 0...rows) {
             var row = columns.map(function(col) return data.get(col)[i]);
             trace(row.join("\t"));
         }
     }
-	
+
     public function mean(column:String):Float {
         var values = data.get(column);
         if (values == null) throw "Column not found: $column";
 
-        var sum  =0.0;
+        var sum = 0.0;
         for (value in values) {
             if (Std.isOfType(value, Float)) {
                 sum += value;
@@ -38,19 +38,19 @@ class DataFrame {
         }
         return sum / values.length;
     }
-	
+
     public function filter(column:String, value:Dynamic):DataFrame {
         var values = data.get(column);
         if (values == null) throw "Column not found: $column";
 
-        var filteredData = new Map<String, Array<Dynamic>>();
-        for (col in data.keys()) {
+        var filteredData = new haxe.ds.StringMap<Array<Dynamic>>();
+        for (col in haxe.ds.StringMap.keys(data)) {
             filteredData.set(col, []);
         }
 
         for (i in 0...values.length) {
             if (values[i] == value) {
-                for (col in data.keys()) {
+                for (col in haxe.ds.StringMap.keys(data)) {
                     filteredData.get(col).push(data.get(col)[i]);
                 }
             }
@@ -60,13 +60,12 @@ class DataFrame {
     }
 
     public function setColumn(column:String, values:Array<Dynamic>) {
-        if (values.length != data.values().toArray()[0].length) {
+        if (values.length != haxe.ds.StringMap.values(data).toArray()[0].length) {
             throw "New column length does not match existing data length";
         }
         data.set(column, values);
     }
 }
-
 
 class Calculator {
     public static function calculate(jsonData:Dynamic, noteSeq:Array<Dynamic> = null, lambda2:Float = 7.0, lambda4:Float = 0.1, w0:Float = 0.4, w1:Float = 2.7, p1:Float = 1.5, w2:Float = 0.27, p0:Float = 1.0):Float {
