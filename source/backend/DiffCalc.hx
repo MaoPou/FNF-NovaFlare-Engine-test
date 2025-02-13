@@ -95,7 +95,7 @@ class Calculator {
         // Preprocessing
         var noteSeqByColumn:Array<Array<Dynamic>> = [];
         for (column in noteDict) {
-            if (column != null && column.hasOwnProperty("value")) {
+            if (column != null && Reflect.hasField(column, "value")) {
                 noteSeqByColumn.push(column.value);
             }
         }
