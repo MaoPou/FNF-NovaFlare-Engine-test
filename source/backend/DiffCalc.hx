@@ -5,6 +5,69 @@ import haxe.ds.IntMap;
 import haxe.ds.ArraySort;
 import Math;
 
+class DataFrame {
+    private var data:Map<String, Array<Dynamic>>;
+
+    public function new(data:Map<String, Array<Dynamic>>) {
+        this.data = data;
+    }
+
+    public function print() {
+        var columns = data.keys().toArray();
+        var rows = data.values().toArray()[0].length;
+
+        trace(columns.join("\t"));
+
+        for (i in 0...rows) {
+            var row = columns.map(function(col) return data.get(col)[i]);
+            trace(row.join("\t"));
+        }
+    }
+	
+    public function mean(column:String):Float {
+        var values = data.get(column);
+        if (values == null) throw "Column not found: $column";
+
+        var sum  =0.0;
+        for (value in values) {
+            if (Std.isOfType(value, Float)) {
+                sum += value;
+            } else {
+                throw "Column $column is not numeric";
+            }
+        }
+        return sum / values.length;
+    }
+	
+    public function filter(column:String, value:Dynamic):DataFrame {
+        var values = data.get(column);
+        if (values == null) throw "Column not found: $column";
+
+        var filteredData = new Map<String, Array<Dynamic>>();
+        for (col in data.keys()) {
+            filteredData.set(col, []);
+        }
+
+        for (i in 0...values.length) {
+            if (values[i] == value) {
+                for (col in data.keys()) {
+                    filteredData.get(col).push(data.get(col)[i]);
+                }
+            }
+        }
+
+        return new DataFrame(filteredData);
+    }
+
+    public function setColumn(column:String, values:Array<Dynamic>) {
+        if (values.length != data.values().toArray()[0].length) {
+            throw "New column length does not match existing data length";
+        }
+        data.set(column, values);
+    }
+}
+
+
 class Calculator {
     public static function calculate(jsonData:Dynamic, noteSeq:Array<Dynamic> = null, lambda2:Float = 7.0, lambda4:Float = 0.1, w0:Float = 0.4, w1:Float = 2.7, p1:Float = 1.5, w2:Float = 0.27, p0:Float = 1.0):Float {
         var lambdaN:Float = 5;
@@ -167,11 +230,12 @@ class Calculator {
 
         // Section 2.4
         var X_ks:Array<Array<Float>> = [];
+	var notesInPair:Dynamic;
         for (k in 0...K + 1) {
             var X_k:Array<Float> = [];
             for (s in 0...T) X_k.push(0);
             if (k == 0) {
-                var notesInPair = noteSeqByColumn[0];
+                notesInPair = noteSeqByColumn[0];
             } else if (k == K) {
                 notesInPair = noteSeqByColumn[K - 1];
             } else {
