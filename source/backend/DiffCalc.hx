@@ -113,6 +113,8 @@ class Calculator {
             return a.t - b.t;
         });
 
+	var tail_seq = LNSeq;
+
         var LNDict:Map<Int, Array<Dynamic>> = new Map();
         for (value in LNSeq) {
             if (!LNDict.exists(value.k)) {
