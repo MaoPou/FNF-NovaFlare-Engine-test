@@ -45,12 +45,9 @@ class InitState extends MusicBeatState
 	override public function create():Void
 	{
 		Paths.clearStoredMemory();
-
-		if (!checkOpenFirst)
-		{
-			FlxTransitionableState.skipNextTransOut = true;
-			checkOpenFirst = true;
-		}
+		
+		FlxTransitionableState.skipNextTransOut = true;
+		FlxTransitionableState.skipNextTransIn = true;
 
 		#if android
 		FlxG.android.preventDefaultKeys = [BACK];
