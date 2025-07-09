@@ -908,7 +908,7 @@ class PauseSubState extends MusicBeatSubstate
 	}
 	
 	function closeSub(){
-	        if(!inPlayState)
+	        if(!ClientPrefs.data.AutoOrientation)
 	                EsOrientation.setScreenOrientation(EsOrientation.ORIENTATION_UNSPECIFIED);
 	        else
                         EsOrientation.setScreenOrientation(EsOrientation.ORIENTATION_PORTRAIT);
