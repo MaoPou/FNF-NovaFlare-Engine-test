@@ -492,7 +492,7 @@ class RelaxSubState extends MusicBeatSubstate
 				}
 			]
 		};
-	
+	}
 	/**
 	 * 切换到下一首歌曲
 	 */
