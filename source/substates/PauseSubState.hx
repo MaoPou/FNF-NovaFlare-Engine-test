@@ -14,6 +14,10 @@ import flixel.util.FlxStringUtil;
 import flixel.addons.transition.FlxTransitionableState;
 import openfl.utils.Assets;
 
+#if mobile
+import extension.eightsines.EsOrientation;
+#end
+
 /*
 	PauseSubState made by TieGuo, code optimized by Beihu.
 	it used at NF Engine
@@ -108,6 +112,8 @@ class PauseSubState extends MusicBeatSubstate
 
 	override function create()
 	{
+	    EsOrientation.setScreenOrientation(EsOrientation.ORIENTATION_UNSPECIFIED);
+	    
 		font = Paths.font(Language.get('fontName', 'ma') + '.ttf');
 		FlxG.sound.play(Paths.sound('scrollMenu'), 0.4);
 		pauseMusic = new FlxSound();
@@ -631,7 +637,7 @@ class PauseSubState extends MusicBeatSubstate
 						FlxG.sound.music.time = pauseMusic.time;
 					}
 				case 'Continues':
-					closeMenu(function(tmr:FlxTimer) close());
+					closeMenu(function(tmr:FlxTimer) close(true));
 				case 'Restart':
 					restartSong();
 				case 'Exit':
@@ -690,7 +696,7 @@ class PauseSubState extends MusicBeatSubstate
 							PlayState.instance.clearNotesBefore(curTime);
 							PlayState.instance.setSongTime(curTime);
 						}
-						close();
+						close(true);
 					}
 				case 'Leave':
 					closeMenu(function(trm:FlxTimer) restartSong());
@@ -899,5 +905,16 @@ class PauseSubState extends MusicBeatSubstate
 		skipTimeText.text = FlxStringUtil.formatTime(Math.max(0, Math.floor(curTime / 1000)), false)
 			+ ' / '
 			+ FlxStringUtil.formatTime(Math.max(0, Math.floor(FlxG.sound.music.length / 1000)), false);
+	}
+	
+	override function close(inPlayState:Bool = false){
+	    if(!ClientPrefs.data.AutoOrientation){
+	        if(!inPlayState)
+	            EsOrientation.setScreenOrientation(EsOrientation.ORIENTATION_UNSPECIFIED);
+	        else
+                    EsOrientation.setScreenOrientation(EsOrientation.ORIENTATION_PORTRAIT);
+	    }
+	    
+	    super.close();
 	}
 }
