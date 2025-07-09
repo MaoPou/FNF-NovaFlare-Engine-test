@@ -102,6 +102,13 @@
       "ref": "main",
       "url": "https://github.com/beihu235/extension-androidtools"
     },
+        {
+      "name": "extension-orientation",
+      "type": "git",
+      "dir": null,
+      "ref": "master",
+      "url": "https://github.com/MaoPou/extension-orientation.git"
+    },
     {
       "name": "funkin.vis",
       "type": "git",
