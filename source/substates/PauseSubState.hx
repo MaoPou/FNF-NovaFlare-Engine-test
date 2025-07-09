@@ -637,7 +637,7 @@ class PauseSubState extends MusicBeatSubstate
 						FlxG.sound.music.time = pauseMusic.time;
 					}
 				case 'Continues':
-					closeMenu(function(tmr:FlxTimer) close(true));
+					closeMenu(function(tmr:FlxTimer) closeSub());
 				case 'Restart':
 					restartSong();
 				case 'Exit':
@@ -696,7 +696,7 @@ class PauseSubState extends MusicBeatSubstate
 							PlayState.instance.clearNotesBefore(curTime);
 							PlayState.instance.setSongTime(curTime);
 						}
-						close(true);
+						closeSub();
 					}
 				case 'Leave':
 					closeMenu(function(trm:FlxTimer) restartSong());
@@ -907,14 +907,12 @@ class PauseSubState extends MusicBeatSubstate
 			+ FlxStringUtil.formatTime(Math.max(0, Math.floor(FlxG.sound.music.length / 1000)), false);
 	}
 	
-	override function close(inPlayState:Bool = false){
-	    if(!ClientPrefs.data.AutoOrientation){
+	function closeSub(){
 	        if(!inPlayState)
-	            EsOrientation.setScreenOrientation(EsOrientation.ORIENTATION_UNSPECIFIED);
+	                EsOrientation.setScreenOrientation(EsOrientation.ORIENTATION_UNSPECIFIED);
 	        else
-                    EsOrientation.setScreenOrientation(EsOrientation.ORIENTATION_PORTRAIT);
-	    }
+                        EsOrientation.setScreenOrientation(EsOrientation.ORIENTATION_PORTRAIT);
 	    
-	    super.close();
+	        close();
 	}
 }
