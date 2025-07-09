@@ -19,6 +19,9 @@ import states.TitleState;
 	public var cacheOnGPU:Bool = false;
 	public var autoPause:Bool = true;
 	public var gcFreeZone:Bool = true;
+	#if mobile
+        public var AutoOrientation:Bool = false;
+        #end
 
 	// Gameplay
 	public var downScroll:Bool = false;
