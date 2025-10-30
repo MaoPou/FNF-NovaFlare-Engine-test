@@ -166,6 +166,61 @@ class ErrorHandledRuntimeShader extends FlxRuntimeShader implements IErrorHandle
 				// 简化处理：统一写到单一输出 output_FragColor
 				s = s.replace("gl_FragData[0]", "output_FragColor");
 				s = s.replace("gl_FragColor", "output_FragColor");
+
+				// 兼容 OpenGL ES：禁止在全局中使用非 const 初始化
+				// 将使用 openfl_TextureCoordv/openfl_TextureSize 的全局初始化移入 main()
+				var initAssignments:Array<String> = [];
+				var beforeMain:Bool = true;
+				var lines = s.split("\n");
+				for (i in 0...lines.length)
+				{
+					var line = StringTools.trim(lines[i]);
+					if (line.indexOf("void main") != -1)
+					{
+						beforeMain = false;
+					}
+
+					if (beforeMain && (line.indexOf("openfl_TextureCoordv") != -1 || line.indexOf("openfl_TextureSize") != -1))
+					{
+						// 只处理简单的声明赋值：<type> <name> = <expr>;
+						var eqPos = line.indexOf("=");
+						var semiPos = line.lastIndexOf(";");
+						if (eqPos > 0 && semiPos > eqPos)
+						{
+							// 提取左侧（含类型与变量名）与右侧表达式
+							var left = StringTools.trim(line.substr(0, eqPos));
+							var right = StringTools.trim(line.substr(eqPos + 1, semiPos - eqPos - 1));
+							// 提取变量名（最后一个空格之后）
+							var lastSpace = left.lastIndexOf(" ");
+							if (lastSpace > 0)
+							{
+								var varName = StringTools.trim(left.substr(lastSpace + 1));
+								initAssignments.push(varName + " = " + right + ";");
+								// 将声明改为无初始化
+								lines[i] = left + ";";
+							}
+						}
+					}
+				}
+
+				// 若需要，将赋值注入 main() 的起始处（紧随 '{' 之后）
+				if (initAssignments.length > 0)
+				{
+					var rebuilt = lines.join("\n");
+					var mPos = rebuilt.indexOf("void main");
+					if (mPos >= 0)
+					{
+						var bracePos = rebuilt.indexOf("{", mPos);
+						if (bracePos >= 0)
+						{
+							var insertPos = bracePos + 1;
+							var inject = "\n" + initAssignments.join("\n") + "\n";
+							rebuilt = rebuilt.substr(0, insertPos) + inject + rebuilt.substr(insertPos);
+							s = rebuilt;
+						}
+					}
+				}
+
 				return s;
 			}
 
