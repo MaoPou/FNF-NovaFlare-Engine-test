@@ -173,10 +173,6 @@ class Main extends Sprite
 				FlxG.game.stage.quality = openfl.display.StageQuality.BEST;
 		}
 
-		FlxG.fixedTimestep = false;
-		FlxG.game.focusLostFramerate = 60;
-		FlxG.keys.preventDefaultKeys = [TAB];
-
 		#if mobile
 		FlxG.fullscreen = true;
 		#end

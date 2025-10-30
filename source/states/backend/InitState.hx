@@ -62,6 +62,10 @@ class InitState extends MusicBeatState
 		}
 		#end
 
+		FlxG.fixedTimestep = false;
+		FlxG.game.focusLostFramerate = 60;
+		FlxG.keys.preventDefaultKeys = [TAB];
+
 		super.create();
 
 		FlxG.save.bind('funkin', CoolUtil.getSavePath());
