@@ -194,11 +194,12 @@ class LoadingState extends MusicBeatState
 
 		cpp.vm.Gc.enable(false);
 
-		ThreadEvent.create(function() {
-			prepareMutex.acquire();
+		//ThreadEvent.create(function() {
+			//prepareMutex.acquire();
 			startPrepare();
-			prepareMutex.release();
-		}, startThreads);
+			startThreads();
+			//prepareMutex.release();
+		//}, startThreads);
 
 		super.create();
 	}

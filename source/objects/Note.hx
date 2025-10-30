@@ -363,7 +363,7 @@ class Note extends FlxSprite
 			{
 				prevNote.animation.play(animToPlay + 'hold');
 
-				prevNote.scale.y *= Conductor.stepCrochet / 100 * 1.05;
+				prevNote.scale.y *= Conductor.stepCrochet / 100 * 1.04;
 				if (createdFrom != null && createdFrom.songSpeed != null)
 					prevNote.scale.y *= createdFrom.songSpeed;
 
@@ -698,17 +698,20 @@ class Note extends FlxSprite
 		var center:Float = myStrum.y + offsetY + sWidth / 2;
 		if (isSustainNote && (mustPress || !ignoreNote) && (!mustPress || (wasGoodHit || (prevNote.wasGoodHit && !canBeHit))))
 		{
-			updateHitbox();
+			//updateHitbox();
 			var swagRect:FlxRect = clipRect;
 			if(swagRect == null) swagRect = new FlxRect(0, 0, frameWidth, frameHeight);
 			
 			var time:Float = FlxMath.bound((Conductor.songPosition - strumTime) / (height / (0.45 * FlxMath.roundDecimal(PlayState.instance.songSpeed, 2))), 0, 1);
-			
+			if (time >= 1) {
+				PlayState.instance.invalidateNote(this);
+				return;
+			}
+
 			swagRect.x = 0;
 			swagRect.y = time * frameHeight;
 			swagRect.width = frameWidth;
 			swagRect.height = frameHeight;
-			if (swagRect.height < 1) PlayState.instance.invalidateNote(this);
 
 			clipRect = swagRect;
 		}

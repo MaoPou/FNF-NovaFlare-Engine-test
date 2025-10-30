@@ -50,7 +50,8 @@ class DataGet
 
 		/////////////////// →memory计算
 
-		wait = number = 0;
+		wait -= 100; 
+		number = 0;
 	}
 
 	static public function getMem():Float
