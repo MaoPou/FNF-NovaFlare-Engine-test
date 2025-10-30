@@ -154,7 +154,7 @@ class Conductor
 	public static function set_bpm(newBPM:Float):Float
 	{
 		crochet = calculateCrochet(newBPM);
-		 crochet / 4;
+		stepCrochet = crochet / 4;
 		return bpm = newBPM;
 	}
 }
