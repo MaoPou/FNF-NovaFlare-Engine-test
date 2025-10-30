@@ -92,8 +92,6 @@ class Note extends FlxSprite
 
 	public var colorSwap:ColorSwap;
 
-	//public static var globalColorSwapShaders:Array<ColorSwap> = [];
-
 	public var inEditor:Bool = false;
 
 	public var animSuffix:String = '';
@@ -155,13 +153,10 @@ class Note extends FlxSprite
 	public var noteSplashSat:Float = 0;
 	public var noteSplashHue:Float = 0;
 
-	// fix old lua😡
-
 	private function set_multSpeed(value:Float):Float
 	{
 		resizeByRatio(value / multSpeed);
 		multSpeed = value;
-		// trace('fuck cock');
 		return value;
 	}
 
@@ -330,8 +325,6 @@ class Note extends FlxSprite
 			}
 		}
 
-		// trace(prevNote);
-
 		if (prevNote != null)
 			prevNote.nextNote = this;
 
@@ -363,7 +356,7 @@ class Note extends FlxSprite
 			{
 				prevNote.animation.play(animToPlay + 'hold');
 
-				prevNote.scale.y *= Conductor.stepCrochet / 100 * 1.04;
+				prevNote.scale.y *= Conductor.stepCrochet / 100 * 1.05;
 				if (createdFrom != null && createdFrom.songSpeed != null)
 					prevNote.scale.y *= createdFrom.songSpeed;
 
@@ -417,15 +410,14 @@ class Note extends FlxSprite
 	public var originalHeight:Float = 6;
 	public var correctionOffset:Float = 0; // dont mess with this
 
-	public function reloadNote(texture:String = '', postfix:String = '')
+	public function reloadNote(texture:String = null, postfix:String = null)
 	{
 		if (texture == null)
-			texture = '';
+			texture = initSkin;
 		if (postfix == null)
 			postfix = '';
 
-		if (saveTexture != texture)
-			reloadPath(texture, postfix);
+		reloadPath(texture, postfix);
 
 		var lastScaleY:Float = scale.y;
 
@@ -494,44 +486,57 @@ class Note extends FlxSprite
 			animation.play(animName, true);
 	}
 
-	static var saveTexture:String; //上一次输入的纹理的路径
-	static var _lastValidChecked:String; // optimization
+	public static final initSkin:String = 'noteSkins/NOTE_assets';
 	static var skin:String;
-	static var skinPixel:String;
-	static var skinPostfix:String;
+	static var skinPixel:String; //像素箭头路径（数据保存形式类似于defaultNoteSkin）
 	static var customSkin:String;
-	static var pathPixel:String;
+	static var skinPostfix:String; //箭头设置给的后缀
+	static var lastLoadData:Dynamic = null;
 
-	public static function reloadPath(texture:String = '', postfix:String = '')
+	public static function reloadPath(texture:String = '', postfix:String = '', oldMod:Bool = false)
 	{
-		saveTexture = texture;
+		if (texture == '')
+			texture = initSkin;
+
+		if (lastLoadData != null && lastLoadData.texture == texture && lastLoadData.postfix == postfix && lastLoadData.oldMod == oldMod)
+			return;
+
+		lastLoadData = {texture: texture, postfix: postfix, oldMod: oldMod};
 
 		skin = texture + postfix;
-		if (texture.length < 1) //如果是''
+		if (texture == defaultNoteSkin) //如果是默认箭头路径
 		{
 			skin = PlayState.SONG != null ? PlayState.SONG.arrowSkin : null; //兼容了铺面json设置的箭头
-			if (skin == null || skin.length < 1)
-				skin = defaultNoteSkin + postfix; //否则是默认箭头路径
+			if (skin == null || skin.length < 1) //当发现铺面json的箭头读取有问题时
+				skin = defaultNoteSkin + postfix; //重设为默认箭头路径，返回到后续加载
+			else 
+				return; //直接跳过后续读取,获取为铺面json的路径
 		}
 
 		skinPixel = skin;
-		skinPostfix = getNoteSkinPostfix(texture);
-		customSkin = skin + skinPostfix;
-		pathPixel = PlayState.isPixelStage ? 'pixelUI/' : '';
-		if (customSkin == _lastValidChecked || Paths.fileExists('images/' + pathPixel + customSkin + '.png', IMAGE))
+
+		if (!oldMod) {
+			skinPostfix = getNoteSkinPostfix(texture); //pe 0.7+
+		} else {
+			skinPostfix = ''; //pe 0.63-
+		}
+
+		customSkin = skin + skinPostfix; //前期加载的箭头数据和设置选择的最后结果
+		var pathPixel = PlayState.isPixelStage ? 'pixelUI/' : '';
+
+		if (Paths.fileExists('images/' + pathPixel + customSkin + '.png', IMAGE))
 		{
 			skin = customSkin;
-		}
-		else {
-			_lastValidChecked = customSkin;
-			skinPostfix = '';
+		} else {
+			skin = defaultNoteSkin + getNoteSkinPostfix(defaultNoteSkin); //返回为默认贴图
 		}
 	}
 
 	public static function getNoteSkinPostfix(?texture:String = '')
 	{
+		if (texture == '') texture = initSkin;
 		var skin:String = '';
-		if (ClientPrefs.data.noteSkin != ClientPrefs.defaultData.noteSkin && texture == '')
+		if (ClientPrefs.data.noteSkin != ClientPrefs.defaultData.noteSkin && texture == initSkin)
 			skin = '-' + ClientPrefs.data.noteSkin.trim().toLowerCase().replace(' ', '_');
 		return skin;
 	}
@@ -640,7 +645,6 @@ class Note extends FlxSprite
 	override public function destroy()
 	{
 		super.destroy();
-		_lastValidChecked = '';
 	}
 
 	public function followStrumNote(myStrum:StrumNote, fakeCrochet:Float, songSpeed:Float = 1)
@@ -752,13 +756,17 @@ class Note extends FlxSprite
 
 	public static function init()
 	{
-		if (Paths.fileExists('images/NOTE_assets.png', IMAGE) && ClientPrefs.data.noteSkin == ClientPrefs.defaultData.noteSkin)
+		lastLoadData = null;
+
+		if (Paths.fileExists('images/NOTE_assets.png', IMAGE) && ClientPrefs.data.noteSkin == ClientPrefs.defaultData.noteSkin) {
 			defaultNoteSkin = 'NOTE_assets';
-		reloadPath(); // 初始化
+			reloadPath(defaultNoteSkin,'', true);
+		} else { 
+			defaultNoteSkin = initSkin;
+			reloadPath(defaultNoteSkin);
+		}
 
 		addSkinCache(skin);
-
-		Note.defaultNoteSkin = 'noteSkins/NOTE_assets';
 	}
 
 	static function addSkinCache(skin:String)
