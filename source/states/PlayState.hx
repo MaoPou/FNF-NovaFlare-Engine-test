@@ -2371,7 +2371,7 @@ class PlayState extends MusicBeatState
 		}
 		else if (!paused && updateTime)
 		{
-			var curTime:Float = Math.max(0, Conductor.songPosition - ClientPrefs.data.noteOffset);
+			var curTime:Float = Math.max(0, Conductor.songPosition - ClientPrefs.data.noteOffset); //待修改
 			songPercent = (curTime / songLength);
 
 			var songCalc:Float = (songLength - curTime);

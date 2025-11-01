@@ -85,7 +85,7 @@ class MouseEffect extends Sprite {
         // 添加事件监听
         Lib.current.stage.addEventListener(MouseEvent.MOUSE_DOWN, onMouseDown);
         Lib.current.stage.addEventListener(MouseEvent.MOUSE_MOVE, onMouseMove);
-        Lib.current.stage.addEventListener(Event.ENTER_FRAME, update);
+        Lib.current.stage.addEventListener(Event.ENTER_UPDATE, update);
     }
 
     private function onMouseDown(e:MouseEvent):Void {
