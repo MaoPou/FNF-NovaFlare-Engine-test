@@ -33,31 +33,61 @@ class ErrorHandledShader extends FlxShader implements IErrorHandler
 		}
 	}
 
-	public static function crashSave(shaderName:String, error:Dynamic, onError:Dynamic, ?vertexSource:String, ?fragmentSource:String)
+	public static function crashSave(shaderName:String, error:Dynamic, onError:Dynamic, ?vertexSource:String, ?fragmentSource:String, ?versionPrefix:String)
 	{
 		if (shaderName == null)
 			shaderName = 'unnamed';
 		var alertTitle:String = 'Error on Shader: "$shaderName"';
 
-		#if !debug
-		var errMsg:String = "";
-		var dateNow:String = Date.now().toString().replace(" ", "_").replace(":", "'");
+		var dateNow:String = Date.now().toString();
+		var callStack:Array<haxe.StackItem> = haxe.CallStack.exceptionStack();
 
-		if (!FileSystem.exists('./logs/'))
-			FileSystem.createDirectory('./logs/');
+		/*
+		var fullReport = new flixel.system.debug.log.LogStyle();
+		fullReport.timestamp = false;
+		fullReport.errorSound = true;
+		*/
 
-		var crashLogPath:String = './logs/shader_${shaderName}_${dateNow}.txt';
-		var fullReport = 'Shader: $shaderName\nError: $error\n\n';
+		var header = 'CRASH: Shader Compilation Failed';
+		var reportText = [
+			'====================================================================================================',
+			'Shader Name: $shaderName',
+			'Timestamp: $dateNow',
+			'Error: ${Std.string(error)}',
+			'----------------------------------------------------------------------------------------------------',
+			'Version Prefix Used:',
+			'${versionPrefix != null ? versionPrefix : "Not Provided"}',
+			'----------------------------------------------------------------------------------------------------',
+			'Call Stack:',
+			'${haxe.CallStack.toString(callStack)}',
+			'===================================================================================================='
+		];
+
 		if (vertexSource != null) {
-			fullReport += '--- VERTEX SHADER (Processed) ---\n$vertexSource\n\n';
+			reportText.push('--- VERTEX SHADER (Processed) ---');
+			reportText.push(vertexSource);
+			reportText.push('-------------------------------------');
 		}
 		if (fragmentSource != null) {
-			fullReport += '--- FRAGMENT SHADER (Processed) ---\n$fragmentSource\n';
+			reportText.push('--- FRAGMENT SHADER (Processed) ---');
+			reportText.push(fragmentSource);
+			reportText.push('---------------------------------------');
 		}
-		File.saveContent(crashLogPath, fullReport);
-		Application.current.window.alert('Error log saved at: $crashLogPath', alertTitle);
+
+		var fullReportString = reportText.join('\n');
+		//flixel.FlxG.log.advanced(fullReportString, fullReport);
+
+		#if !debug
+		var logPath:String = './logs/shader_errors/';
+		if (!sys.FileSystem.exists(logPath))
+			sys.FileSystem.createDirectory(logPath);
+		
+		var fileName = '${shaderName}_${dateNow.replace(" ", "_").replace(":", "'")}.log';
+		var finalPath = sys.FileSystem.absolutePath(logPath + fileName);
+		sys.io.File.saveContent(finalPath, fullReportString);
+		Application.current.window.alert('Shader compilation failed! Error log saved to:\n$finalPath', alertTitle);
 		#else
-		Application.current.window.alert('Error logs aren\'t created on debug builds, check the trace log instead.', alertTitle);
+		Application.current.window.alert('Shader compilation failed! Check the console for the full error report.', alertTitle);
 		#end
 
 		onError(error);
@@ -113,16 +143,17 @@ class ErrorHandledRuntimeShader extends FlxRuntimeShader implements IErrorHandle
 	{
 		var vertex:String = null;
 		var fragment:String = null;
+		var versionPrefix:String = null;
 		try
 		{
 			@:privateAccess
 			var gl = __context.gl;
 
 			#if lime_opengles
-			var versionPrefix = "#version 300 es\n";
+			versionPrefix = "#version 300 es\n";
 			var isES = true;
 			#else
-			var versionPrefix = "#version 400 core\n";
+			versionPrefix = "#version 400 core\n";
 			var isES = false;
 			#end
 
@@ -229,7 +260,7 @@ class ErrorHandledRuntimeShader extends FlxRuntimeShader implements IErrorHandle
 		}
 		catch (error)
 		{
-			ErrorHandledShader.crashSave(this.shaderName, error, onError, vertex, fragment);
+			ErrorHandledShader.crashSave(this.shaderName, error, onError, vertex, fragment, versionPrefix);
 		}
 	}
 
