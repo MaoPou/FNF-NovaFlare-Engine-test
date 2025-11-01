@@ -40,13 +40,6 @@ class ErrorHandledShader extends FlxShader implements IErrorHandler
 		var alertTitle:String = 'Error on Shader: "$shaderName"';
 
 		var dateNow:String = Date.now().toString();
-		var callStack:Array<haxe.StackItem> = haxe.CallStack.exceptionStack();
-
-		/*
-		var fullReport = new flixel.system.debug.log.LogStyle();
-		fullReport.timestamp = false;
-		fullReport.errorSound = true;
-		*/
 
 		var header = 'CRASH: Shader Compilation Failed';
 		var reportText = [
@@ -58,9 +51,6 @@ class ErrorHandledShader extends FlxShader implements IErrorHandler
 			'Version Prefix Used:',
 			'${versionPrefix != null ? versionPrefix : "Not Provided"}',
 			'----------------------------------------------------------------------------------------------------',
-			'Call Stack:',
-			'${haxe.CallStack.toString(callStack)}',
-			'===================================================================================================='
 		];
 
 		if (vertexSource != null) {
@@ -75,7 +65,6 @@ class ErrorHandledShader extends FlxShader implements IErrorHandler
 		}
 
 		var fullReportString = reportText.join('\n');
-		//flixel.FlxG.log.advanced(fullReportString, fullReport);
 
 		#if !debug
 		var logPath:String = './logs/shader_errors/';
