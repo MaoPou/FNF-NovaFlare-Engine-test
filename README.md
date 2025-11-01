@@ -62,3 +62,46 @@
 | ![](https://raw.githubusercontent.com/ShadowMario/FNF-PsychEngine/refs/heads/main/assets/shared/images/credits/phantomarcade.png) | [PhantomArcade](https://x.com/PhantomArcade3K) | Animator of Friday Night Funkin'
 | ![](https://raw.githubusercontent.com/ShadowMario/FNF-PsychEngine/refs/heads/main/assets/shared/images/credits/evilsk8r.png) | [Evilsk8r](https://x.com/evilsk8r) | Artist of Friday Night Funkin'
 | ![](https://raw.githubusercontent.com/ShadowMario/FNF-PsychEngine/refs/heads/main/assets/shared/images/credits/kawaisprite.png) | [KawaiSprite](https://x.com/kawaisprite) | Composer of Friday Night Funkin'
+## Shader 兼容性检测（OpenGL ES 3.0 / 300 es）
+
+本仓库提供一个工具用于扫描并验证所有安卓端可运行的 Shader 是否兼容 OpenGL ES 3.0 语法（`#version 300 es`）。该工具会：
+- 扫描 `source/shaders` 目录中所有 Haxe 定义的 `@:glFragmentSource` / `@:glVertexSource` 以及外部 `.frag/.glsl` 文件；
+- 自动进行 ES3 预转换（统一 `attribute/varying`、`texture2D→texture`、`gl_FragColor→out`、移除非法全局初始化等）；
+- 对关键语法特性进行静态检查（uniform、sampler、矩阵、分支控制）；
+- 生成详细报告与已转换示例代码库。
+
+### 运行方式
+
+1. 安装 Haxe（推荐 Neko 或 HashLink 目标）。
+2. 在项目根目录执行以下命令之一：
+
+```
+haxe --run tools.shader_compat.ShaderCompatChecker
+```
+
+或编译到 Neko 后运行：
+
+```
+haxe -main tools.shader_compat.ShaderCompatChecker -neko bin/shader_compat.n
+neko bin/shader_compat.n
+```
+
+### 输出内容
+
+- 报告目录：`reports/shader_compat/`
+  - `report.json`：每个 Shader 的详细检查结果（是否兼容、失败项与说明）。
+  - `summary.md`：Markdown 摘要，便于快速查看。
+- 示例代码库：`reports/shader_compat/verified_es300/`
+  - 为每个扫描到的 Shader 生成转换后的 ES 3.0 版本（含 `#version 300 es` 与精度前缀、必要的输出声明）。
+
+### 检查项说明
+
+- uniform 声明：是否存在有效的 `uniform` 类型声明。
+- 采样器使用：是否使用 `texture()` 或框架的 `flixel_texture2D()`。
+- 矩阵运算：是否使用 `mat2/mat3/mat4`、`transpose`、`outerProduct` 等（非必需，仅标记）。
+- 分支控制：是否存在 `if/for/while` 等标准流程控制。
+- 废弃内建：是否移除了 `gl_FragColor/gl_FragData/attribute/varying` 等 ES3 不推荐的旧接口。
+
+### 桌面运行环境适配（说明）
+
+工具会为 ES3 转换版本同时生成可用于桌面 GL 的源码（通过 `ErrorHandledRuntimeShader` 的版本前缀与统一 API），你可以在 Windows/macOS/Linux 上通过 OpenFL/Lime 的 GL 上下文进行编译测试。若需要更严格的离线编译验证，建议配合 `glslangValidator` 或 ANGLE 环境进行实际编译与运行测试。

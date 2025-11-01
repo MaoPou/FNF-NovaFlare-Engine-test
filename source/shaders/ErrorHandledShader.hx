@@ -3,6 +3,7 @@ package shaders;
 import flixel.addons.display.FlxRuntimeShader;
 import lime.graphics.opengl.GLProgram;
 import lime.app.Application;
+import shaders.backend.ShaderCompatChecker;
 
 class ErrorHandledShader extends FlxShader implements IErrorHandler
 {
@@ -121,117 +122,23 @@ class ErrorHandledRuntimeShader extends FlxRuntimeShader implements IErrorHandle
 			#end
 
 			var precisionPrefix = "#ifdef GL_ES\n"
-				+ (precisionHint == FULL ? "#ifdef GL_FRAGMENT_PRECISION_HIGH\n"
-					+ "precision highp float;\n"
-					+ "#else\n"
-					+ "precision mediump float;\n"
-					+ "#endif\n" : "precision lowp float;\n")
+				+ "#ifdef GL_FRAGMENT_PRECISION_HIGH\n"
+				+ "precision highp float;\n"
+				+ "#else\n"
+				+ "precision mediump float;\n"
+				+ "#endif\n"
 				+ "#endif\n\n";
 
-			// 局部转换函数：统一升级到现代 GLSL 语法
-			function upgradeCommon(source:String):String
-			{
-				var s = source;
-				// 纹理采样 API 统一至现代版本
-				s = s.replace("texture2DProj", "textureProj");
-				s = s.replace("texture2DLod", "textureLod");
-				s = s.replace("textureCubeLod", "textureLod");
-				s = s.replace("texture3D", "texture");
-				s = s.replace("textureCube", "texture");
-				s = s.replace("texture2D", "texture");
-				// 移除 ES3 已内建的派生扩展声明
-				s = s.replace("#extension GL_OES_standard_derivatives : enable", "");
-				return s;
-			}
-
-			function upgradeVertex(source:String):String
-			{
-				var s = source;
-				// attribute/varying 升级为 in/out（顶点着色器为 out）
-				s = s.replace("attribute", "in");
-				s = s.replace("varying", "out");
-				s = upgradeCommon(s);
-				return s;
-			}
-
-			function upgradeFragment(source:String):String
-			{
-				var s = source;
-				// attribute 不应出现在片段着色器，但若出现仍统一
-				s = s.replace("attribute", "in");
-				// varying 在片段着色器为 in
-				s = s.replace("varying", "in");
-				s = upgradeCommon(s);
-				// gl_FragData/gl_FragColor 迁移到用户定义输出
-				// 简化处理：统一写到单一输出 output_FragColor
-				s = s.replace("gl_FragData[0]", "output_FragColor");
-				s = s.replace("gl_FragColor", "output_FragColor");
-
-				// 兼容 OpenGL ES：禁止在全局中使用非 const 初始化
-				// 将使用 openfl_TextureCoordv/openfl_TextureSize 的全局初始化移入 main()
-				var initAssignments:Array<String> = [];
-				var beforeMain:Bool = true;
-				var lines = s.split("\n");
-				for (i in 0...lines.length)
-				{
-					var line = StringTools.trim(lines[i]);
-					if (line.indexOf("void main") != -1)
-					{
-						beforeMain = false;
-					}
-
-					if (beforeMain && (line.indexOf("openfl_TextureCoordv") != -1 || line.indexOf("openfl_TextureSize") != -1))
-					{
-						// 只处理简单的声明赋值：<type> <name> = <expr>;
-						var eqPos = line.indexOf("=");
-						var semiPos = line.lastIndexOf(";");
-						if (eqPos > 0 && semiPos > eqPos)
-						{
-							// 提取左侧（含类型与变量名）与右侧表达式
-							var left = StringTools.trim(line.substr(0, eqPos));
-							var right = StringTools.trim(line.substr(eqPos + 1, semiPos - eqPos - 1));
-							// 提取变量名（最后一个空格之后）
-							var lastSpace = left.lastIndexOf(" ");
-							if (lastSpace > 0)
-							{
-								var varName = StringTools.trim(left.substr(lastSpace + 1));
-								initAssignments.push(varName + " = " + right + ";");
-								// 将声明改为无初始化
-								lines[i] = left + ";";
-							}
-						}
-					}
-				}
-
-				// 若需要，将赋值注入 main() 的起始处（紧随 '{' 之后）
-				if (initAssignments.length > 0)
-				{
-					var rebuilt = lines.join("\n");
-					var mPos = rebuilt.indexOf("void main");
-					if (mPos >= 0)
-					{
-						var bracePos = rebuilt.indexOf("{", mPos);
-						if (bracePos >= 0)
-						{
-							var insertPos = bracePos + 1;
-							var inject = "\n" + initAssignments.join("\n") + "\n";
-							rebuilt = rebuilt.substr(0, insertPos) + inject + rebuilt.substr(insertPos);
-							s = rebuilt;
-						}
-					}
-				}
-
-				return s;
-			}
-
-			var needsFragOut:Bool = (glFragmentSource.indexOf("gl_FragColor") >= 0) || (glFragmentSource.indexOf("gl_FragData") >= 0);
+			// 使用后端兼容检查器完成 ES3 预转换
+			var compat = ShaderCompatChecker.toES3(glVertexSource, glFragmentSource, isES);
+			var needsFragOut:Bool = compat.needsFragOut;
 
 			// 构建顶点/片段源码（在片段中按需声明输出）
 			var vertexHeader = versionPrefix + precisionPrefix;
 			var fragmentHeader = versionPrefix + precisionPrefix + (needsFragOut ? "out vec4 output_FragColor;\n" : "");
 
-			var vertex = vertexHeader + upgradeVertex(glVertexSource);
-			var fragment = fragmentHeader + upgradeFragment(glFragmentSource);
+			var vertex = vertexHeader + compat.convertedVertex;
+			var fragment = fragmentHeader + compat.convertedFragment;
 
 			var id = vertex + fragment;
 			@:privateAccess
