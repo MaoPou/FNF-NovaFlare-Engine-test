@@ -325,32 +325,35 @@ class Shader
 		var hasInfoLog = shaderInfoLog != null && StringTools.trim(shaderInfoLog) != "";
 		var compileStatus = gl.getShaderParameter(shader, gl.COMPILE_STATUS);
 
-		if (hasInfoLog || compileStatus == 0)
+		if (compileStatus == 0)
 		{
-			final startMessage = '${(compileStatus == 0) ? "Error" : "Info"} ${(type == gl.VERTEX_SHADER) ? "compiling vertex shader" : "compiling fragment shader"}';
-			var message = startMessage;
-			message += "\n" + shaderInfoLog;
-			message += "\n" + source;
-			#if sys
-			if (compileStatus == 0)
-			{
-				try
-				{
-					if (!sys.FileSystem.exists('logs'))
-						sys.FileSystem.createDirectory('logs');
+			var shaderType = (type == gl.VERTEX_SHADER) ? "vertex" : "fragment";
+			var fullMessage = 'Error compiling ' + shaderType + ' shader: ' + shaderInfoLog + '\n' + source;
 
-					sys.io.File.saveContent('logs/' + 'ShaderCompileError.txt', '$message');
-				}
-				catch (e:haxe.Exception)
-					Log.warn("Couldn\'t save error message. (${e.message})", null);
+			#if sys
+			try
+			{
+				if (!sys.FileSystem.exists('logs'))
+					sys.FileSystem.createDirectory('logs');
+
+				var dateNow:String = Date.now().toString().replace(" ", "_").replace(":", "'");
+				var logFileName = 'ShaderCompileError_${dateNow}.txt';
+				sys.io.File.saveContent('logs/' + logFileName, fullMessage);
 			}
+			catch (e:haxe.Exception)
+				Log.warn("Couldn\'t save error message. (${e.message})", null);
 			#end
-			if (compileStatus == 0)
-				#if (android && !macro) AndroidTools.showAlertDialog("Shader Compile Error!", message, {name: "OK", func: null},
-					null) #elseif !ios openfl.Lib.application.window.alert('$message', 'Shader Compile Error!') #else Log.error(message) #end;
-			else if (hasInfoLog)
-				Log.debug(message);
+			
+			#if (android && !macro) AndroidTools.showAlertDialog("Shader Compile Error!", message, {name: "OK", func: null},
+				null) #elseif !ios openfl.Lib.application.window.alert('$message', 'Shader Compile Error!') #else Log.error(message) #end;
 		}
+		else if (hasInfoLog)
+		{
+			var shaderType = (type == gl.VERTEX_SHADER) ? "vertex" : "fragment";
+			Log.debug('Info compiling ' + shaderType + ' shader: ' + shaderInfoLog + '\n' + source);
+		}
+
+
 
 		return shader;
 	}
