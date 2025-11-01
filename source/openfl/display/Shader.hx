@@ -344,16 +344,14 @@ class Shader
 				Log.warn("Couldn\'t save error message. (${e.message})", null);
 			#end
 			
-			#if (android && !macro) AndroidTools.showAlertDialog("Shader Compile Error!", message, {name: "OK", func: null},
-				null) #elseif !ios openfl.Lib.application.window.alert('$message', 'Shader Compile Error!') #else Log.error(message) #end;
+			#if (android && !macro) AndroidTools.showAlertDialog("Shader Compile Error!", fullMessage, {name: "OK", func: null},
+				null) #elseif !ios openfl.Lib.application.window.alert('$fullMessage', 'Shader Compile Error!') #else Log.error(message) #end;
 		}
 		else if (hasInfoLog)
 		{
 			var shaderType = (type == gl.VERTEX_SHADER) ? "vertex" : "fragment";
 			Log.debug('Info compiling ' + shaderType + ' shader: ' + shaderInfoLog + '\n' + source);
 		}
-
-
 
 		return shader;
 	}
