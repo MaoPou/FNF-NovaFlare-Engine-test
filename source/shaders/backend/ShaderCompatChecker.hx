@@ -9,6 +9,7 @@ class ShaderCompatChecker {
 
         function upgradeCommon(source:String):String {
             var s = source;
+            s = s.replace("flixel_texture2D", "texture");
             s = s.replace("texture2DProj", "textureProj");
             s = s.replace("texture2DLod", "textureLod");
             s = s.replace("textureCubeLod", "textureLod");
