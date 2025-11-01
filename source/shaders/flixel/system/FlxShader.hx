@@ -3,7 +3,7 @@ package shaders.flixel.system;
 import flixel.system.FlxAssets.FlxShader as OriginalFlxShader;
 
 /**
- * A modded FlxShader that allows using GLSL Es 300 and GLSL 400 core
+ * A modded FlxShader that allows using GLSL Es 300 and GLSL 330
  * @author Mihai Alexandru (M.A. Jigsaw)
  */
 class FlxShader extends OriginalFlxShader
@@ -54,7 +54,7 @@ class FlxShader extends OriginalFlxShader
 		#if lime_opengles
 		var prefix = "#version 300 es\n";
 		#else
-		var prefix = "#version 400 core\n";
+		var prefix = "#version 330\n";
 		#end
 
 		prefix += "#ifdef GL_ES\n"
