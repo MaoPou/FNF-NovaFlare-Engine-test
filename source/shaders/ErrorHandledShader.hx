@@ -33,16 +33,13 @@ class ErrorHandledShader extends FlxShader implements IErrorHandler
 		}
 	}
 
-	public static function crashSave(shaderName:String, error:Dynamic, onError:Dynamic) // prevent the app from dying immediately
+	public static function crashSave(shaderName:String, error:Dynamic, onError:Dynamic, ?vertexSource:String, ?fragmentSource:String)
 	{
 		if (shaderName == null)
 			shaderName = 'unnamed';
 		var alertTitle:String = 'Error on Shader: "$shaderName"';
 
-		trace(error);
-
 		#if !debug
-		// Save a crash log on Release builds
 		var errMsg:String = "";
 		var dateNow:String = Date.now().toString().replace(" ", "_").replace(":", "'");
 
@@ -50,7 +47,14 @@ class ErrorHandledShader extends FlxShader implements IErrorHandler
 			FileSystem.createDirectory('./logs/');
 
 		var crashLogPath:String = './logs/shader_${shaderName}_${dateNow}.txt';
-		File.saveContent(crashLogPath, error);
+		var fullReport = 'Shader: $shaderName\nError: $error\n\n';
+		if (vertexSource != null) {
+			fullReport += '--- VERTEX SHADER (Processed) ---\n$vertexSource\n\n';
+		}
+		if (fragmentSource != null) {
+			fullReport += '--- FRAGMENT SHADER (Processed) ---\n$fragmentSource\n';
+		}
+		File.saveContent(crashLogPath, fullReport);
 		Application.current.window.alert('Error log saved at: $crashLogPath', alertTitle);
 		#else
 		Application.current.window.alert('Error logs aren\'t created on debug builds, check the trace log instead.', alertTitle);
@@ -107,12 +111,13 @@ class ErrorHandledRuntimeShader extends FlxRuntimeShader implements IErrorHandle
 
 	public function initGood(glFragmentSource:String, glVertexSource:String)
 	{
+		var vertex:String = null;
+		var fragment:String = null;
 		try
 		{
 			@:privateAccess
 			var gl = __context.gl;
 
-			// 生成版本前缀
 			#if lime_opengles
 			var versionPrefix = "#version 300 es\n";
 			var isES = true;
@@ -129,16 +134,14 @@ class ErrorHandledRuntimeShader extends FlxRuntimeShader implements IErrorHandle
 				+ "#endif\n"
 				+ "#endif\n\n";
 
-			// 使用后端兼容检查器完成 ES3 预转换
 			var compat = ShaderCompatChecker.toES3(glVertexSource, glFragmentSource, isES);
 			var needsFragOut:Bool = compat.needsFragOut;
 
-			// 构建顶点/片段源码（在片段中按需声明输出）
 			var vertexHeader = versionPrefix + precisionPrefix;
 			var fragmentHeader = versionPrefix + precisionPrefix + (needsFragOut ? "out vec4 output_FragColor;\n" : "");
 
-			var vertex = vertexHeader + compat.convertedVertex;
-			var fragment = fragmentHeader + compat.convertedFragment;
+			vertex = vertexHeader + compat.convertedVertex;
+			fragment = fragmentHeader + compat.convertedFragment;
 
 			var id = vertex + fragment;
 			@:privateAccess
@@ -163,7 +166,6 @@ class ErrorHandledRuntimeShader extends FlxRuntimeShader implements IErrorHandle
 				@:privateAccess
 				glProgram = program.__glProgram;
 
-				// Set up input bitmap data
 				for (input in __inputBitmapData)
 				{
 					@:privateAccess
@@ -179,7 +181,6 @@ class ErrorHandledRuntimeShader extends FlxRuntimeShader implements IErrorHandle
 					}
 				}
 
-				// Set up boolean parameters
 				for (parameter in __paramBool)
 				{
 					@:privateAccess
@@ -195,7 +196,6 @@ class ErrorHandledRuntimeShader extends FlxRuntimeShader implements IErrorHandle
 					}
 				}
 
-				// Set up float parameters
 				for (parameter in __paramFloat)
 				{
 					@:privateAccess
@@ -211,7 +211,6 @@ class ErrorHandledRuntimeShader extends FlxRuntimeShader implements IErrorHandle
 					}
 				}
 
-				// Set up integer parameters
 				for (parameter in __paramInt)
 				{
 					@:privateAccess
@@ -230,7 +229,7 @@ class ErrorHandledRuntimeShader extends FlxRuntimeShader implements IErrorHandle
 		}
 		catch (error)
 		{
-			ErrorHandledShader.crashSave(this.shaderName, error, onError);
+			ErrorHandledShader.crashSave(this.shaderName, error, onError, vertex, fragment);
 		}
 	}
 
@@ -243,7 +242,7 @@ class ErrorHandledRuntimeShader extends FlxRuntimeShader implements IErrorHandle
 		}
 		catch (error)
 		{
-			ErrorHandledShader.crashSave(this.shaderName, error, onError);
+			ErrorHandledShader.crashSave(this.shaderName, error, onError, vertexSource, fragmentSource);
 			return null;
 		}
 	}

@@ -17,6 +17,10 @@ class ShaderCompatChecker {
             s = s.replace("textureCube", "texture");
             s = s.replace("texture2D", "texture");
             s = s.replace("#extension GL_OES_standard_derivatives : enable", "");
+
+            // The following hardcoded, shader-specific fixes have been removed as they are not a general solution.
+            // A more robust implementation will use uniforms to control these values from game logic.
+
             return s;
         }
 
