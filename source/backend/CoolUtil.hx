@@ -107,54 +107,123 @@ class CoolUtil
 		return maxKey;
 	}
 
-	inline public static function getComboColor(sprite:flixel.FlxSprite):Int
-	{
-		var maxSaturation:Float = 0;
-		var maxSaturationColor:Int = 0xFFFFFFFF;
-		var blackPixelCount:Int = 0;
-		var totalPixelCount:Int = 0;
-		
-		for (col in 0...sprite.frameWidth)
-		{
-			for (row in 0...sprite.frameHeight)
-			{
-				var colorOfThisPixel:Int = sprite.pixels.getPixel32(col, row);
-				if (colorOfThisPixel != 0)
-				{
-					totalPixelCount++;
-					
-					if (colorOfThisPixel == FlxColor.BLACK)
-					{
-						blackPixelCount++;
-						continue;
-					}
-					
-					// 计算饱和度
-					var flxColor = FlxColor.fromInt(colorOfThisPixel);
-					var r = flxColor.red / 255.0;
-					var g = flxColor.green / 255.0;
-					var b = flxColor.blue / 255.0;
-					
-					var max = Math.max(Math.max(r, g), b);
-					var min = Math.min(Math.min(r, g), b);
-					var saturation = max == 0 ? 0 : (max - min) / max;
-					
-					// 找到饱和度最高的颜色
-					if (saturation > maxSaturation)
-					{
-						maxSaturation = saturation;
-						maxSaturationColor = colorOfThisPixel;
-					}
-				}
-			}
-		}
-		
-		// 如果黑色像素占50%以上，返回黑色，目前不用了这个功能
-		//if (blackPixelCount >= totalPixelCount * 0.5)
-			//return 0xFF000000;
-		
-		return maxSaturationColor;
-	}
+    inline public static function getComboColor(sprite:FlxSprite):Int
+    {
+        // 1) 高质量缩放到原始的 50%
+        var src = sprite.pixels; // openfl.display.BitmapData
+        if (src == null)
+        {
+            // 无像素数据时返回白色
+            return 0xFFFFFFFF;
+        }
+
+        var newW:Int = Std.int(Math.max(1, Std.int(src.width * 0.5)));
+        var newH:Int = Std.int(Math.max(1, Std.int(src.height * 0.5)));
+
+        var scaled = new openfl.display.BitmapData(newW, newH, true, 0x00000000);
+        var m = new openfl.geom.Matrix();
+        m.scale(newW / src.width, newH / src.height);
+        scaled.draw(src, m, null, null, null, true);
+
+        // 2) 颜色分析：构建加权直方图，考虑空间分布密度与视觉显著性，排除背景干扰色
+        var centerX = newW * 0.5;
+        var centerY = newH * 0.5;
+        var sigma = Math.min(newW, newH) * 0.3; // 中心权重的尺度
+        var twoSigma2 = 2 * sigma * sigma;
+
+        var hist:Map<Int, Float> = [];
+        var agg:Map<Int, { r:Float, g:Float, b:Float, w:Float }> = [];
+
+        for (y in 0...newH)
+        {
+            for (x in 0...newW)
+            {
+                var c:Int = scaled.getPixel32(x, y);
+                var a:Int = (c >> 24) & 0xFF;
+                if (a <= 10) continue; // 排除近透明像素
+
+                var r:Int = (c >> 16) & 0xFF;
+                var g:Int = (c >> 8) & 0xFF;
+                var b:Int = c & 0xFF;
+
+                // HSV（只需 S/V）用于计算视觉显著性
+                var rf:Float = r / 255.0;
+                var gf:Float = g / 255.0;
+                var bf:Float = b / 255.0;
+                var maxC = Math.max(rf, Math.max(gf, bf));
+                var minC = Math.min(rf, Math.min(gf, bf));
+                var v:Float = maxC;
+                var s:Float = (maxC == 0) ? 0 : (maxC - minC) / maxC;
+
+                // 排除背景干扰色：过暗/过亮且饱和度很低的像素
+                if ((v < 0.05 || v > 0.95) && s < 0.2) continue;
+
+                // 空间权重：让中心区域权重更高（近似高斯）
+                var dx = x - centerX;
+                var dy = y - centerY;
+                var d2 = dx * dx + dy * dy;
+                var centerWeight:Float = Math.exp(-d2 / twoSigma2);
+
+                // 视觉显著性权重：偏好高饱和、高亮度的色彩
+                var saliencyWeight:Float = (0.2 + s) * (0.1 + v);
+
+                var weight:Float = centerWeight * saliencyWeight;
+                if (weight <= 0) continue;
+
+                // 颜色量化，降低噪声：每通道 4bit（0..15）
+                var rq = r >> 4;
+                var gq = g >> 4;
+                var bq = b >> 4;
+                var key:Int = (rq << 8) | (gq << 4) | bq;
+
+                var prev = hist.exists(key) ? hist[key] : 0.0;
+                hist[key] = prev + weight;
+
+                var bucket = agg.get(key);
+                if (bucket == null)
+                {
+                    agg.set(key, { r: r * weight, g: g * weight, b: b * weight, w: weight });
+                }
+                else
+                {
+                    bucket.r += r * weight;
+                    bucket.g += g * weight;
+                    bucket.b += b * weight;
+                    bucket.w += weight;
+                }
+            }
+        }
+
+        // 3) 选择加权直方图中权重最大的颜色桶，并返回桶的加权平均颜色
+        var bestKey:Int = -1;
+        var bestWeight:Float = -1;
+        for (key in hist.keys())
+        {
+            var w = hist[key];
+            if (w > bestWeight)
+            {
+                bestWeight = w;
+                bestKey = key;
+            }
+        }
+
+        if (bestKey == -1)
+        {
+            // 回退：没有有效像素时，返回白色
+            return 0xFFFFFFFF;
+        }
+
+        var best = agg.get(bestKey);
+        var outR:Int = Std.int(best.r / best.w);
+        var outG:Int = Std.int(best.g / best.w);
+        var outB:Int = Std.int(best.b / best.w);
+
+        // 4) 返回主体颜色（十六进制颜色代码值）。此处以 Int 表示 0xAARRGGBB，便于现有调用
+        var resultColor:Int = (0xFF << 24) | (outR << 16) | (outG << 8) | outB;
+
+        // 5) 已使用平滑缩放与权重策略，尽量避免缩放导致的颜色失真
+        return resultColor;
+    }
 
 	inline public static function numberArray(max:Int, ?min = 0):Array<Int>
 	{

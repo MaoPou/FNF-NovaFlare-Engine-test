@@ -1194,6 +1194,7 @@ class PlayState extends MusicBeatState
 		Paths.sound('introGo' + introSoundsSuffix);
 	}
 
+	//var funkin_modchart_instance:Manager;
 	public function startCountdown()
 	{
 		if (ClientPrefs.data.pauseButton)
@@ -1215,6 +1216,9 @@ class PlayState extends MusicBeatState
 			canPause = true;
 			generateStaticArrows(0);
 			generateStaticArrows(1);
+
+			//funkin_modchart_instance = new Manager();
+			//addManager(funkin_modchart_instance);
 
 			for (i in 0...playerStrums.length)
 			{
@@ -1349,7 +1353,6 @@ class PlayState extends MusicBeatState
 	{
 		insert(members.indexOf(dadGroup), obj);
 	}
-
 	
 	public function addManager(obj:Manager)
 	{
