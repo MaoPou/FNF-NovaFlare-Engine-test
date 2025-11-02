@@ -9,6 +9,8 @@ import vlc.VideoHandler;
 
 class InitScriptData {
     public static function init() {
+        
+        //psychlua
         Iris.proxyImports.set("psychlua.CallbackHandler", CallbackHandler);
         Iris.proxyImports.set("psychlua.CustomSubstate", CustomSubstate);
         Iris.proxyImports.set("psychlua.DebugLuaText", DebugLuaText);

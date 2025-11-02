@@ -17,17 +17,18 @@
 	<!--Minimum without FLX_NO_GAMEPAD: 11.8, without FLX_NO_NATIVE_CURSOR: 11.2-->
 	<set name="SWF_VERSION" value="11.8" />
 	
-	<!-- ______________________ PSYCH ENGINE CUSTOMIZATION ______________________ -->
+	<!-- ______________________ NOVAFLARE ENGINE CUSTOMIZATION ______________________ -->
 
 	<define name="MODS_ALLOWED" if="desktop || mobile || emscripten" />
-	<define name="HSCRIPT_ALLOWED" if="desktop || mobile || web" />
 	<define name="LUA_ALLOWED" if="desktop || mobile" unless="hl"/>
+	<define name="HSCRIPT_ALLOWED" if="desktop || mobile || web" />
 	<define name="ACHIEVEMENTS_ALLOWED" />
 	<!--define name="DISCORD_ALLOWED" if="desktop" unless="hl"/-->
 	<define name="PSYCH_WATERMARKS"/> <!-- DELETE THIS TO REMOVE WATERMARKS/DEV NAMES ON TITLE SCREEN -->
 	<define name="VIDEOS_ALLOWED" if="desktop || mobile" unless="32bits || hl || NOVIDEO || rpi"/> <!-- i'll keep this cuz it makes vscode think i don't use videos -->
-	<!--define name="VIDEOS_ALLOWED_Old" if="desktop || android" unless="32bits || hl || NOVIDEO || rpi"/-->
     <define name="CUSTOM_SHADERS_ALLOWED" if="LUA_ALLOWED"/>
+
+	 <define name="TRACY_ALLOWED" if="desktop" unless="hl"/>
 
 	<section if="officialBuild">
 		<!--define name="TITLE_SCREEN_EASTER_EGG"/-->
@@ -162,6 +163,12 @@
 	<haxedef name="HXCPP_ALIGN_ALLOC"/>
 	<haxedef name="HXCPP_GC_GENERATIONAL" />
 
+	<!-- _______________________________ TRACY ______________________________ -->
+
+	<haxedef name="HXCPP_TRACY" if="TRACY_ALLOWED"/>
+	<haxedef name="HXCPP_TELEMETRY" if="TRACY_ALLOWED"/>
+	<haxedef name="HXCPP_STACK_TRACE" if="TRACY_ALLOWED"/>
+	<haxedef name="HXCPP_STACK_LINES" if="TRACY_ALLOWED"/>
 
 	<!-- ______________________________ Haxedefines _____________________________ -->
 

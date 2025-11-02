@@ -7,7 +7,6 @@ import hxvlc.flixel.FlxVideoSprite;
 import hxcodec.flixel.FlxVideo;
 import vlc.VideoHandler;
 
-// 仅仅导入作为hscript使用 -狐月影
 class VideoSprite extends FlxSpriteGroup
 {
 	#if VIDEOS_ALLOWED
