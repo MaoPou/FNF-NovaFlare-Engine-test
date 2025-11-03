@@ -11,6 +11,7 @@ import states.TitleState;
 {
 	// General
 	public var framerate:Int = 60;
+	public var splitUpdate:Bool = #if desktop false #else true #end;
 	public var colorblindMode:String = 'None';
 	public var lowQuality:Bool = false;
 	public var gameQuality:Int = #if mobile 0 #else 1 #end;
@@ -560,6 +561,8 @@ class ClientPrefs
 			data.framerate = Std.int(FlxMath.bound(refreshRate, 60, 1000));
 		}
 		#end
+
+		FlxG.stage.application.window.splitUpdate = data.splitUpdate;
 
 		if (data.framerate > FlxG.drawFramerate)
 		{

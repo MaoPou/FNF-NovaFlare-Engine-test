@@ -20,6 +20,10 @@ class GeneralGroup extends OptionCata
 		addOption(option);
 		option.onChange = onChangeLanguage;
 
+		var option:Option = new Option(this, 'splitUpdate', BOOL);
+		addOption(option, true);
+		option.onChange = onChangeSplitUpdate;
+
 		var option:Option = new Option(this, 'gameQuality', INT, [0, 3]);
 		addOption(option);
 
@@ -101,6 +105,11 @@ class GeneralGroup extends OptionCata
 			FlxG.updateFramerate = ClientPrefs.data.framerate;
 			FlxG.stage.window.frameRate = FlxG.drawFramerate;
 		}
+	}
+
+	function onChangeSplitUpdate()
+	{
+		FlxG.stage.application.window.splitUpdate = ClientPrefs.data.splitUpdate;
 	}
 
 	function onChangeFilter()

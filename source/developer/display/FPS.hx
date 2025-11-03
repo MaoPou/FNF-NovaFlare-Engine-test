@@ -13,6 +13,8 @@ package developer.display;
 import flixel.tweens.FlxTween;
 import flixel.tweens.FlxEase;
 
+import openfl.events.Event;
+
 class FPS extends Sprite
 {
 	public function new(x:Float = 10, y:Float = 10)
@@ -50,9 +52,11 @@ class FPS extends Sprite
 		}
 
 		extraShow.visible = ClientPrefs.data.showExtra;
+
+		addEventListener(Event.ENTER_UPDATE, update);
 	}
 	
-	private override function __enterFrame(deltaTime:Float):Void
+	private function update(e:Event):Void
 	{
 		if (isPointInFPSCounter() && FlxG.mouse.justPressed)
 		{
@@ -68,6 +72,10 @@ class FPS extends Sprite
 		fpsShow.update();
 		extraShow.update();
 		versionShow.update();
+
+		#if TRACY_ALLOWED
+			cpp.vm.tracy.TracyProfiler.frameMark();
+		#end
 	}
 
 	public function change()
