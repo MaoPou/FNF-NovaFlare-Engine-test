@@ -34,4 +34,5 @@ Gameplaybackend => Gameplay Backend
 
 replayBot => Script will thought you open the bot when you're replay state
 fixLNL => Reduce Long Note length
+SaveScoreBase => playback record storage basis, Score: the highest score, Accuracy: with the highest accuracy, Misses: with the least number of misses, highestCombo: combo most
 gameOverVibration => Device will vibrate at game over

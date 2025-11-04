@@ -1,4 +1,5 @@
 User Interface => 用户界面
+
 CustomFade => 过场动画类型
 CustomFadeText => 过场文本可见
 CustomFadeSound => 过场音量
@@ -8,3 +9,4 @@ freeplayOld => 旧版自由模式
 skipTitleVideo => 跳过启动动画
 resultsScreen => 结尾结算界面
 loadingScreen => 预加载界面
+loadThreads => 加载线程数

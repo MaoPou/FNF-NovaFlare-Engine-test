@@ -2,6 +2,7 @@ General => 常规设置
 
 framerate => 更改帧数上限
 language => 切换语言
+splitUpdate => 将update和draw的更新分开，效果就是帧数提升大约两到三倍（取决于设备性能）
 gameQuality => 更改屏幕的游戏画面质量
 lowQuality => 低质量模式
 colorblindMode => 色盲滤镜模式

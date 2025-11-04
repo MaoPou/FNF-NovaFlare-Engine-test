@@ -35,4 +35,5 @@ Gameplaybackend => 游戏后端设置
 
 replayBot => 在回放时内置机器人处理特殊摁键
 fixLNL => 减少长键长度
+saveScoreBase => 回放记录保存基础，Score：分数最高，Accuracy：准确率最高，Misses：错过数最少，highestCombo：连击最多
 gameOverVibration => 设备会在你死亡时振动（如果设备支持）

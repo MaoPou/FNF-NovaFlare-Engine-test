@@ -9,7 +9,7 @@ showComboNum => 连击数字
 showRating => 评级贴图
 opponentStrums => 显示对手箭头
 judgementCounter => 判定计数板
-keyboardDisplay => 键盘反馈
+KeyboardViewer => 键盘反馈
 
 
 TimeBar => 时长条

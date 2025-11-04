@@ -35,4 +35,5 @@ Gameplaybackend => 游戏后端设置
 
 replayBot => 回放机器人处理
 fixLNL => 缩短长键
+saveScoreBase => 回放记录保存基础
 gameOverVibration => 死亡振动
