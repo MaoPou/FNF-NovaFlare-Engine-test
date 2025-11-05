@@ -28,7 +28,7 @@ class OptionCata extends FlxSpriteGroup
 		mainY = Y;
 
 		bg = new RoundRect(0, 0, width, height, width / 75, LEFT_UP, OptionsState.instance.mainColor);
-		bg.alpha = 1.0;
+		bg.alpha = 0.75;
 		bg.mainX = mainX;
 		bg.mainY = mainY;
 		add(bg);

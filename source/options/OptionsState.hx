@@ -29,7 +29,7 @@ class OptionsState extends MusicBeatState
 
 	public var mouseEvent:MouseEvent;
 
-	var naviBG:RoundRect;
+	var naviBG:Rect;
 	var naviGroup:Array<NaviGroup> = [];
 	var naviMove:MouseMove;
 
@@ -91,10 +91,11 @@ class OptionsState extends MusicBeatState
 		mouseEvent = new MouseEvent();
 		add(mouseEvent);
 
-		var bg = new Rect(0, 0, FlxG.width, FlxG.height, 0, 0, baseColor);
-		add(bg);
+		var background = new ChangeSprite(0, 0).load(Paths.image('menuDesat'));
+		background.antialiasing = ClientPrefs.data.antialiasing;
+		add(background);
 
-		naviBG = new RoundRect(0, 0, FlxG.width * 0.2, FlxG.height, 0, LEFT_CENTER,  mainColor);
+		naviBG = new Rect(0, 0, FlxG.width * 0.2, FlxG.height, 0, 0,  mainColor, 0.75);
 		add(naviBG);
 
 		for (i in 0...naviArray.length)
@@ -404,12 +405,13 @@ class OptionsState extends MusicBeatState
 
 	public function changeLanguage() {
 		for (spr in 0...naviGroup.length) {
-				naviGroup[spr].changeLanguage();
-				cataGroup[spr].changeLanguage();
-				for (mem in 0...naviGroup[spr].parent.length) {
-					naviGroup[spr].parent[mem].changeLanguage();
-				}
+			naviGroup[spr].changeLanguage();
+
+			for (mem in naviGroup[spr].parent) mem.changeLanguage();
 		}
+
+		for (cata in cataGroup) cata.changeLanguage();
+
 		tipButton.changeLanguage();
 		resetButton.changeLanguage();
 		searchButton.changeLanguage();

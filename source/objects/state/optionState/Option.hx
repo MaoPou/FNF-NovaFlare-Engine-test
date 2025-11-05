@@ -395,7 +395,7 @@ class Option extends FlxSpriteGroup
 		if (!double) calcHeight = calcWidth * 0.16;
 		else calcHeight = calcWidth * 0.1;
 
-		baseBG = new Rect(0, 0, calcWidth, calcHeight, calcWidth / 75 / mult, calcWidth / 75 / mult, 0xffffff, 0.1);
+		baseBG = new Rect(0, 0, calcWidth, calcHeight, calcWidth / 75 / mult, calcWidth / 75 / mult, 0x000000, 0.3);
 		add(baseBG);
 
 		baseTar = new FlxText(0, 0, 0, Language.get('Target', 'op') + ': ' + variable, Std.int(baseBG.width / 20 / mult));
