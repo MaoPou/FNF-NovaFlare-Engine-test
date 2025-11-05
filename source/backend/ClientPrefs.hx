@@ -11,6 +11,7 @@ import states.TitleState;
 {
 	// General
 	public var framerate:Int = 60;
+	public var drawFrameRate:Int = 60;
 	public var splitUpdate:Bool = #if desktop false #else true #end;
 	public var colorblindMode:String = 'None';
 	public var lowQuality:Bool = false;
@@ -557,12 +558,19 @@ class ClientPrefs
 
 		if (FlxG.save.data.framerate == null)
 		{
-			final refreshRate:Int = FlxG.stage.application.window.displayMode.refreshRate;
+			final refreshRate:Int = FlxG.stage.application.window.displayMode.refreshRate * 2;
 			data.framerate = Std.int(FlxMath.bound(refreshRate, 60, 1000));
+		}
+
+		if (FlxG.save.data.drawFrameRate == null)
+		{
+			final refreshRate:Int = FlxG.stage.application.window.displayMode.refreshRate;
+			data.drawFrameRate = Std.int(FlxMath.bound(refreshRate, 60, 1000));
 		}
 		#end
 
 		FlxG.stage.application.window.splitUpdate = data.splitUpdate;
+		FlxG.stage.application.window.drawFrameRate = data.drawFrameRate;
 
 		if (data.framerate > FlxG.drawFramerate)
 		{
