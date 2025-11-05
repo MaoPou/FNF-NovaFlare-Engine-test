@@ -1,6 +1,7 @@
 General => General
 
-framerate => Framerate Cap
+framerate => Update Framerate Cap
+drawFrameRate => Draw Framerate Cap
 language => Engine Language
 gameQuality => Game Quality
 lowQuality => Low Quality
