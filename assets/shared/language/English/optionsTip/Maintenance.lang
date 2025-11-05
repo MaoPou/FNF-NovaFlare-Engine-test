@@ -1,5 +1,8 @@
 Maintenance => Maintenance
 
+developerMode => developer mode, which disables some error displays and traces
+DevConScale => size of the console used to capture all trace output
+
 oldHscriptVersion => Reduced version to use hscript work for runhaxecode
 
 

@@ -9,7 +9,7 @@ showComboNum => Show Combo Num
 showRating => Show Rating
 opponentStrums => Opponent Strums
 judgementCounter => Judgement Counter
-keyboardDisplay => Keyboard Display
+KeyboardViewer => Keyboard Display
 
 
 TimeBar => Time Bar

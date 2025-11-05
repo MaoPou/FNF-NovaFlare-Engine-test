@@ -9,7 +9,7 @@ showComboNum => Combo sprite appearance
 showRating => Rating sprite appearance
 opponentStrums => Shows opponent strums on screen
 judgementCounter => Show your judgements
-keyboardDisplay => Feedback the key you pressed
+KeyboardViewer => Feedback the key you pressed
 
 
 TimeBar => TimeBar

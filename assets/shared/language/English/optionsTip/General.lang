@@ -2,6 +2,7 @@ General => General
 
 framerate => Change your FPS cap
 language => Change engine language
+splitUpdate => Will update separate from the draw update, the effect is to increase the number of frames by about two to three times (depending on device performance)
 gameQuality => Change game quality for screen
 lowQuality => Turn off some object on stages
 colorblindMode => Colorblind filter more playable for colorblind people

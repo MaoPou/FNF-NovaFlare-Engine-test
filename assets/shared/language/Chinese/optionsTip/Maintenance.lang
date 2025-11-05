@@ -1,5 +1,8 @@
 Maintenance => 维护设置
 
+developerMode => 开发者模式，会禁用一些报错显示和trace
+DevConScale => 控制台的大小，此控制台是用来捕捉所有trace输出的
+
 oldHscriptVersion => 使用 Hscript 为 runhaxecode 工作以兼容旧模组
 
 
