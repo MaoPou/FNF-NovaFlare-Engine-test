@@ -9,6 +9,7 @@ import flixel.input.gamepad.FlxGamepad;
 import openfl.Assets;
 import openfl.display.Bitmap;
 import openfl.display.BitmapData;
+import openfl.events.KeyboardEvent;
 
 import shaders.ColorblindFilter;
 import states.StoryMenuState;
@@ -20,6 +21,7 @@ import states.TitleState;
 import mobile.states.CopyState;
 #end
 import lime.app.Application;
+import lime.system.System as LimeSystem;
 #if hxvlc
 import hxvlc.flixel.FlxVideoSprite;
 #end
@@ -28,6 +30,8 @@ import backend.device.AppData;
 import states.backend.PirateState;
 import sys.io.File;
 #end
+
+import scripts.init.InitScriptData;
 
 import sys.thread.Thread;
 
@@ -41,26 +45,10 @@ class InitState extends MusicBeatState
 
 	public static var ignoreCopy = false; //用于copystate，别删
 
-	override public function create():Void
+	override public function create()
 	{
-		Paths.clearStoredMemory();
-
 		FlxTransitionableState.skipNextTransIn = true;
 		FlxTransitionableState.skipNextTransOut = true;
-
-		#if android
-		FlxG.android.preventDefaultKeys = [BACK];
-		#end
-
-		#if mobile
-		try{
-			#if android
-			if (!FileSystem.exists(AndroidEnvironment.getExternalStorageDirectory() + '/.' + Application.current.meta.get('file')))
-				FileSystem.createDirectory(AndroidEnvironment.getExternalStorageDirectory() + '/.' + Application.current.meta.get('file'));
-			#end
-			Sys.setCwd(SUtil.getStorageDirectory());
-		}
-		#end
 
 		FlxG.fixedTimestep = false;
 		FlxG.game.focusLostFramerate = 60;
@@ -72,22 +60,54 @@ class InitState extends MusicBeatState
 
 		ClientPrefs.loadPrefs();
 
-		Language.resetData();
+		#if ACHIEVEMENTS_ALLOWED Achievements.load(); #end
 
-		#if android
-		
-		if (AppData.getVersionName() != Application.current.meta.get('version')
-			|| AppData.getAppName() != Application.current.meta.get('file')                                                                                                                                                                                                                                                                                                                                                                                                                         || !AppData.verifySignature()
-			|| (AppData.getPackageName() != Application.current.meta.get('packageName')
-				&& AppData.getPackageName() != Application.current.meta.get('packageName') + 'Backup1' // 共存
-				&& AppData.getPackageName() != Application.current.meta.get('packageName') + 'Backup2' // 共存
-				&& AppData.getPackageName() != 'com.antutu.ABenchMark' // 超频测试 安兔兔
-				&& AppData.getPackageName() != 'com.ludashi.benchmark' // 超频测试 鲁大师
-			)) {
-				FlxG.switchState(new PirateState());
-				return;
-			}
+		switch (ClientPrefs.data.gameQuality)
+		{
+			case 0:
+				FlxG.game.stage.quality = openfl.display.StageQuality.LOW;
+			case 1:
+				FlxG.game.stage.quality = openfl.display.StageQuality.HIGH;
+			case 2:
+				FlxG.game.stage.quality = openfl.display.StageQuality.MEDIUM;
+			case 3:
+				FlxG.game.stage.quality = openfl.display.StageQuality.BEST;
+		}
+
+		#if mobile
+		FlxG.fullscreen = true;
 		#end
+
+		#if desktop FlxG.stage.addEventListener(KeyboardEvent.KEY_UP, Main.toggleFullScreen); #end
+
+		#if android FlxG.android.preventDefaultKeys = [BACK]; #end
+
+		#if mobile
+		LimeSystem.allowScreenTimeout = ClientPrefs.data.screensaver;
+		#end
+
+		#if html5
+		FlxG.autoPause = false;
+		FlxG.mouse.visible = false;
+		#end
+
+		// shader coords fix
+		FlxG.signals.gameResized.add(function(w, h)
+		{
+			if (FlxG.cameras != null)
+			{
+				for (cam in FlxG.cameras.list)
+				{
+					if (cam != null && cam.filters != null)
+						Main.resetSpriteCache(cam.flashSprite);
+				}
+			}
+
+			if (FlxG.game != null)
+				Main.resetSpriteCache(FlxG.game);
+		});
+
+		Language.resetData();
 
 		#if CHECK_FOR_UPDATES
 		if (ClientPrefs.data.checkForUpdates)
@@ -168,7 +188,6 @@ class InitState extends MusicBeatState
 		#end
 		#end
 
-
 		Mods.loadTopMod();
 
 		if (FlxG.save.data != null && FlxG.save.data.fullscreen)
@@ -179,6 +198,7 @@ class InitState extends MusicBeatState
 		persistentUpdate = true;
 		persistentDraw = true;
 
+		InitScriptData.init();
 		Main.initScriptModules();
 		#if HSCRIPT_ALLOWED
 		scripts.stages.modules.ModuleHandler.init();

@@ -1,4 +1,4 @@
 #if (LUA_ALLOWED && !macro)
-import llua.*;
-import llua.Lua;
+import luau.*;
+import luau.Lua;
 #end

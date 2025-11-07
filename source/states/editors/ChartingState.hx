@@ -32,7 +32,7 @@ import objects.NoteSplash;
 import objects.HealthIcon;
 import objects.AttachedSprite;
 import objects.Character;
-import developer.display.DataGet;
+import developer.display.DataCalc;
 import substates.Prompt;
 import flixel.util.FlxStringUtil;
 import openfl.media.Sound;

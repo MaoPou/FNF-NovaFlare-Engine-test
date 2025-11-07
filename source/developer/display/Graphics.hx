@@ -24,21 +24,22 @@ class Watermark extends Bitmap
 
 class FPSBG extends Bitmap
 {
-	public function new(Width:Int = 140, Height:Int = 50, Alpha:Float = 0.3)
+	public function new(width:Int = 140, height:Int = 50, alpha:Float = 0.4)
 	{
 		super();
 
-		var color:FlxColor = FlxColor.fromRGB(124, 118, 146, 255);
+		var color:FlxColor = FlxColor.fromRGB(0, 0, 0, 255);
 
 		var shape:Shape = new Shape();
 		shape.graphics.beginFill(color);
-		shape.graphics.drawRoundRect(0, 0, Width, Height, 10, 10);
+		var round:Int = Std.int(Math.min(width, height) * 0.2);
+		shape.graphics.drawRoundRect(0, 0, width, height, round, round);
 		shape.graphics.endFill();
 
-		var BitmapData:BitmapData = new BitmapData(Width, Height, 0x00FFFFFF);
+		var BitmapData:BitmapData = new BitmapData(width, height, 0x00FFFFFF);
 		BitmapData.draw(shape);
 
 		this.bitmapData = BitmapData;
-		this.alpha = Alpha;
-	} // 说真的，haxe怎么写个贴图在flxgame层这么麻烦
+		this.alpha = alpha;
+	} // 说真的，haxe怎么写个贴图在openfl层这么麻烦
 }

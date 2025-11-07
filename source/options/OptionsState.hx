@@ -429,7 +429,7 @@ class OptionsState extends MusicBeatState
 			ClientPrefs.saveSettings();
 			Main.fpsVar.visible = ClientPrefs.data.showFPS;
 			Main.fpsVar.scaleX = Main.fpsVar.scaleY = ClientPrefs.data.FPSScale;
-			Main.fpsVar.change();
+			//Main.fpsVar.change();
 			if (Main.watermark != null)
 			{
 				Main.watermark.scaleX = Main.watermark.scaleY = ClientPrefs.data.WatermarkScale;

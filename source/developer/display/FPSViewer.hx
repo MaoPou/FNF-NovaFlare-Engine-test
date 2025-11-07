@@ -15,7 +15,7 @@ import flixel.tweens.FlxEase;
 
 import openfl.events.Event;
 
-class FPS extends Sprite
+class FPSViewer extends Sprite
 {
 	public function new(x:Float = 10, y:Float = 10)
 	{
@@ -25,11 +25,13 @@ class FPS extends Sprite
 		this.y = y;
 
 		create();
+
+		scaleX = scaleY = ClientPrefs.data.FPSScale;
+		visible = ClientPrefs.data.showFPS;
 	}
 
 	public static var fpsShow:FPSCounter;
 	public static var extraShow:ExtraCounter;
-	public static var versionShow:VersionCounter;
 
 	public var isHiding = true;
 
@@ -43,54 +45,34 @@ class FPS extends Sprite
 		addChild(extraShow);
 		extraShow.update();
 
-		versionShow = new VersionCounter(10, 130);
-		addChild(versionShow);
-
-		if (!ClientPrefs.data.showExtra)
-		{
-			versionShow.y = 70;
-		}
-
-		extraShow.visible = ClientPrefs.data.showExtra;
-
 		addEventListener(Event.ENTER_UPDATE, update);
+		addEventListener(Event.ENTER_FRAME, draw);
 	}
 	
 	private function update(e:Event):Void
 	{
+		DataCalc.update();
+		
 		if (isPointInFPSCounter() && FlxG.mouse.justPressed)
 		{
 			isHiding = !isHiding;
 			hide();
 		}
 
-		DataGet.update();
-
-		if (DataGet.number != 0)
+		if (DataCalc.updateMember != 0)
 			return;
 
 		fpsShow.update();
 		extraShow.update();
-		versionShow.update();
 
 		#if TRACY_ALLOWED
 			cpp.vm.tracy.TracyProfiler.frameMark();
 		#end
 	}
 
-	public function change()
+	private function draw(e:Event)
 	{
-		extraShow.visible = ClientPrefs.data.showExtra;
-		if (!ClientPrefs.data.showExtra)
-		{
-			versionShow.y = 70;
-			versionShow.change();
-		}
-		else
-		{
-			versionShow.y = 130;
-			versionShow.change();
-		}
+		DataCalc.draw();
 	}
 
 	var helloAlpha1:FlxTween;
@@ -100,13 +82,11 @@ class FPS extends Sprite
 	{
 		if (isHiding)
 		{
-			helloAlpha1 = FlxTween.tween(extraShow, {alpha: 0}, 0.2, {ease: FlxEase.quadOut});
-			helloAlpha2 = FlxTween.tween(versionShow, {alpha: 0}, 0.2, {ease: FlxEase.quadOut});
+			extraShow.alpha = 0;
 		}
 		else
 		{
-			helloAlpha1 = FlxTween.tween(extraShow, {alpha: 1}, 0.2, {ease: FlxEase.quadOut});
-			helloAlpha2 = FlxTween.tween(versionShow, {alpha: 1}, 0.2, {ease: FlxEase.quadOut});
+			extraShow.alpha = 1;
 		}
 	}
 

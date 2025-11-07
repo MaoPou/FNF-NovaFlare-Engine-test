@@ -15,7 +15,7 @@ class GeneralGroup extends OptionCata
 		addOption(option);
 		option.onChange = onChangeFramerate;
 
-		var option:Option = new Option(this, 'drawFrameRate', INT, [24, 360, 'FPS']);
+		var option:Option = new Option(this, 'drawFramerate', INT, [24, 360, 'FPS']);
 		addOption(option);
 		option.onChange = onChangeDrawFramerate;
 
@@ -113,7 +113,7 @@ class GeneralGroup extends OptionCata
 
 	function onChangeDrawFramerate()
 	{
-		FlxG.stage.application.window.drawFrameRate = ClientPrefs.data.drawFrameRate;
+		FlxG.stage.application.window.drawFrameRate = ClientPrefs.data.drawFramerate;
 	}
 
 	function onChangeSplitUpdate()

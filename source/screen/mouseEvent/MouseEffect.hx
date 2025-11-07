@@ -9,7 +9,7 @@ import openfl.geom.Point;
 import openfl.Lib;
 import openfl.geom.ColorTransform;
 
-import developer.display.DataGet;
+import developer.display.DataCalc;
 
 class MouseEffect extends Sprite {
     // 点击特效配置

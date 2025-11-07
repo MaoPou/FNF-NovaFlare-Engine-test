@@ -10,5 +10,5 @@ import openfl.display.Shape;
 import developer.display.Graphics;
 import developer.display.ExtraCounter;
 import developer.display.FPSCounter;
-import developer.display.DataGet;
-import developer.display.FPS;
+import developer.display.DataCalc;
+import developer.display.FPSViewer;

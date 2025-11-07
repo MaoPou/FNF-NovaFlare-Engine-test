@@ -18,15 +18,7 @@ class GraphicsGroup extends OptionCata
 		option.onChange = () -> changeWatermark();
 		addOption(option);
 
-		var option:Option = new Option(this, 'showExtra', BOOL);
-		addOption(option, true);
-
 		var option:Option = new Option(this, 'rainbowFPS', BOOL);
-		addOption(option);
-
-		var memoryTypeArray:Array<String> = ["Usage", "Reserved", "Current", "Large", "Total"];
-
-		var option:Option = new Option(this, 'memoryType', STRING, memoryTypeArray);
 		addOption(option, true);
 
 		var option:Option = new Option(this, 'FPSScale', FLOAT, [0, 5, 1]);
@@ -52,7 +44,7 @@ class GraphicsGroup extends OptionCata
 	function changeWatermark() {
 		Main.fpsVar.visible = ClientPrefs.data.showFPS;
 		Main.fpsVar.scaleX = Main.fpsVar.scaleY = ClientPrefs.data.FPSScale;
-		Main.fpsVar.change();
+		//Main.fpsVar.change();
 		if (Main.watermark != null)
 		{
 			Main.watermark.scaleX = Main.watermark.scaleY = ClientPrefs.data.WatermarkScale;

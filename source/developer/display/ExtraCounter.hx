@@ -17,7 +17,7 @@ class ExtraCounter extends Sprite
 		this.x = x;
 		this.y = y;
 
-		bgSprite = new FPSBG();
+		bgSprite = new FPSBG(300, 100);
 		addChild(bgSprite);
 
 		this.delay = new TextField();
@@ -64,24 +64,24 @@ class ExtraCounter extends Sprite
 		{
 			if (ClientPrefs.data.rainbowFPS)
 			{
-				label.textColor = ColorReturn.transfer(DataGet.currentFPS, ClientPrefs.data.framerate);
+				label.textColor = ColorReturn.transfer(DataCalc.drawFPS, ClientPrefs.data.drawFramerate);
 			}
 			else
 			{
 				label.textColor = 0xFFFFFFFF;
 			}
 
-			if (!ClientPrefs.data.rainbowFPS && DataGet.currentFPS <= ClientPrefs.data.framerate / 2)
+			if (!ClientPrefs.data.rainbowFPS && DataCalc.drawFPS <= ClientPrefs.data.drawFramerate / 2)
 			{
 				label.textColor = 0xFFFF0000;
 			}
 		}
 
 		this.delay.text = "Delay          MS ";
-		this.mem.text = "Mem            " + DataGet.memType + " ";
+		this.mem.text = "Mem            MB ";
 
-		var showTime:Float = Math.floor((DataGet.displayedFrameTime) * 10) / 10;
-		this.delayData.text = Display.fix(showTime) + " ";
-		this.memData.text = Display.fix(DataGet.memoryDis, true) + " ";
+		var showTime:Float = Math.floor((DataCalc.updateFrameTime) * 10) / 10;
+		this.delayData.text = Display.fix(showTime, 1) + " ";
+		this.memData.text = Display.fix(DataCalc.memory, 2) + " ";
 	}
 }

@@ -1,6 +1,6 @@
 package;
 
-import developer.display.FPS;
+import developer.display.FPSViewer;
 import developer.display.Graphics;
 import developer.console.TraceInterceptor;
 
@@ -40,21 +40,21 @@ import lime.graphics.Image;
 #end
 
 import haxe.ui.Toolkit;
-import scripts.init.InitScriptData;
+
 
 class Main extends Sprite
 {
 	private static var game = {
 		width: 1280, // WINDOW width
 		height: 720, // WINDOW height
-		initialState: InitState, // initial game state
+		initialState: InitState,
 		zoom: -1.0, // game state bounds
 		framerate: 60, // default framerate
 		skipSplash: true, // if the default flixel splash screen should be skipped
 		startFullscreen: false // if the game should start at fullscreen mode
 	};
 
-	public static var fpsVar:FPS;
+	public static var fpsVar:FPSViewer;
 	public static var watermark:Watermark;
 
 	#if mobile
@@ -128,7 +128,7 @@ class Main extends Sprite
 
 		Toolkit.init();
 
-		#if LUA_ALLOWED llua.Lua.set_callbacks_function(cpp.Callable.fromStaticFunction(scripts.lua.CallbackHandler.call)); #end
+		#if LUA_ALLOWED luau.Lua.set_callbacks_function(cpp.Callable.fromStaticFunction(scripts.lua.CallbackHandler.call)); #end
 		Controls.instance = new Controls();
 
 		#if mobile
@@ -138,44 +138,34 @@ class Main extends Sprite
 		#end
 		Sys.setCwd(SUtil.getStorageDirectory());
 		#end
-		#if ACHIEVEMENTS_ALLOWED Achievements.load(); #end
+
+		#if android
+			if (AppData.getVersionName() != Application.current.meta.get('version')
+				|| AppData.getAppName() != Application.current.meta.get('file')                                                                                                                                                                                                                                                                                                                                                                                                                         || !AppData.verifySignature()
+				|| (AppData.getPackageName() != Application.current.meta.get('packageName')
+					&& AppData.getPackageName() != Application.current.meta.get('packageName') + 'Backup1' // 共存
+					&& AppData.getPackageName() != Application.current.meta.get('packageName') + 'Backup2' // 共存
+					&& AppData.getPackageName() != 'com.antutu.ABenchMark' // 超频测试 安兔兔
+					&& AppData.getPackageName() != 'com.ludashi.benchmark' // 超频测试 鲁大师
+				)) {
+					FlxG.switchState(new PirateState());
+					return;
+				}
+		#end
 
 		///////////////////////////////////////////   --包含有读取文件的别在这个的上面运行
 
 		ExtraKeysHandler.instance = new ExtraKeysHandler();
 		ClientPrefs.loadDefaultKeys();
 
-		addChild(new FlxGame(#if (openfl >= "9.2.0") 1280, 720 #else game.width, game.height #end, game.initialState, #if (flixel < "5.0.0") game.zoom, #end
-			game.framerate, game.framerate, game.skipSplash, game.startFullscreen));
+		var flxGame:FlxGame = new FlxGame(#if (openfl >= "9.2.0") 1280, 720 #else game.width, game.height #end,game.initialState, #if (flixel < "5.0.0") game.zoom, #end game.framerate, game.framerate, game.skipSplash, game.startFullscreen);
+		addChild(flxGame);
 
-		Achievements.load();
-
-		fpsVar = new FPS(5, 5);
+		fpsVar = new FPSViewer(5, 5);
 		addChild(fpsVar);
-		if (fpsVar != null)
-		{
-			fpsVar.scaleX = fpsVar.scaleY = ClientPrefs.data.FPSScale;
-			fpsVar.visible = ClientPrefs.data.showFPS;
-		}
 
 		Lib.current.stage.align = "tl";
 		Lib.current.stage.scaleMode = StageScaleMode.NO_SCALE;
-
-		switch (ClientPrefs.data.gameQuality)
-		{
-			case 0:
-				FlxG.game.stage.quality = openfl.display.StageQuality.LOW;
-			case 1:
-				FlxG.game.stage.quality = openfl.display.StageQuality.HIGH;
-			case 2:
-				FlxG.game.stage.quality = openfl.display.StageQuality.MEDIUM;
-			case 3:
-				FlxG.game.stage.quality = openfl.display.StageQuality.BEST;
-		}
-
-		#if mobile
-		FlxG.fullscreen = true;
-		#end
 
 		var image:String = Paths.modFolders('images/menuExtend/Others/watermark.png');
 
@@ -197,24 +187,9 @@ class Main extends Sprite
 		var effect = new MouseEffect();
 		addChild(effect);
 
-		InitScriptData.init();
-
 		#if linux
 		var icon = Image.fromFile("icon.png");
 		Lib.current.stage.window.setIcon(icon);
-		#end
-
-		#if desktop FlxG.stage.addEventListener(KeyboardEvent.KEY_UP, toggleFullScreen); #end
-
-		#if android FlxG.android.preventDefaultKeys = [BACK]; #end
-
-		#if mobile
-		LimeSystem.allowScreenTimeout = ClientPrefs.data.screensaver;
-		#end
-
-		#if html5
-		FlxG.autoPause = false;
-		FlxG.mouse.visible = false;
 		#end
 
 		#if DISCORD_ALLOWED
@@ -227,26 +202,11 @@ class Main extends Sprite
 		Data.setup();
 
 		#if !debug
-			//cpp.NativeGc.enterGCFreeZone();
+			cpp.NativeGc.enterGCFreeZone();
 		#end
-		
-		// shader coords fix
-		FlxG.signals.gameResized.add(function(w, h)
-		{
-			if (FlxG.cameras != null)
-			{
-				for (cam in FlxG.cameras.list)
-				{
-					if (cam != null && cam.filters != null)
-						resetSpriteCache(cam.flashSprite);
-				}
-			}
-
-			if (FlxG.game != null)
-				resetSpriteCache(FlxG.game);
-		});
 	}
 
+	@:allow(states.backend.InitState)
 	static function resetSpriteCache(sprite:Sprite):Void
 	{
 		@:privateAccess {
@@ -298,7 +258,8 @@ class Main extends Sprite
 		#end
 	}
 
-	function toggleFullScreen(event:KeyboardEvent)
+	@:allow(states.backend.InitState)
+	static function toggleFullScreen(event:KeyboardEvent)
 	{
 		if (Controls.instance.justReleased('fullscreen'))
 			FlxG.fullscreen = !FlxG.fullscreen;

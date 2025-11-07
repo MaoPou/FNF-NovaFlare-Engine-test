@@ -11,7 +11,7 @@ import states.TitleState;
 {
 	// General
 	public var framerate:Int = 60;
-	public var drawFrameRate:Int = 60;
+	public var drawFramerate:Int = 60;
 	public var splitUpdate:Bool = #if desktop false #else true #end;
 	public var colorblindMode:String = 'None';
 	public var lowQuality:Bool = false;
@@ -142,7 +142,6 @@ import states.TitleState;
 
 	// Watermark
 	public var showFPS:Bool = true;
-	public var showExtra:Bool = true;
 	public var rainbowFPS:Bool = false;
 	public var memoryType:String = 'Usage';
 	public var FPSScale:Float = 1;
@@ -421,7 +420,6 @@ class ClientPrefs
 		defaultKeys = keyBinds.copy();
 		defaultButtons = gamepadBinds.copy();
 		defaultMobileBinds = mobileBinds.copy();
-
 	}
 
 	public static function saveSettings()
@@ -562,15 +560,15 @@ class ClientPrefs
 			data.framerate = Std.int(FlxMath.bound(refreshRate, 60, 1000));
 		}
 
-		if (FlxG.save.data.drawFrameRate == null)
+		if (FlxG.save.data.drawFramerate == null)
 		{
 			final refreshRate:Int = FlxG.stage.application.window.displayMode.refreshRate;
-			data.drawFrameRate = Std.int(FlxMath.bound(refreshRate, 60, 1000));
+			data.drawFramerate = Std.int(FlxMath.bound(refreshRate, 60, 1000));
 		}
 		#end
 
 		FlxG.stage.application.window.splitUpdate = data.splitUpdate;
-		FlxG.stage.application.window.drawFrameRate = data.drawFrameRate;
+		FlxG.stage.application.window.drawFrameRate = data.drawFramerate;
 
 		if (data.framerate > FlxG.drawFramerate)
 		{
