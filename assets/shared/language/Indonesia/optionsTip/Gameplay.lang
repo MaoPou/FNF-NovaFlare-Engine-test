@@ -1,8 +1,0 @@
-Gameplay => Alur Permainan
-
-downScroll => Catatan turun, bukan naik, cukup sederhana
-middleScroll => Letakkan lajur Anda di tengah atau di sebelah kanan
-flipChart => Balik bagan untuk bermain
-ghostTapping => Beralih menghitung dengan menekan input arah ketika tidak ada panah yang meleset
-guitarHeroSustains => Tahan Catatan tidak dapat ditekan jika Anda melewatkan
-noReset => Mengalihkan penekanan R ke permainan berakhir

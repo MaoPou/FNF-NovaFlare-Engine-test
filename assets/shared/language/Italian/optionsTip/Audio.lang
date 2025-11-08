@@ -1,7 +1,0 @@
-Audio => Audio
-
-mainMusic => Tipo di brano della schermata principale
-optionMusic => Opzione Schermata Tipo di brano
-pauseMusic => Pausa Tipo di brano della schermata
-hitsoundType => Tipo di suono
-hitsoundVolume => Volume dell'suono

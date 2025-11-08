@@ -13,6 +13,7 @@ The stuff shown on the preload screen is just a random line from the JustSay fil
 look here!!!!!!!
 2025-4-19 --MaoPou: "I've only joined the Chinese JustSay for now because it has a lot of local Chinese phrases that I can't translate well, so I'll let the language pros handle it."
 2025-4-24 --MaoPou: "I think I can translate it using DeepSeek.;)"
+2025-11-08  --MaoPou: "Well, I changed my mind because ai translation is a piece of shit. We need translators who really understand these words to translate into their mother tongue"
 ////////////////////
 JustSay就是当你打开预加载界面的时候会显示一些好玩的话打发无聊的等待。
 

@@ -1,7 +1,0 @@
-Audio => Audio
-
-mainMusic => Écran principal Type de chanson
-optionMusic => Option Écran Type de chanson
-pauseMusic => Pause Écran Type de chanson
-hitsoundType => Type de Sonorité
-hitsoundVolume => Volume de Sonorité
