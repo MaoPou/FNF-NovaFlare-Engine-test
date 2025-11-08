@@ -41,9 +41,11 @@ class FPSViewer extends Sprite
 		addChild(fpsShow);
 		fpsShow.update();
 
-		extraShow = new ExtraCounter(10, 80);
+		extraShow = new ExtraCounter(10, 10);
 		addChild(extraShow);
 		extraShow.update();
+
+		extraShow.alpha = 0;
 
 		addEventListener(Event.ENTER_UPDATE, update);
 		addEventListener(Event.ENTER_FRAME, draw);
@@ -75,18 +77,17 @@ class FPSViewer extends Sprite
 		DataCalc.draw();
 	}
 
-	var helloAlpha1:FlxTween;
-	var helloAlpha2:FlxTween;
-
 	function hide():Void
 	{
 		if (isHiding)
 		{
 			extraShow.alpha = 0;
+			fpsShow.alpha = 1;
 		}
 		else
 		{
 			extraShow.alpha = 1;
+			fpsShow.alpha = 0;
 		}
 	}
 
