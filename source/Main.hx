@@ -24,6 +24,12 @@ import states.backend.PassState;
 import mobile.backend.Data;
 import backend.extraKeys.ExtraKeysHandler;
 
+#if android
+import backend.device.AppData;
+import states.backend.PirateState;
+import sys.io.File;
+#end
+
 #if desktop
 import backend.device.ALSoftConfig;
 #end
