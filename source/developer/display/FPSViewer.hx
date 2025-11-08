@@ -70,6 +70,10 @@ class FPSViewer extends Sprite
 		#if TRACY_ALLOWED
 			cpp.vm.tracy.TracyProfiler.frameMark();
 		#end
+
+		// Ensure FPSViewer stays fixed at world origin
+		this.x = -FlxG.camera.scroll.x;
+		this.y = -FlxG.camera.scroll.y;
 	}
 
 	private function draw(e:Event)
@@ -93,11 +97,13 @@ class FPSViewer extends Sprite
 
 	private function isPointInFPSCounter():Bool
 	{
-		var global = fpsShow.localToGlobal(new openfl.geom.Point(0, 0));
+		var target = isHiding ? fpsShow : extraShow;
+
+		var global = target.localToGlobal(new openfl.geom.Point(0, 0));
 		var fpsX = global.x;
 		var fpsY = global.y;
-		var fpsWidth = fpsShow.width;
-		var fpsHeight = fpsShow.height;
+		var fpsWidth = target.width;
+		var fpsHeight = target.height;
 
 		var mx = Lib.current.stage.mouseX;
 		var my = Lib.current.stage.mouseY;

@@ -28,7 +28,7 @@ class FPSBG extends Bitmap
 	{
 		super();
 
-		var color:FlxColor = FlxColor.fromRGB(0, 0, 0, 255);
+		var color:FlxColor = FlxColor.fromRGB(100, 100, 100, 255);
 
 		var shape:Shape = new Shape();
 		shape.graphics.beginFill(color);

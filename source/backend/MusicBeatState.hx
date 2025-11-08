@@ -57,7 +57,7 @@ class MusicBeatState extends FlxUIState
 		mobileControls = new MobileControls();
 
 		var stage = Lib.current.stage;
-		var scale:Float = Math.min((stage.stageWidth / 1280), (stage.stageHeight / 720));
+		var scale:Float = Math.min((stage.stageWidth / FlxG.width), (stage.stageHeight / FlxG.height));
 		var newWidth:Int = Std.int(stage.stageWidth / scale);
 		var newHeight:Int = Std.int(stage.stageHeight / scale);
 

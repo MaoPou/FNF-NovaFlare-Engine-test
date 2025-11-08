@@ -54,7 +54,7 @@ class ExtraCounter extends Sprite
 			}
 		}
 
-		this.typeName.text = "Memery \nUpdate \nDraw \n";
+		this.typeName.text = "Update \nDraw \nMemery \n";
 
 		var outputText:String = '';
 		var showTime:Float = Math.floor((DataCalc.updateFrameTime) * 10) / 10;
