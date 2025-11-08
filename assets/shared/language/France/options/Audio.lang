@@ -1,7 +1,0 @@
-Audio => Audio
-
-mainMusic => Musique écran principal
-optionMusic => Musique écran options
-pauseMusic => Musique écran pause
-hitsoundType => Type de son de frappe
-hitsoundVolume => Volume son de frappe

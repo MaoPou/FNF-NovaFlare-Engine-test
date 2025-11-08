@@ -1,7 +1,0 @@
-Audio => Ljud
-
-mainMusic => Huvudskärm typ av låt
-optionMusic => Alternativ Skärm typ av låt
-pauseMusic => Pausskärm typ av låt
-hitsoundType => Typ av hitsound
-hitsoundVolume => Volym för Hitsound
