@@ -71,6 +71,8 @@ class FPSViewer extends Sprite
 			cpp.vm.tracy.TracyProfiler.frameMark();
 		#end
 
+		this.x = 10 - FlxG.game.x;
+		this.y = 10 - FlxG.game.y;
 	}
 
 	private function draw(e:Event)
