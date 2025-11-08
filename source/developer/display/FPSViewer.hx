@@ -71,9 +71,6 @@ class FPSViewer extends Sprite
 			cpp.vm.tracy.TracyProfiler.frameMark();
 		#end
 
-		// Ensure FPSViewer stays fixed at world origin
-		this.x = -FlxG.camera.scroll.x;
-		this.y = -FlxG.camera.scroll.y;
 	}
 
 	private function draw(e:Event)

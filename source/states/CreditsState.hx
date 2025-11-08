@@ -55,7 +55,7 @@ class CreditsState extends MusicBeatState
 				'Ex-Programmer',
 				'Pause Menu creator\n\n\nI like coding shit',
 				'FF6600',
-				'https://b23.tv/7OVWzAO'
+				'https://b23.tv/7OVWzAO',
 			],
 			[
 				'Careful_Scarf_487',
