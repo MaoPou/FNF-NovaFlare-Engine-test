@@ -55,6 +55,7 @@ class MouseMove extends FlxBasic
         this.event = onClick;
     }
     
+    private var _lastUpdateTime:Int = 0;
     public var inputAllow:Bool = true;
     override function update(elapsed:Float) {
         if (!allowUpdate) {
@@ -86,9 +87,11 @@ class MouseMove extends FlxBasic
             }
             
             // 拖动中更新位置
-            if (isDragging && mouse.pressed) {
+            if (isDragging && mouse.pressed)
+            {
                 updateDrag(mouse.y);
             }
+
             // 鼠标释放时停止拖动
             else if (isDragging && mouse.justReleased) {
                 endDrag();
@@ -145,7 +148,10 @@ class MouseMove extends FlxBasic
         target += velocity;
         lastMouseY = currentY;
 
-        velocUpdate(velocity);
+        if (FlxG.game.ticks - _lastUpdateTime >= 100)
+        {
+            velocUpdate(velocity);
+        }
     }
     
     private function endDrag() {

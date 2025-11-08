@@ -41,7 +41,7 @@ class FPSViewer extends Sprite
 		addChild(fpsShow);
 		fpsShow.update();
 
-		extraShow = new ExtraCounter(10, 70);
+		extraShow = new ExtraCounter(10, 80);
 		addChild(extraShow);
 		extraShow.update();
 

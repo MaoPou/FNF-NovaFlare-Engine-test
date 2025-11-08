@@ -1753,8 +1753,6 @@ class PlayState extends MusicBeatState
 
 		unspawnNotes.sort(sortByTime);
 
-		Note.defaultNoteSkin = 'noteSkins/NOTE_assets';
-
 		generatedMusic = true;
 	}
 

@@ -24,7 +24,7 @@ class Watermark extends Bitmap
 
 class FPSBG extends Bitmap
 {
-	public function new(width:Int = 140, height:Int = 50, alpha:Float = 0.4)
+	public function new(width:Int = 140, height:Int = 60, round:Int = 10, alpha:Float = 0.4)
 	{
 		super();
 
@@ -32,7 +32,6 @@ class FPSBG extends Bitmap
 
 		var shape:Shape = new Shape();
 		shape.graphics.beginFill(color);
-		var round:Int = Std.int(Math.min(width, height) * 0.2);
 		shape.graphics.drawRoundRect(0, 0, width, height, round, round);
 		shape.graphics.endFill();
 

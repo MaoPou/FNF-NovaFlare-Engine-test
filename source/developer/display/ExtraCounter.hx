@@ -2,11 +2,8 @@ package developer.display;
 
 class ExtraCounter extends Sprite
 {
-	public var delay:TextField;
-	public var mem:TextField;
-
-	public var delayData:TextField;
-	public var memData:TextField;
+	public var typeName:TextField;
+	public var typeData:TextField;
 
 	public var bgSprite:FPSBG;
 
@@ -17,50 +14,30 @@ class ExtraCounter extends Sprite
 		this.x = x;
 		this.y = y;
 
-		bgSprite = new FPSBG(300, 100);
+		bgSprite = new FPSBG(320, 75);
 		addChild(bgSprite);
 
-		this.delay = new TextField();
-		this.delayData = new TextField();
-		this.mem = new TextField();
-		this.memData = new TextField();
-
-		for (label in [this.delay, this.delayData, this.mem, this.memData])
+		this.typeName = new TextField();
+		this.typeData = new TextField();
+		
+		for (label in [this.typeData, this.typeName])
 		{
 			label.x = 0;
 			label.y = 0;
-			label.defaultTextFormat = new TextFormat(Assets.getFont("assets/fonts/FPS.ttf").fontName, 15, 0xFFFFFFFF, false, null, null, LEFT, 0, 0);
-			label.multiline = label.wordWrap = false;
+			label.defaultTextFormat = new TextFormat(Assets.getFont("assets/fonts/FPS.ttf").fontName, 18, 0xFFFFFFFF, false, null, null, RIGHT, 0, 0);
+			label.wordWrap = false;
 			label.selectable = false;
 			label.mouseEnabled = false;
 			addChild(label);
 		}
 
-		this.delay.y = this.delayData.y = 20;
-
-		this.delay.y += 2;
-		this.mem.y += 2;
-		this.delayData.y += 2;
-		this.memData.y += 2;
-
-		this.memData.x = this.memData.x + 45;
-		this.delayData.x = this.delayData.x + 28 * 2;
-
-		this.delay.text = "Delay:MS";
-		this.mem.text = "Memory:MB";
-
-		this.delay.width = 300;
-		this.mem.width = 300;
-
-		this.delay.x += 4;
-		this.mem.x += 4;
-		this.delayData.x += 4;
-		this.memData.x += 4;
+		typeName.x -= 10;
+		typeData.x += 100;
 	}
 
 	public function update():Void
 	{
-		for (label in [this.delay, this.delayData, this.mem, this.memData])
+		for (label in [this.typeData, this.typeName])
 		{
 			if (ClientPrefs.data.rainbowFPS)
 			{
@@ -77,11 +54,16 @@ class ExtraCounter extends Sprite
 			}
 		}
 
-		this.delay.text = "Delay          MS ";
-		this.mem.text = "Mem            MB ";
+		this.typeName.text = "Memery \nUpdate \nDraw \n";
 
+		var outputText:String = '';
 		var showTime:Float = Math.floor((DataCalc.updateFrameTime) * 10) / 10;
-		this.delayData.text = Display.fix(showTime, 1) + " ";
-		this.memData.text = Display.fix(DataCalc.memory, 2) + " ";
+		outputText += DataCalc.updateFPS + " / " + ClientPrefs.data.framerate + "fps (" + Display.fix(showTime, 1) + " ms) \n";
+		showTime = Math.floor((DataCalc.drawFrameTime) * 10) / 10;
+		outputText += DataCalc.drawFPS + " / " + (ClientPrefs.data.splitUpdate ? ClientPrefs.data.drawFramerate : ClientPrefs.data.framerate) + "fps (" + Display.fix(showTime, 1) + " ms) \n";
+		outputText += Display.fix(DataCalc.memory, 2) + " MB \n";
+		this.typeData.text = outputText;
+		typeData.width = typeData.textWidth;
+		typeData.x = bgSprite.x + bgSprite.width - typeData.width - 10;
 	}
 }

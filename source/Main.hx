@@ -128,7 +128,7 @@ class Main extends Sprite
 
 		Toolkit.init();
 
-		#if LUA_ALLOWED luau.Lua.set_callbacks_function(cpp.Callable.fromStaticFunction(scripts.lua.CallbackHandler.call)); #end
+		#if LUA_ALLOWED llua.Lua.set_callbacks_function(cpp.Callable.fromStaticFunction(scripts.lua.CallbackHandler.call)); #end
 		Controls.instance = new Controls();
 
 		#if mobile

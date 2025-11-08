@@ -12,7 +12,8 @@ class MouseEvent extends FlxBasic
         super(); //对的什么都没有
     }
 
-    var calcPos:Float = 0;
+    var calcPosX:Float = 0;
+    var calcPosY:Float = 0;
     var lastMouseY:Float = 0;
     var lastMouseX:Float = 0;
     override function update(elapsed:Float) {
@@ -23,17 +24,19 @@ class MouseEvent extends FlxBasic
             justPressed = true; 
             lastMouseY = mouse.y;
             lastMouseX = mouse.x;
-            calcPos = 0;
+            calcPosX = 0;
+            calcPosY = 0;
         }
         else justPressed = false;
 
         if (mouse.pressed) {
             pressed = true;
-            calcPos += Math.abs(mouse.y - lastMouseY) + Math.abs(mouse.x - lastMouseX);
+            calcPosX += Math.abs(mouse.x - lastMouseX);
+            calcPosY += Math.abs(mouse.y - lastMouseY);
         }
         else pressed = false;
 
-        if (mouse.justReleased && calcPos < 10) justReleased = true;
+        if (mouse.justReleased && calcPosX < 20 && calcPosY < 20) justReleased = true;
         else justReleased = false;
     
         super.update(elapsed);
