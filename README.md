@@ -21,6 +21,19 @@
 </div>
 <br />
 
+## 🔒 Security Notice
+
+**⚠️ IMPORTANT:** If you're building for production, please read:
+- [SECURITY_REVIEW.md](SECURITY_REVIEW.md) - Security audit findings
+- [KEYSTORE_SETUP.md](KEYSTORE_SETUP.md) - Android signing setup
+- [.env.example](.env.example) - Environment configuration template
+
+**For contributors:** The previous commits contained sensitive security information that has been removed. Please never commit:
+- Keystore files (*.keystore, *.jks)
+- API keys or passwords
+- Encryption keys
+- .env files with secrets
+
 # NovaFlare crew credits:
 | Avatar | Username | Involvement |
 | ------ | -------- | ----------- | 
