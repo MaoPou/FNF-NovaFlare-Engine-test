@@ -5,18 +5,6 @@ art/build_x32-officialrelease.bat
 art/build_x64-officialrelease.bat
 art/test_x64-debug-officialrelease.bat
 
-### Security - DO NOT COMMIT THESE FILES
-# Android signing keystores (contains private keys)
-*.keystore
-*.jks
-# Environment files with secrets
-.env
-.env.local
-.env.production
-# Configuration files with secrets
-config/secrets.*
-secrets.*
-
 ### VS Code
 export/*
 .vscode/*

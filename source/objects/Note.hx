@@ -481,33 +481,40 @@ class Note extends FlxSprite
 			animation.play(animName, true);
 	}
 
+	static var oldMod:Bool = false;
+
 	public static final initSkin:String = 'noteSkins/NOTE_assets';
 	static var skin:String;
 	static var skinPixel:String; //像素箭头路径（数据保存形式类似于defaultNoteSkin）
 	static var customSkin:String;
 	static var skinPostfix:String; //箭头设置给的后缀
-	static var loadedNote:Map<String, {texture:String, postfix:String, oldMod:Bool, skin:String}> = new Map<String, {texture:String, postfix:String, oldMod:Bool, skin:String}>();
+	static var loadedNote:Map<String, {texture:String, postfix:String, skin:String}> = new Map<String, {texture:String, postfix:String, skin:String}>();
 
-	public static function reloadPath(texture:String = '', postfix:String = '', oldMod:Bool = false)
+	public static function reloadPath(texture:String = '', postfix:String = '')
 	{
 		if (texture == null)
 			texture = defaultNoteSkin;
 		if (postfix == null)
 			postfix = '';
 
-		var currentKey = getLoadDataKey(texture, postfix, oldMod);
+		var currentKey = getLoadDataKey(texture, postfix);
 		if (loadedNote.exists(currentKey)) {
 			skin = loadedNote.get(currentKey).skin;
 			return;
 		}
 
-		skin = texture + postfix;
+		var defaultAdd:String = oldMod ? '' : defaultNoteSkin;
+		var slashAdd:String = oldMod ? '' : '/';
+		skin = defaultAdd + slashAdd + texture + postfix;
 		if (texture == defaultNoteSkin) //如果是默认箭头路径
 		{
 			skin = PlayState.SONG != null ? PlayState.SONG.arrowSkin : null; //兼容了铺面json设置的箭头
-			if (skin == null || skin.length < 1) //当发现铺面json的箭头读取有问题时
-				skin = defaultNoteSkin + postfix; //重设为默认箭头路径，返回到后续加载
-			else 
+			if (skin == null || skin.length < 1) {//当发现铺面json的箭头读取有问题时
+				if (oldMod)
+					skin = defaultAdd + postfix; //重设为默认箭头路径，返回到后续加载
+				else 
+					skin = defaultAdd + slashAdd + postfix; //重设为默认箭头路径，返回到后续加载
+			} else
 				defaultNoteSkin = skin; //将铺面json的箭头路径赋值给默认箭头路径
 				return; //直接跳过后续读取,获取为铺面json的路径
 		}
@@ -543,9 +550,9 @@ class Note extends FlxSprite
 		return skin;
 	}
 
-	static function getLoadDataKey(texture:String, postfix:String, oldMod:Bool):String
+	static function getLoadDataKey(texture:String, postfix:String):String
 	{
-		return '${texture}::${postfix}::${oldMod}';
+		return '${texture}::${postfix}';
 	}
 
 	function loadNoteAnims()
@@ -763,13 +770,15 @@ class Note extends FlxSprite
 
 	public static function init()
 	{
-		loadedNote = new Map<String, {texture:String, postfix:String, oldMod:Bool, skin:String}>();
+		loadedNote = new Map<String, {texture:String, postfix:String, skin:String}>();
 
 		if (FileSystem.exists(Paths.mods(Mods.currentModDirectory + '/images/NOTE_assets.png')) && ClientPrefs.data.noteSkin == ClientPrefs.defaultData.noteSkin) {
 			defaultNoteSkin = 'NOTE_assets';
-			reloadPath(defaultNoteSkin,'', true);
+			oldMod = true;
+			reloadPath(defaultNoteSkin,'');
 		} else {
 			defaultNoteSkin = initSkin;
+			oldMod = false;
 			reloadPath(defaultNoteSkin);
 		}
 
