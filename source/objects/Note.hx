@@ -486,7 +486,7 @@ class Note extends FlxSprite
 	static var skinPixel:String; //像素箭头路径（数据保存形式类似于defaultNoteSkin）
 	static var customSkin:String;
 	static var skinPostfix:String; //箭头设置给的后缀
-	static var loadedNote:Map<String, {texture:String, postfix:String, oldMod:Bool}> = new Map<String, {texture:String, postfix:String, oldMod:Bool}>();
+	static var loadedNote:Map<String, {texture:String, postfix:String, oldMod:Bool, skin:String}> = new Map<String, {texture:String, postfix:String, oldMod:Bool, skin:String}>();
 
 	public static function reloadPath(texture:String = '', postfix:String = '', oldMod:Bool = false)
 	{
@@ -496,10 +496,10 @@ class Note extends FlxSprite
 			postfix = '';
 
 		var currentKey = getLoadDataKey(texture, postfix, oldMod);
-		if (loadedNote.exists(currentKey))
+		if (loadedNote.exists(currentKey)) {
+			skin = loadedNote.get(currentKey).skin;
 			return;
-
-		loadedNote.set(currentKey, {texture: texture, postfix: postfix, oldMod: oldMod});
+		}
 
 		skin = texture + postfix;
 		if (texture == defaultNoteSkin) //如果是默认箭头路径
@@ -530,6 +530,8 @@ class Note extends FlxSprite
 		} else {
 			skin = defaultNoteSkin + getNoteSkinPostfix(defaultNoteSkin); //返回为默认贴图
 		}
+
+		loadedNote.set(currentKey, {texture: texture, postfix: postfix, oldMod: oldMod, skin: skin});
 	}
 
 	public static function getNoteSkinPostfix(?texture:String = '')
@@ -761,7 +763,7 @@ class Note extends FlxSprite
 
 	public static function init()
 	{
-		loadedNote = new Map<String, {texture:String, postfix:String, oldMod:Bool}>();
+		loadedNote = new Map<String, {texture:String, postfix:String, oldMod:Bool, skin:String}>();
 
 		if (FileSystem.exists(Paths.mods(Mods.currentModDirectory + '/images/NOTE_assets.png')) && ClientPrefs.data.noteSkin == ClientPrefs.defaultData.noteSkin) {
 			defaultNoteSkin = 'NOTE_assets';
