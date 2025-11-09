@@ -538,7 +538,7 @@ class Note extends FlxSprite
 			skin = defaultNoteSkin + getNoteSkinPostfix(defaultNoteSkin); //返回为默认贴图
 		}
 
-		loadedNote.set(currentKey, {texture: texture, postfix: postfix, oldMod: oldMod, skin: skin});
+		loadedNote.set(currentKey, {texture: texture, postfix: postfix, skin: skin});
 	}
 
 	public static function getNoteSkinPostfix(?texture:String = '')
