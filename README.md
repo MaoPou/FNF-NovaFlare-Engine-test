@@ -11,17 +11,28 @@
     <p style="margin: 12px 0;">
       <a href="https://novaflare.fun/docs-choose.html" style="font-size: 1.1em; display: block;">❗Our Docs❗</a>
     </p>
-    <!--
     <p style="margin: 12px 0;">
       <a href="http://xz.novaflare.top/" style="font-size: 1.1em; display: block;">🇨🇳 中国网络下载 (Chinese Mirror) 🇨🇳</a>
     </p>
-    -->
     <p style="margin: 2px 0;">
       <a href="https://online.novaflare.fun/dashboard.php" style="font-size: 0.1em; display: block;">-------------------------</a>
     </p>
   </div>
 </div>
 <br />
+
+## 🔒 Security Notice
+
+**⚠️ IMPORTANT:** If you're building for production, please read:
+- [SECURITY_REVIEW.md](SECURITY_REVIEW.md) - Security audit findings
+- [KEYSTORE_SETUP.md](KEYSTORE_SETUP.md) - Android signing setup
+- [.env.example](.env.example) - Environment configuration template
+
+**For contributors:** The previous commits contained sensitive security information that has been removed. Please never commit:
+- Keystore files (*.keystore, *.jks)
+- API keys or passwords
+- Encryption keys
+- .env files with secrets
 
 # NovaFlare crew credits:
 | Avatar | Username | Involvement |
