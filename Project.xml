@@ -232,8 +232,22 @@
 		<undefine name="openfl-disable-handle-error" if="debug" unless="${openfl >= 9.4.0}" />
 	</section>
 	
-	<!-- Do whatever you want I'm tired uninstall and install everytime -->
-	<certificate path="key.keystore" password="novaFlare" alias="psychport" alias-password="novaFlare" if="android" unless="debug" />
+	<!-- Android Release Signing Configuration
+	     IMPORTANT: For security, keystore passwords should be set via environment variables:
+	     - ANDROID_KEYSTORE_PASSWORD: Password for the keystore file
+	     - ANDROID_KEY_ALIAS: Alias name for the key
+	     - ANDROID_KEY_PASSWORD: Password for the specific key
+	     
+	     The keystore file itself (key.keystore) should NEVER be committed to the repository.
+	     Store it securely outside of version control.
+	     
+	     For debug builds, a separate debug.keystore can be used with a simple password.
+	-->
+	<certificate path="key.keystore" 
+	             password="${ANDROID_KEYSTORE_PASSWORD}" 
+	             alias="${ANDROID_KEY_ALIAS}" 
+	             alias-password="${ANDROID_KEY_PASSWORD}" 
+	             if="android" unless="debug" />
 
 	<!--Avoid memory leaks with for loops in HScript-->
 	<haxedef name="loop_unroll_max_cost" value="25" />
