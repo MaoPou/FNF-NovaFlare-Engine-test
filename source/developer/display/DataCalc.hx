@@ -72,11 +72,13 @@ class DataCalc
 
 		drawFPS = Math.floor(1000 / drawFrameTime + 0.5);
 		if (ClientPrefs.data.splitUpdate) {
-			if (drawFPS > ClientPrefs.data.drawFramerate)
+			if (drawFPS > ClientPrefs.data.drawFramerate) {
 				drawFPS = ClientPrefs.data.drawFramerate;
+			}
 		} else {
-			if (drawFPS > ClientPrefs.data.framerate)
-			drawFPS = ClientPrefs.data.framerate;
+			if (drawFPS > ClientPrefs.data.framerate) {
+				drawFPS = ClientPrefs.data.framerate;
+			}
 		}
 
 		////////////////////////////// 数据初始化
