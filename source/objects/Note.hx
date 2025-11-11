@@ -486,15 +486,15 @@ class Note extends FlxSprite
 	public static final initSkin:String = 'noteSkins/NOTE_assets';
 	static var skin:String;
 	static var skinPixel:String; //像素箭头路径（数据保存形式类似于defaultNoteSkin）
-	static var customSkin:String;
-	static var skinPostfix:String; //箭头设置给的后缀
+	static var customSkin:String = '';
+	static var skinPostfix:String = ''; //箭头设置给的后缀
 	static var loadedNote:Map<String, {texture:String, postfix:String, skin:String}> = new Map<String, {texture:String, postfix:String, skin:String}>();
 
 	public static function reloadPath(texture:String = '', postfix:String = '')
 	{
-		if (texture == null)
+		if (texture == null || texture.length < 1)
 			texture = defaultNoteSkin;
-		if (postfix == null)
+		if (postfix == null || postfix.length < 1)
 			postfix = '';
 
 		var currentKey = getLoadDataKey(texture, postfix);
@@ -503,29 +503,21 @@ class Note extends FlxSprite
 			return;
 		}
 
-		var defaultAdd:String = oldMod ? '' : defaultNoteSkin;
-		var slashAdd:String = oldMod ? '' : '/';
-		skin = defaultAdd + slashAdd + texture + postfix;
+		skin = texture + postfix;
 		if (texture == defaultNoteSkin) //如果是默认箭头路径
 		{
 			skin = PlayState.SONG != null ? PlayState.SONG.arrowSkin : null; //兼容了铺面json设置的箭头
 			if (skin == null || skin.length < 1) {//当发现铺面json的箭头读取有问题时
-				if (oldMod)
-					skin = defaultAdd + postfix; //重设为默认箭头路径，返回到后续加载
-				else 
-					skin = defaultAdd + slashAdd + postfix; //重设为默认箭头路径，返回到后续加载
-			} else
-				defaultNoteSkin = skin; //将铺面json的箭头路径赋值给默认箭头路径
+				skin = texture + postfix;
+			} else {
+				loadedNote.set(currentKey, {texture: texture, postfix: postfix, skin: skin});
 				return; //直接跳过后续读取,获取为铺面json的路径
+			}
 		}
 
 		skinPixel = skin;
 
-		if (!oldMod) {
-			skinPostfix = getNoteSkinPostfix(texture); //pe 0.7+
-		} else {
-			skinPostfix = ''; //pe 0.63-
-		}
+		skinPostfix = getNoteSkinPostfix(texture);
 
 		customSkin = skin + skinPostfix; //前期加载的箭头数据和设置选择的最后结果
 
@@ -541,11 +533,11 @@ class Note extends FlxSprite
 		loadedNote.set(currentKey, {texture: texture, postfix: postfix, skin: skin});
 	}
 
-	public static function getNoteSkinPostfix(?texture:String = '')
+	public static function getNoteSkinPostfix(?texture:String = ''):String
 	{
-		if (texture == '') texture = initSkin;
+		if (texture == '') texture = defaultNoteSkin;
 		var skin:String = '';
-		if (ClientPrefs.data.noteSkin != ClientPrefs.defaultData.noteSkin && defaultNoteSkin == initSkin)
+		if (ClientPrefs.data.noteSkin != ClientPrefs.defaultData.noteSkin && texture == initSkin)
 			skin = '-' + ClientPrefs.data.noteSkin.trim().toLowerCase().replace(' ', '_');
 		return skin;
 	}
