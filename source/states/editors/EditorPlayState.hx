@@ -14,9 +14,11 @@ import openfl.events.KeyboardEvent;
 import haxe.Json;
 import objects.Character;
 import openfl.utils.Assets as OpenFlAssets;
+import backend.TimingSystem;
 
 class EditorPlayState extends MusicBeatSubstate
 {
+    var timing:TimingSystem;
 	// Borrowed from original PlayState
 	var finishTimer:FlxTimer = null;
 	var noteKillOffset:Float = 350;
@@ -171,8 +173,8 @@ class EditorPlayState extends MusicBeatSubstate
 		RecalculateRating();
 	}
 
-	override function update(elapsed:Float)
-	{
+    override function update(elapsed:Float)
+    {
 		if (#if !android virtualPad.buttonP.justPressed
 			|| #end FlxG.keys.justPressed.ESCAPE #if android || FlxG.android.justPressed.BACK #end)
 		{
@@ -182,15 +184,21 @@ class EditorPlayState extends MusicBeatSubstate
 			return;
 		}
 
-		if (startingSong)
-		{
-			timerToStart -= elapsed * 1000;
-			Conductor.songPosition = startPos - timerToStart;
-			if (timerToStart < 0)
-				startSong();
-		}
-		else
-			Conductor.songPosition += elapsed * 1000 * playbackRate;
+        if (startingSong)
+        {
+            timerToStart -= elapsed * 1000;
+            Conductor.songPosition = startPos - timerToStart;
+            if (timing == null) {
+                timing = new TimingSystem();
+                timing.setRate(playbackRate);
+            }
+            timing.setPosition(Conductor.songPosition);
+            timing.enableTick();
+            if (timerToStart < 0)
+                startSong();
+        }
+        else
+            Conductor.songPosition = timing != null ? timing.getPositionMs() : Conductor.songPosition;
 
 		if (unspawnNotes[0] != null)
 		{
@@ -307,24 +315,30 @@ class EditorPlayState extends MusicBeatSubstate
 		super.destroy();
 	}
 
-	function startSong():Void
-	{
-		startingSong = false;
-		@:privateAccess
-		FlxG.sound.playMusic(inst._sound, 1, false);
-		FlxG.sound.music.time = startPos;
-		#if FLX_PITCH FlxG.sound.music.pitch = playbackRate; #end
-		FlxG.sound.music.onComplete = finishSong;
-		vocals.volume = 1;
-		vocals.time = startPos;
-		vocals.play();
-		opponentVocals.volume = 1;
-		opponentVocals.time = startPos;
-		opponentVocals.play();
+    function startSong():Void
+    {
+        startingSong = false;
+        @:privateAccess
+        FlxG.sound.playMusic(inst._sound, 1, false);
+        FlxG.sound.music.time = startPos;
+        #if FLX_PITCH FlxG.sound.music.pitch = playbackRate; #end
+        FlxG.sound.music.onComplete = finishSong;
+        vocals.volume = 1;
+        vocals.time = startPos;
+        vocals.play();
+        opponentVocals.volume = 1;
+        opponentVocals.time = startPos;
+        opponentVocals.play();
 
 		// Song duration in a float, useful for the time left feature
-		songLength = FlxG.sound.music.length;
-	}
+        songLength = FlxG.sound.music.length;
+        if (timing == null) {
+            timing = new TimingSystem();
+            timing.setRate(playbackRate);
+        }
+        timing.setPosition(startPos);
+        timing.play();
+    }
 
 	// Borrowed from PlayState
 	function generateSong(dataPath:String)
@@ -794,6 +808,7 @@ class EditorPlayState extends MusicBeatSubstate
 		var lastTime:Float = Conductor.songPosition;
 		if (Conductor.songPosition >= 0)
 			Conductor.songPosition = FlxG.sound.music.time;
+			if (timing != null) timing.setPosition(Conductor.songPosition);
 
 		// obtain notes that the player can hit
 		var plrInputNotes:Array<Note> = notes.members.filter(function(n:Note) return n != null && n.canBeHit && n.mustPress && !n.tooLate && !n.wasGoodHit
@@ -830,6 +845,7 @@ class EditorPlayState extends MusicBeatSubstate
 
 		// more accurate hit time for the ratings? part 2 (Now that the calculations are done, go back to the time it was before for not causing a note stutter)
 		Conductor.songPosition = lastTime;
+		if (timing != null) timing.setPosition(lastTime);
 
 		var spr:StrumNote = playerStrums.members[key];
 		if (spr != null && spr.animation.curAnim.name != 'confirm')
@@ -1055,6 +1071,7 @@ class EditorPlayState extends MusicBeatSubstate
 		FlxG.sound.music.play();
 		#if FLX_PITCH FlxG.sound.music.pitch = playbackRate; #end
 		Conductor.songPosition = FlxG.sound.music.time;
+		if (timing != null) timing.setPosition(Conductor.songPosition);
 		if (Conductor.songPosition <= vocals.length)
 		{
 			vocals.time = Conductor.songPosition;

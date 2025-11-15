@@ -10,6 +10,7 @@ import backend.Song;
 import backend.Section;
 import backend.Rating;
 import backend.Replay;
+import backend.TimingSystem;
 import sys.thread.Thread;
 import sys.thread.Mutex;
 import haxe.Timer;
@@ -134,7 +135,9 @@ class PlayState extends MusicBeatState
 	public var songSpeedType:String = "multiplicative";
 	public var noteKillOffset:Float = 350;
 
-	public var playbackRate(default, set):Float = 1;
+    public var playbackRate(default, set):Float = 1;
+    public var timing:TimingSystem;
+    public var timingDebug:FlxText;
 
 	public var boyfriendGroup:FlxSpriteGroup;
 	public var dadGroup:FlxSpriteGroup;
@@ -355,8 +358,9 @@ class PlayState extends MusicBeatState
 		}
 		else keysArray = ['note_left', 'note_down', 'note_up', 'note_right'];
 
-		if (FlxG.sound.music != null)
-			FlxG.sound.music.stop();
+        if (FlxG.sound.music != null)
+            FlxG.sound.music.stop();
+        if (timing != null) timing.pause();
 
 		// Gameplay settings
 		healthGain = ClientPrefs.getGameplaySetting('healthgain');
@@ -394,8 +398,10 @@ class PlayState extends MusicBeatState
 
 		persistentUpdate = persistentDraw = true;
 
-		Conductor.mapBPMChanges(SONG);
-		Conductor.bpm = SONG.bpm;
+        Conductor.mapBPMChanges(SONG);
+        Conductor.bpm = SONG.bpm;
+        timing = new TimingSystem();
+        timing.setRate(playbackRate);
 
 		#if DISCORD_ALLOWED
 		// String that contains the mode defined here so it isn't necessary to call changePresence for each mode
@@ -592,7 +598,7 @@ class PlayState extends MusicBeatState
 
 		Conductor.songPosition = -5000 / Conductor.songPosition;
 		var showTime:Bool = (ClientPrefs.data.timeBarType != 'Disabled');
-		timeTxt = new FlxText(STRUM_X + (FlxG.width / 2) - 248, 19, 400, "", 32);
+        timeTxt = new FlxText(STRUM_X + (FlxG.width / 2) - 248, 19, 400, "", 32);
 		timeTxt.setFormat(Paths.font("vcr.ttf"), 32, FlxColor.WHITE, CENTER, FlxTextBorderStyle.OUTLINE, FlxColor.BLACK);
 		timeTxt.scrollFactor.set();
 		timeTxt.alpha = 0;
@@ -665,7 +671,7 @@ class PlayState extends MusicBeatState
 		scoreTxt.cameras = [camHUD];
 		timeBar.cameras = [camHUD];
 		timeBarBG.cameras = [camHUD];
-		timeTxt.cameras = [camHUD];
+        timeTxt.cameras = [camHUD];
 
 		if (ClientPrefs.data.pauseButton)
 		{
@@ -872,15 +878,16 @@ class PlayState extends MusicBeatState
 					note.resizeByRatio(ratio);
 			}
 		}
-		playbackRate = value;
-		FlxG.animationTimeScale = value;
-		Conductor.safeZoneOffset = (ClientPrefs.data.safeFrames / 60) * 1000 * value;
-		setOnScripts('playbackRate', playbackRate);
-		#else
-		playbackRate = 1.0; // ensuring -Crow
-		#end
-		return playbackRate;
-	}
+        playbackRate = value;
+        FlxG.animationTimeScale = value;
+        Conductor.safeZoneOffset = (ClientPrefs.data.safeFrames / 60) * 1000 * value;
+        setOnScripts('playbackRate', playbackRate);
+        if (timing != null) timing.setPrimaryRate(playbackRate);
+        #else
+        playbackRate = 1.0; // ensuring -Crow
+        #end
+        return playbackRate;
+    }
 
 	#if (LUA_ALLOWED || HSCRIPT_ALLOWED)
 	public function addTextToDebug(text:String, color:FlxColor)
@@ -1231,8 +1238,13 @@ class PlayState extends MusicBeatState
 				// if(ClientPrefs.data.middleScroll) opponentStrums.members[i].visible = false;
 			}
 
-			startedCountdown = true;
-			Conductor.songPosition = -Conductor.crochet * 5;
+            startedCountdown = true;
+            Conductor.songPosition = -Conductor.crochet * 5;
+            new FlxTimer().start(0, function(tmr:FlxTimer)
+            {
+                timing.setPosition(Conductor.songPosition);
+                timing.enableTick();
+            });
 			setOnScripts('startedCountdown', true);
 			callOnScripts('onCountdownStarted');
 
@@ -1476,10 +1488,11 @@ class PlayState extends MusicBeatState
 		FlxG.sound.music.pause();
 		vocals.pause();
 		opponentVocals.pause();
-		if (videoCutscene != null)
-		{
-			videoCutscene.pause();
-		};
+        if (videoCutscene != null)
+        {
+            videoCutscene.pause();
+        };
+        if (timing != null) timing.pause();
 
 		FlxG.sound.music.time = time;
 		#if FLX_PITCH FlxG.sound.music.pitch = playbackRate; #end
@@ -1500,7 +1513,8 @@ class PlayState extends MusicBeatState
 		{
 			videoCutscene.resume();
 		};
-		Conductor.songPosition = time;
+        Conductor.songPosition = time;
+        if (timing != null) timing.setPosition(time);
 	}
 
 	public function startNextDialogue()
@@ -1533,6 +1547,12 @@ class PlayState extends MusicBeatState
 		if (startOnTime > 0)
 			setSongTime(startOnTime - 500);
 		startOnTime = 0;
+
+		if (timing != null) {
+			// 音频开始播放时设置基准并启动计时
+			timing.setPosition(FlxG.sound.music.time);
+			timing.play();
+		}
 
 		if (paused)
 		{
@@ -2111,12 +2131,13 @@ class PlayState extends MusicBeatState
 				FlxTween.globalManager.forEach(function(twn:FlxTween) if (!twn.finished)
 					twn.active = true);
 
-				paused = false;
-				if (mobileControls != null)
-					mobileControls.visible = true;
-				callOnScripts('onResume');
-				resetRPC(startTimer != null && startTimer.finished);
-			});
+                paused = false;
+                if (timing != null) timing.resume();
+                if (mobileControls != null)
+                    mobileControls.visible = true;
+                callOnScripts('onResume');
+                resetRPC(startTimer != null && startTimer.finished);
+            });
 
 			for (key in 0...keyboardViewer.keys) {
 				if (!Controls.instance.pressed(keysArray[key]))
@@ -2187,7 +2208,8 @@ class PlayState extends MusicBeatState
 
 		FlxG.sound.music.play();
 		#if FLX_PITCH FlxG.sound.music.pitch = playbackRate; #end
-		Conductor.songPosition = FlxG.sound.music.time;
+        Conductor.songPosition = FlxG.sound.music.time;
+        if (timing != null) timing.setPosition(Conductor.songPosition);
 
 		if (Conductor.songPosition <= vocals.length)
 		{
@@ -2235,9 +2257,9 @@ class PlayState extends MusicBeatState
 	var memEnd:Float = 0;
 	var allocDelta:Int = 0;
 
-	override public function update(elapsed:Float)
-	{
-		memStart = Gc.memInfo(0);
+override public function update(elapsed:Float)
+{
+		//memStart = Gc.memInfo(0);
 
 		if (ClientPrefs.data.pauseButton)
 		{
@@ -2339,13 +2361,13 @@ class PlayState extends MusicBeatState
 		updateIconsScale(elapsed);
 		updateIconsPosition();
 
-		if (startedCountdown && !paused)
-		{
-			Conductor.songPosition += elapsed * 1000 * playbackRate;
-			if (checkIfDesynced)
-			{
-				var diff:Float = 50 * playbackRate; // 0.05秒的音乐延迟偏差
-				var timeSub:Float = Conductor.songPosition - Conductor.offset;
+        if (startedCountdown && !paused)
+        {
+            Conductor.songPosition = timing.getPositionMs();
+            if (checkIfDesynced)
+            {
+                var diff:Float = 50 * playbackRate; // 0.05秒的音乐延迟偏差
+                var timeSub:Float = Conductor.songPosition - Conductor.offset;
 
 				if (Math.abs(FlxG.sound.music.time - timeSub) > diff
 					|| musicCheck(vocals, timeSub, diff)
@@ -2369,8 +2391,9 @@ class PlayState extends MusicBeatState
 		{
 			if (startedCountdown && Conductor.songPosition >= 0)
 				startSong();
-			else if (!startedCountdown)
-				Conductor.songPosition = -Conductor.crochet * 5;
+            else if (!startedCountdown)
+                Conductor.songPosition = -Conductor.crochet * 5;
+            if (!startedCountdown) timing.setPosition(Conductor.songPosition);
 		}
 		else if (!paused && updateTime)
 		{
@@ -2587,8 +2610,8 @@ class PlayState extends MusicBeatState
 
 		callOnScripts('onUpdatePost', [elapsed]);
 
-		memEnd = Gc.memInfo(0);
-		allocDelta = Std.int(Math.max(0, memEnd - memStart));
+		//memEnd = Gc.memInfo(0);
+		//allocDelta = Std.int(Math.max(0, memEnd - memStart));
 
 		#if desktop
 		/*
@@ -2692,7 +2715,8 @@ class PlayState extends MusicBeatState
 		FlxG.camera.followLerp = 0;
 		persistentUpdate = false;
 		persistentDraw = true;
-		paused = true;
+                paused = true;
+                if (timing != null) timing.pause();
 
 		keyboardViewer.save();
 
