@@ -305,6 +305,7 @@ class Note extends FlxSprite
 		if (noteData > -1)
 		{
 			texture = '';
+			
 			rgbShader = new RGBShaderReference(this, initializeGlobalRGBShader(noteData));
 			if (PlayState.SONG != null && (PlayState.SONG.disableNoteRGB || !ClientPrefs.data.noteRGB || ClientPrefs.data.noteColorSwap))
 				rgbShader.enabled = false;

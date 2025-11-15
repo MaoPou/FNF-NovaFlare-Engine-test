@@ -219,7 +219,7 @@ class PlayState extends MusicBeatState
 
 	var songPercent:Float = 0;
 
-	public var KeyboardViewer:KeyboardViewer;
+	public var keyboardViewer:KeyboardViewer;
 
 	public var ratingsData:Array<Rating> = Rating.loadDefault();
 
@@ -657,38 +657,12 @@ class PlayState extends MusicBeatState
 		judgementCounter_S.cameras = [camHUD];
 		add(judgementCounter_S);
 		judgementCounter_S.y = FlxG.height / 2 - judgementCounter_S.height / 2;
-
-		botplayTxt = new FlxText(400, timeBar.y + 55, FlxG.width - 800, "BOTPLAY", 32);
-		botplayTxt.setFormat(Paths.font("vcr.ttf"), 32, FlxColor.WHITE, CENTER, FlxTextBorderStyle.OUTLINE, FlxColor.BLACK);
-		botplayTxt.scrollFactor.set();
-		botplayTxt.borderSize = 1.25;
-		botplayTxt.visible = ClientPrefs.data.playOpponent ? cpuControlled_opponent : cpuControlled;
-		add(botplayTxt);
-		if (ClientPrefs.data.downScroll)
-			botplayTxt.y = timeBar.y - 78;
-
-		replayTxt = new FlxText(400, timeBar.y + 55, FlxG.width - 800, "REPLAY", 32);
-		replayTxt.setFormat(Paths.font("vcr.ttf"), 32, FlxColor.WHITE, CENTER, FlxTextBorderStyle.OUTLINE, FlxColor.BLACK);
-		replayTxt.scrollFactor.set();
-		replayTxt.borderSize = 1.25;
-		replayTxt.visible = replayMode;
-		add(replayTxt);
-		if (ClientPrefs.data.downScroll)
-			replayTxt.y = timeBar.y - 78;
-
-		if (ClientPrefs.data.timeBarType == 'Song Name')
-		{
-			timeTxt.size = 24;
-			timeTxt.y += 3;
-		}
 		
 		healthBar.cameras = [camHUD];
 		healthBarBG.cameras = [camHUD];
 		iconP1.cameras = [camHUD];
 		iconP2.cameras = [camHUD];
 		scoreTxt.cameras = [camHUD];
-		botplayTxt.cameras = [camHUD];
-		replayTxt.cameras = [camHUD];
 		timeBar.cameras = [camHUD];
 		timeBarBG.cameras = [camHUD];
 		timeTxt.cameras = [camHUD];
@@ -721,13 +695,38 @@ class PlayState extends MusicBeatState
 		opponentStrums = new FlxTypedGroup<StrumNote>();
 		playerStrums = new FlxTypedGroup<StrumNote>();
 
+		botplayTxt = new FlxText(400, timeBar.y + 55, FlxG.width - 800, "BOTPLAY", 32);
+		botplayTxt.setFormat(Paths.font("vcr.ttf"), 32, FlxColor.WHITE, CENTER, FlxTextBorderStyle.OUTLINE, FlxColor.BLACK);
+		botplayTxt.scrollFactor.set();
+		botplayTxt.borderSize = 1.25;
+		botplayTxt.visible = ClientPrefs.data.playOpponent ? cpuControlled_opponent : cpuControlled;
+		add(botplayTxt);
+		if (ClientPrefs.data.downScroll)
+			botplayTxt.y = timeBar.y - 78;
+
+		replayTxt = new FlxText(400, timeBar.y + 55, FlxG.width - 800, "REPLAY", 32);
+		replayTxt.setFormat(Paths.font("vcr.ttf"), 32, FlxColor.WHITE, CENTER, FlxTextBorderStyle.OUTLINE, FlxColor.BLACK);
+		replayTxt.scrollFactor.set();
+		replayTxt.borderSize = 1.25;
+		replayTxt.visible = replayMode;
+		add(replayTxt);
+		if (ClientPrefs.data.downScroll)
+			replayTxt.y = timeBar.y - 78;
+
+		if (ClientPrefs.data.timeBarType == 'Song Name'){
+			timeTxt.size = 24;
+			timeTxt.y += 3;
+		}
+		botplayTxt.cameras = [camHUD];
+		replayTxt.cameras = [camHUD];
+
 		generateSong(SONG.song);
 
-		KeyboardViewer = new KeyboardViewer(ClientPrefs.data.comboOffset[4], ClientPrefs.data.comboOffset[5]);
-		KeyboardViewer.antialiasing = ClientPrefs.data.antialiasing;
-		KeyboardViewer.visible = ClientPrefs.data.KeyboardViewer;
-		add(KeyboardViewer);
-		KeyboardViewer.cameras = [camHUD];
+		keyboardViewer = new KeyboardViewer(ClientPrefs.data.comboOffset[4], ClientPrefs.data.comboOffset[5]);
+		keyboardViewer.antialiasing = ClientPrefs.data.antialiasing;
+		keyboardViewer.visible = ClientPrefs.data.KeyboardViewer;
+		add(keyboardViewer);
+		keyboardViewer.cameras = [camHUD];
 
 		camFollow = new FlxObject(0, 0, 1, 1);
 		camFollow.setPosition(camPos.x, camPos.y);
@@ -1670,6 +1669,7 @@ class PlayState extends MusicBeatState
 				var swagNote:Note = new Note(daStrumTime, daNoteData, oldNote);
 				swagNote.mustPress = gottaHitNote;
 				swagNote.sustainLength = songNotes[2];
+				
 				swagNote.gfNote = (section.gfSection && (songNotes[1]<(SONG.mania + 1)));
 				swagNote.noteType = songNotes[3];
 				if (!Std.isOfType(songNotes[3], String))
@@ -1727,6 +1727,8 @@ class PlayState extends MusicBeatState
 						}
 					}
 				}
+
+				//trace('work5');
 
 				if (swagNote.mustPress)
 				{
@@ -2116,9 +2118,9 @@ class PlayState extends MusicBeatState
 				resetRPC(startTimer != null && startTimer.finished);
 			});
 
-			for (key in 0...KeyboardViewer.keys) {
+			for (key in 0...keyboardViewer.keys) {
 				if (!Controls.instance.pressed(keysArray[key]))
-					KeyboardViewer.released(key);
+					keyboardViewer.released(key);
 			}
 		}
 	}
@@ -2692,7 +2694,7 @@ class PlayState extends MusicBeatState
 		persistentDraw = true;
 		paused = true;
 
-		KeyboardViewer.save();
+		keyboardViewer.save();
 
 		if (FlxG.sound.music != null)
 		{
@@ -3244,7 +3246,7 @@ class PlayState extends MusicBeatState
 			}
 		}
 
-		KeyboardViewer.save();
+		keyboardViewer.save();
 
 		timeBar.visible = false;
 		timeTxt.visible = false;
@@ -3737,7 +3739,7 @@ class PlayState extends MusicBeatState
 		if (!generatedMusic || endingSong || char.stunned)
 			return;
 
-		KeyboardViewer.pressed(key);
+		keyboardViewer.pressed(key);
 
 		replayExam.push(Conductor.songPosition, key, 1);
 		// 回放数据的保存
@@ -3877,7 +3879,7 @@ class PlayState extends MusicBeatState
 	{
 		if (ClientPrefs.data.playOpponent ? !cpuControlled_opponent : !cpuControlled && startedCountdown && !paused)
 		{
-			KeyboardViewer.released(key);
+			keyboardViewer.released(key);
 
 			replayExam.push(Conductor.songPosition, key, 0);
 			// 回放数据的保存

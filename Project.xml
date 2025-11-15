@@ -2,7 +2,7 @@
 <project>
 	<!-- _________________________ Application Settings _________________________ -->
 
-	<app title="NovaFlare Engine" file="NovaFlare Engine" packageName="com.NovaFlareEngine" package="com.NovaFlareEngine" main="Main" version="1.2.0-DEV" company="beihu" />
+	<app title="NovaFlare Engine" file="NovaFlare Engine" packageName="com.NovaFlareEngine" package="com.NovaFlareEngine" main="Main" version="1.2.0" company="beihu" />
 	<!--Switch Export with Unique ApplicationID and Icon-->
 	<set name="APP_ID" value="0x0100f6c013bbc000" />
 
@@ -263,10 +263,10 @@
 	<architecture name="arm64" exclude="armv7" if="android" />
 
 <config>
-	<android gradle-version="8.7" />
-    <android gradle-plugin="8.6.0" />
-	<android minimum-sdk-version="24" />
-	<android target-sdk-version= "35" />
+	<!--android gradle-version="8.7" /-->
+    <!--android gradle-plugin="8.6.0" /-->
+	<!--android minimum-sdk-version="24" /-->
+	<!--android target-sdk-version= "35" /-->
     <!--Fuck you xcode-->
     <ios deployment="13.6"/>
 </config>
