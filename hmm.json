@@ -5,14 +5,14 @@
       "type": "git",
       "dir": null,
       "ref": "main",
-      "url": "https://github.com/NovaFlare-Engine-haxelib/lime-8.3.0"
+      "url": "https://github.com/NovaFlare-Engine-haxelib/lime-8.2.2"
     },
     {
       "name": "openfl",
       "type": "git",
       "dir": null,
       "ref": "main",
-      "url": "https://github.com/NovaFlare-Engine-haxelib/openfl-9.5.0"
+      "url": "https://github.com/NovaFlare-Engine-haxelib/openfl-9.4.2"
     },
     {
       "name": "flixel",
