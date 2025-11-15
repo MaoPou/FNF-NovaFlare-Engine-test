@@ -263,12 +263,12 @@
 	<architecture name="arm64" exclude="armv7" if="android" />
 
 <config>
-	<!--android gradle-version="8.7" /-->
-    <!--android gradle-plugin="8.6.0" /-->
-	<!--android minimum-sdk-version="24" /-->
-	<!--android target-sdk-version= "35" /-->
+	<android gradle-version="8.7" />
+    <android gradle-plugin="8.6.0" />
+	<android minimum-sdk-version="24" />
+	<android target-sdk-version= "35" />
     <!--Fuck you xcode-->
-    <!--ios deployment="13.6"/-->
+    <!ios deployment="13.6"/>
 </config>
     
 </project>
