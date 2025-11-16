@@ -118,7 +118,6 @@
 
 	<!--Psych stuff needed-->
 	<haxelib name="linc_luajit" if="LUA_ALLOWED"/>
-	<haxelib name="luahscript" if="LUA_ALLOWED"/>
 	<haxelib name="hscript-iris-improved" if="HSCRIPT_ALLOWED"/>
 	<haxelib name="hxvlc" if="VIDEOS_ALLOWED"/>
 	<haxelib name="hxCodec" if="VIDEOS_ALLOWED_Old"/>
