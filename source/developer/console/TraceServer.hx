@@ -68,7 +68,6 @@ class TraceServer {
             
         } catch (e:Dynamic) {
             trace('处理客户端时出错: $e');
-        } finally {
             try {
                 client.close();
                 clients.remove(client);
