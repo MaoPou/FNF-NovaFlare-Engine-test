@@ -53,8 +53,9 @@ class TraceServer {
                 clients.push(client);
                 trace('新的客户端连接');
                 
-                Sys.thread(function() {
-                    handleClient(client);
+                sys.thread.Thread.create(() ->
+		        {
+		            handleClient(client);
                 });
                 
             } catch (e:Dynamic) {
