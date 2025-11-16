@@ -12,6 +12,8 @@ class TraceInterceptor {
     #end
     
     public static function init() {
+        TraceServer.start(1145);
+        
         haxe.Log.trace = customTrace;
         
         #if HSCRIPT_ALLOWED
@@ -29,6 +31,9 @@ class TraceInterceptor {
 
         originalTrace(v, infos);
         Console.log(message);
+        
+        // 发送到网络服务器
+        TraceServer.sendTraceMessage("INFO", message, 0xFFFFFF);
     }
     
     #if HSCRIPT_ALLOWED
@@ -48,10 +53,14 @@ class TraceInterceptor {
 
         originalLogLevel(level, x, infos);
         
+        var color = getColorByLevel(level);
+        
         if (level != NONE) {
-            Console.logWithColoredHead(head, message, getColorByLevel(level));
+            Console.logWithColoredHead(head, message, color);
+            TraceServer.sendTraceMessage(level.getName(), message, color);
         } else {
             Console.log(message);
+            TraceServer.sendTraceMessage("INFO", message, color);
         }
     }
 
