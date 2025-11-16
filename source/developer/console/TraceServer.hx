@@ -20,8 +20,9 @@ class TraceServer {
             trace('Trace服务器启动在端口: $port');
             
             sys.thread.Thread.create(() ->
+            {
                 acceptConnections();
-            )
+            });
             
         } catch (e:Dynamic) {
             trace('启动服务器失败: $e');
