@@ -56,6 +56,9 @@ class FunkinLua
 		var times:Float = Date.now().getTime();
 		lua = LuaL.newstate();
 		LuaL.openlibs(lua);
+		Lua_helper.register_hxtrace(lua);
+		Lua.init_callbacks(lua);
+		
 
 		// trace('Lua version: ' + Lua.version());
 		// trace("LuaJIT version: " + Lua.versionJIT());
@@ -1821,13 +1824,14 @@ class FunkinLua
 			var isString:Bool = !FileSystem.exists(scriptName);
 			var result:Dynamic = null;
 			if (!isString)
-				result = LuaL.dofile(lua, scriptName);
-			else
-				result = LuaL.dostring(lua, scriptName);
-
-			var resultStr:String = Lua.tostring(lua, result);
-			if (resultStr != null && result != 0)
 			{
+				var code:String = File.getContent(scriptName);
+				result = LuaL.luau_loadsource(lua, scriptName, code);
+			}
+					
+			if (result != Lua.LUA_OK)
+			{
+				var resultStr:String = Lua.tostring(lua, -1);
 				trace(resultStr);
 				#if (windows || mobile || js || wasm)
 				SUtil.showPopUp(resultStr, 'Error on lua script!');
@@ -1845,6 +1849,24 @@ class FunkinLua
 			trace(e);
 			return;
 		}
+		
+		LuaRequire.init(lua, ["./", "mods/", "scripts/", "data/"]);
+
+		var runStatus:Int = Lua.pcall(lua, 0, 0, 0);
+		if(runStatus != Lua.LUA_OK) {
+			var err:String = Lua.tostring(lua, -1);
+			Lua.pop(lua, 1);
+			trace('Error running lua script! ' + err);
+			#if (windows || mobile || js || wasm)
+			SUtil.showPopUp(err, 'Error running lua script!');
+			#else
+			luaTrace('Error running lua script: "$scriptName"\n' + err, true, false, FlxColor.RED);
+			#end
+			Lua.close(lua);
+			lua = null;
+			return;
+		}
+		
 		call('onCreate', []);
 		trace('lua file loaded succesfully: $scriptName (${Std.int(Date.now().getTime() - times)}ms)');
 		#end
