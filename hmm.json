@@ -121,6 +121,13 @@
       "url": "https://gitlab.com/Ajwyunsx/linc_luau.git"
     },
     {
+      "name": "luahscript",
+      "type": "git",
+      "dir": null,
+      "ref": "master",
+      "url": "https://github.com/VapireMox/luahscript"
+    },
+    {
       "name": "spine-haxe",
       "type": "git",
       "dir": "spine-haxe",
