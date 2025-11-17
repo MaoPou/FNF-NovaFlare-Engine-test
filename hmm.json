@@ -83,8 +83,8 @@
       "name": "hscript-iris-improved",
       "type": "git",
       "dir": null,
-      "ref": "main",
-      "url": "https://github.com/NovaFlare-Engine-haxelib/hscript-iris-improved"
+      "ref": "master",
+      "url": "https://github.com/NovaFlare-Engine-Concentration/hscript-iris-improved"
     },
     {
       "name": "flxsoundfilters",

@@ -96,7 +96,7 @@ class FPSViewer extends Sprite
 
 	private function isPointInFPSCounter():Bool
 	{
-		var target = isHiding ? fpsShow : extraShow;
+		var target = isHiding ? fpsShow.bgSprite : extraShow.bgSprite;
 
 		var global = target.localToGlobal(new openfl.geom.Point(0, 0));
 		var fpsX = global.x;

@@ -452,6 +452,10 @@ class Option extends FlxSpriteGroup
 				tipsText.text = description;
 				tipsText.setFormat(Paths.font(Language.get('fontName', 'ma') + '.ttf'), Std.int(follow.bg.realWidth / 45), 0xffffff, LEFT, FlxTextBorderStyle.OUTLINE, 0xFFFFFFFF);
 				tipsText.borderStyle = NONE;
+			case STATE:
+				stateButton.stateName.text = description;
+				stateButton.stateName.setFormat(Paths.font(Language.get('fontName', 'ma') + '.ttf'), Std.int(stateButton.bg.width / 20), 0xffffff, CENTER, FlxTextBorderStyle.OUTLINE, 0xFFFFFFFF);
+				stateButton.stateName.borderStyle = NONE;
 			default:
 		}
 	}

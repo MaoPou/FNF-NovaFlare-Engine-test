@@ -56,7 +56,7 @@ class FunkinLua
 		var times:Float = Date.now().getTime();
 		lua = LuaL.newstate();
 		LuaL.openlibs(lua);
-		Lua_helper.register_hxtrace(lua);
+		//Lua_helper.register_hxtrace(lua);
 		Lua.init_callbacks(lua);
 		
 
@@ -1826,7 +1826,7 @@ class FunkinLua
 			if (!isString)
 			{
 				var code:String = File.getContent(scriptName);
-				result = LuaL.luau_loadsource(lua, scriptName, code);
+				//result = LuaL.luau_loadsource(lua, scriptName, code);
 			}
 					
 			if (result != Lua.LUA_OK)
@@ -1850,7 +1850,7 @@ class FunkinLua
 			return;
 		}
 		
-		LuaRequire.init(lua, ["./", "mods/", "scripts/", "data/"]);
+		//LuaRequire.init(lua, ["./", "mods/", "scripts/", "data/"]);
 
 		var runStatus:Int = Lua.pcall(lua, 0, 0, 0);
 		if(runStatus != Lua.LUA_OK) {

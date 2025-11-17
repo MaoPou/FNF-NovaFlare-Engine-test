@@ -39,10 +39,10 @@ class AudioDisplay extends FlxSpriteGroup
 		if (snd != null)
 		{
 		    if(!inRelax){
-    			analyzer = new SpectralAnalyzer(snd._channel.__audioSource, Std.int(line * 1 + Math.abs(0.05 * (4 - ClientPrefs.data.audioDisplayQuality))), 1, 5);
+    			analyzer = new SpectralAnalyzer(snd._channel.__audioSource, line, 1, 5);
     			analyzer.fftN = 256 * ClientPrefs.data.audioDisplayQuality;
     		}else{
-    		    analyzer = new SpectralAnalyzer(snd._channel.__audioSource, Std.int(line * 1 + Math.abs(0.05 * (10 - ClientPrefs.data.RelaxAudioDisplayQuality))), 1, 5);
+    		    analyzer = new SpectralAnalyzer(snd._channel.__audioSource, line, 1, 5);
     			analyzer.fftN = 256 * ClientPrefs.data.RelaxAudioDisplayQuality;
     		}
 		}
@@ -91,7 +91,7 @@ class AudioDisplay extends FlxSpriteGroup
 		@:privateAccess
 		if (snd != null && analyzer == null)
 		{
-			analyzer = new SpectralAnalyzer(snd._channel.__audioSource, Std.int(line * 1 + Math.abs(0.05 * (4 - ClientPrefs.data.audioDisplayQuality))), 1, 5);
+			analyzer = new SpectralAnalyzer(snd._channel.__audioSource,line, 1, 5);
 			analyzer.fftN = 256 * ClientPrefs.data.audioDisplayQuality;
 		}
 	}
