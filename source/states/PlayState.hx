@@ -2257,8 +2257,8 @@ class PlayState extends MusicBeatState
 	var memEnd:Float = 0;
 	var allocDelta:Int = 0;
 
-override public function update(elapsed:Float)
-{
+	override public function update(elapsed:Float)
+	{
 		//memStart = Gc.memInfo(0);
 
 		if (ClientPrefs.data.pauseButton)
