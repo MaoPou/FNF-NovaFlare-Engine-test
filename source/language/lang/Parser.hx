@@ -12,8 +12,8 @@ class Parser
 	#if sys
 	/**
 	 * 解析指定路径的文件
-	 * @params ls				 我不知道
-	 * @params path			 解析路径
+	 * @param ls				 我不知道
+	 * @param path			 解析路径
 	 * @return						 返回检验是否报错的布尔值，如果报错请使用`ls.errorMessage()`获取报错信息
 	 */
 	public static function parseFile(ls:LangState, path:String):Bool
@@ -46,8 +46,8 @@ class Parser
 
 	/**
 	 * 解析字符串
-	 * @params ls				 我不知道
-	 * @params text			 解析字符串
+	 * @param ls				 我不知道
+	 * @param text			 解析字符串
 	 * @return						 返回检验是否报错的布尔值，如果报错请使用`ls.errorMessage()`获取报错信息
 	 */
 	public static function parse(ls:LangState, text:String):Bool
@@ -246,7 +246,7 @@ class LangState
 
 	/**
 	 * 添加编译定义的值，可以使`#if define`来控制执行的操作
-	 + @params define		 u m3
+	 + @param define		 u m3
 	 */
 	public inline function addDefine(define:String)
 	{
@@ -257,7 +257,7 @@ class LangState
 	/**
 	 * 锁定一个lang中的键，需要在`Parser.parse`或`Parser.parseFile`后使用
 	 * 如果lang本身出现语法错误，可能使用也会出错
-	 * @params key			 一个键
+	 * @param key			 一个键
 	 * @return 					 返回检测是否存在此键的布尔值
 	 */
 	public function forceAtKey(key:String):Bool
@@ -272,7 +272,7 @@ class LangState
 	/**
 	 * 需要锁定一个lang的键后使用，用于获取键对应的元组中的一个值
 	 * 如果lang本身出现语法错误，可能使用也会出错
-	 * @params i					 元组的层数
+	 * @param i					 元组的层数
 	 * @return 					 如果不存在，（通常）返回`null`
 	 */
 	public function getAtIndex(i:Int):Null<String>
