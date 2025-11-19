@@ -1240,9 +1240,10 @@ class PlayState extends MusicBeatState
 
             startedCountdown = true;
             Conductor.songPosition = -Conductor.crochet * 5;
-            new FlxTimer().start(0, function(tmr:FlxTimer)
+            new FlxTimer().start(0.00001, function(tmr:FlxTimer)
             {
-                timing.setPosition(Conductor.songPosition);
+				var saveTime:Float = Conductor.songPosition;
+                timing.setPosition(saveTime);
                 timing.enableTick();
             });
 			setOnScripts('startedCountdown', true);
