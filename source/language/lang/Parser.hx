@@ -1,6 +1,8 @@
 package language.lang;
 
 import haxe.ds.List;
+import haxe.ds.Vector;
+import sys.io.FileInput;
 
 /**
  * 解析lang文件并把结果输入到`LangState`中
@@ -14,18 +16,20 @@ class Parser
 	 * 解析指定路径的文件
 	 * @param ls				 我不知道
 	 * @param path			 解析路径
-	 * @return						 返回检验是否报错的布尔值，如果报错请使用`ls.errorMessage()`获取报错信息
+	 * @return					 返回检验是否报错的布尔值，如果报错请使用`ls.errorMessage()`获取报错信息
 	 */
 	public static function parseFile(ls:LangState, path:String):Bool
 	{
 		ls.dic = new Map();
 		ls.thrown = null;
-
 		try
 		{
 			try
 			{
-				var lexes:List<Lex> = new Lexer(sys.io.File.getContent(path)).doLex();
+				var input:FileInput = sys.io.File.read(path, false);
+				var bs:haxe.io.Bytes = input.readAll();
+				input.close();
+				var lexes:List<Lex> = new Lexer(bs).doLex();
 				_doParse(ls, lexes);
 			} catch(e:LangException)
 				throw e
@@ -93,32 +97,39 @@ class Parser
 
 				switch(next.def)
 				{
-					case LPointer(arr):
+					case LPointer(arr, _):
 						if(ls.condCompilation && arr.length > 0)
 						{
+							var vector:Vector<String> = new Vector(arr.length);
 							for(k=>i in arr)
 							{
 								var buf = new StringBuf();
 
 								while(ls.emregex.match(i))
 								{
-									var result:String = ls.emregex.matched(2);
-									if(result == null) result = ls.emregex.matched(1);
+									var result:String = ls.emregex.matched(3);
+									if(result == null) result = ls.emregex.matched(2);
 
 									buf.add(ls.emregex.matchedLeft());
-									if(ls.embeddedVariables.exists(result))
-										buf.add(Std.string(ls.embeddedVariables.get(result)));
-									else if(ls.dic.exists(result))
-										buf.add(ls.dic.get(result)[0]);
+									if(ls.emregex.matched(1) != '@')
+									{
+										if(ls.embeddedVariables.exists(result))
+											buf.add(Std.string(ls.embeddedVariables.get(result)));
+										else if(ls.dic.exists(result))
+											buf.add(ls.dic.get(result)[0]);
+									} else
+									{
+										buf.add(ls.emregex.matched(0).substr(1));
+									}
 									i = ls.emregex.matchedRight();
 								}
 								buf.add(i);
-								arr[k] = buf.toString();
+								vector.set(k, buf.toString());
 							}
-							ls.dic.set(id, arr);
+							ls.dic.set(id, vector);
 						}
 					default:
-						unexpectedLex(ls, LPointer(null));
+						unexpectedLex(ls, LPointer(null, false));
 				}
 			case LPreFork(cp):
 				switch(cp)
@@ -178,7 +189,14 @@ class Parser
 	{
 		return switch(lex)
 		{
-			case LPointer(_): '[=> *]';
+			case LPointer(_, td): '[' + (td ? ':' : "") + "=> *]";
+			case LTypeDecl(tc): "[type: " + (switch(tc)
+			{
+				case TUnknown: "(unknown)";
+				case TInt: "(int)";
+				case TFloat: "(float)";
+				case TString: "(string)";
+			}) + "]";
 			case LIdentifier(id): id;
 			case LPreFork(cp): '#' + (switch(cp)
 			{
@@ -229,9 +247,9 @@ class LangState
 	private var thrown:Null<String>;
 
 	var forceLex:Null<Lex>;
-	var dic:Map<String, Array<String>>;
+	var dic:Map<String, Vector<String>>;
 	var condCompilation:Bool = true;
-	private var emregex = ~/(?<!@)@([a-zA-Z_][a-zA-Z_0-9]*|\{([a-zA-Z_][a-zA-Z_0-9]*(?:(\.|:)[a-zA-Z_][a-zA-Z_0-9]*)*)\})/;
+	private var emregex = ~/(.?)@([a-zA-Z_][a-zA-Z_0-9]*|\{([a-zA-Z_][a-zA-Z_0-9]*(?:(\.|:)[a-zA-Z_][a-zA-Z_0-9]*)*)\})/;
 
 	var preprocesorDefines:Array<String>;
 
@@ -246,7 +264,7 @@ class LangState
 
 	/**
 	 * 添加编译定义的值，可以使`#if define`来控制执行的操作
-	 + @param define		 u m3
+	 * @param define		 u m3
 	 */
 	public inline function addDefine(define:String)
 	{
@@ -294,7 +312,7 @@ class LangState
 	{
 		if(forceKey != null)
 		{
-			return dic.get(forceKey).copy();
+			return dic.get(forceKey).toArray();
 		}
 
 		return null;
@@ -390,22 +408,31 @@ class LangException
 
 	public function toString():String
 	{
-		return 'in line $line($tmin, $tmax): $msg';
+		return 'in line $line($tmin-$tmax): $msg';
 	}
 }
 
 private enum LexDef
 {
-	LPointer(meta:Array<String>);
+	LTypeDecl(tc:TypeChecker);
+	LPointer(meta:Array<String>, typeDeclaration:Bool);
 	LIdentifier(id:String);
 	LPreFork(cp:CompilerPointer);
 }
 
-private enum abstract CompilerPointer(NativeUInt) from NativeUInt to NativeUInt
+private enum abstract TypeChecker(NativeUInt)
 {
-	var CIf:NativeUInt;
-	var CElse:NativeUInt;
-	var CEnd:NativeUInt;
+	var TUnknown:TypeChecker;
+	var TInt:TypeChecker;
+	var TFloat:TypeChecker;
+	var TString:TypeChecker;
+}
+
+private enum abstract CompilerPointer(NativeUInt)
+{
+	var CIf:CompilerPointer;
+	var CElse:CompilerPointer;
+	var CEnd:CompilerPointer;
 }
 
 private class Lexer
@@ -417,9 +444,14 @@ private class Lexer
 
 	var input:String;
 
-	public function new(text:String)
+	public function new(content:Dynamic)
 	{
-		input = text;
+		if(content is haxe.io.Bytes)
+			input = (content : haxe.io.Bytes).toString();
+		else if(content is String)
+			input = cast content;
+		else
+			input = Std.string(content);
 
 		pos = 0;
 		line = 1;
@@ -436,6 +468,7 @@ private class Lexer
 	public function doLex():List<Lex>
 	{
 		ret = new List();
+
 		while(true)
 		{
 			var char:Int = this.char != null ? this.char : getChar();
@@ -476,6 +509,71 @@ private class Lexer
 						}
 						tprefork(id);
 					} else this.char = char;
+				case '('.code:
+					char = getChar();
+					switch(char)
+					{
+						case _ if(Parser.inLetter(char)):
+							var id:String = String.fromCharCode(char);
+							while(true)
+							{
+								char = getChar();
+								if(!Parser.inLu(char))
+								{
+									if(char != ')'.code) terror("Request ')' at the end of the type identifier");
+									break;
+								}
+								id += String.fromCharCode(char);
+							}
+
+							tpush(LTypeDecl(switch(id)
+							{
+								case "int": TInt;
+								case "float": TFloat;
+								case "string": TString;
+								case _:
+									terror("Invalid type declaration '" + id + "'");
+									TUnknown;
+							}));
+						default:
+							terror("Request identifier at the '(' declaring type");
+					}
+				case ':'.code:
+					if((char = getChar()) == '='.code && (char = getChar()) == '>'.code)
+					{
+						var value:Array<String> = [];
+						var buf:StringBuf = null;
+						while(true)
+						{
+							char = getChar();
+							switch(char)
+							{
+								case 32 | 13 | 9:
+									if(buf != null)
+									{
+										value.push(buf.toString());
+										buf = null;
+									}
+								case 10:
+									this.char = char;
+									break;
+								case _ if(StringTools.isEof(char)):
+									this.char = char;
+									break;
+								default:
+									if(buf == null) buf = new StringBuf();
+									if(char == '"'.code || char == '\''.code) buf.add(tstring(char));
+									else buf.addChar(char);
+							}
+						}
+						if(buf != null)
+						{
+							value.push(buf.toString());
+							buf = null;
+						}
+
+						tpush(LPointer(value, true));
+					} else this.char = char;
 				case '='.code:
 					char = getChar();
 					if(char == '>'.code)
@@ -511,7 +609,7 @@ private class Lexer
 							buf = null;
 						}
 
-						tpush(LPointer(value));
+						tpush(LPointer(value, false));
 					} else this.char = char;
 				case _ if(Parser.inLetter(char)):
 					var id:String = String.fromCharCode(char);
@@ -529,7 +627,7 @@ private class Lexer
 				case _ if(StringTools.isEof(char)):
 					break;
 				case _:
-					terror("Unknown Character '" + (isSpace(char) || StringTools.isEof(char) ? '<\\$char>' : String.fromCharCode(char)) + '\'');
+					terror("Invalid Character '" + (isSpace(char) || StringTools.isEof(char) ? '<\\$char>' : String.fromCharCode(char)) + '\'');
 			}
 		}
 
