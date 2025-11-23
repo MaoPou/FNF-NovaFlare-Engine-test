@@ -183,7 +183,7 @@ jobs:
           fi
     
       - name: Compile
-        run: haxelib run lime build ios -arm64 -nosign
+        run: haxelib run lime build ios -arm64 -nosign -verbose
         
       - name: Make IPA And iOS Zip
         run: |
