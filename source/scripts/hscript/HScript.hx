@@ -363,62 +363,49 @@ class HScript implements ISharedScript {
 						PlayState.instance.addTextToDebug(text, color);
 					});
 
-					set('keyJustPressed', function(name:String = '')
-					{
-						name = name.toLowerCase();
-						switch (name)
-						{
-							case 'left':
-								return Controls.instance.NOTE_LEFT_P;
-							case 'down':
-								return Controls.instance.NOTE_DOWN_P;
-							case 'up':
-								return Controls.instance.NOTE_UP_P;
-							case 'right':
-								return Controls.instance.NOTE_RIGHT_P;
-							default:
-								return Controls.instance.justPressed(name);
-						}
-						return false;
-					});
-
-					set('keyPressed', function(name:String = '')
-					{
-						name = name.toLowerCase();
-						switch (name)
-						{
-							case 'left':
-								return Controls.instance.NOTE_LEFT;
-							case 'down':
-								return Controls.instance.NOTE_DOWN;
-							case 'up':
-								return Controls.instance.NOTE_UP;
-							case 'right':
-								return Controls.instance.NOTE_RIGHT;
-							default:
-								return Controls.instance.pressed(name);
-						}
-						return false;
-					});
-
-					set('keyReleased', function(name:String = '')
-					{
-						name = name.toLowerCase();
-						switch (name)
-						{
-							case 'left':
-								return Controls.instance.NOTE_LEFT_R;
-							case 'down':
-								return Controls.instance.NOTE_DOWN_R;
-							case 'up':
-								return Controls.instance.NOTE_UP_R;
-							case 'right':
-								return Controls.instance.NOTE_RIGHT_R;
-							default:
-								return Controls.instance.justReleased(name);
-						}
-						return false;
-					});
+                    set('keyboardJustPressed', function(name:String){
+            		    name = name.toUpperCase();
+            		    if (MusicBeatState.instance.mobileControls != null){   
+            				var extraControl = MusicBeatState.instance.mobileControls.current;
+            				if (name == ClientPrefs.data.extraKeyReturn1.toUpperCase() && extraControl.buttonExtra1 != null && extraControl.buttonExtra1.justPressed) return true;
+            				        
+            				if (name == ClientPrefs.data.extraKeyReturn2.toUpperCase() && extraControl.buttonExtra2 != null && extraControl.buttonExtra2.justPressed) return true;
+                                    
+            				if (name == ClientPrefs.data.extraKeyReturn3.toUpperCase() && extraControl.buttonExtra3 != null && extraControl.buttonExtra3.justPressed) return true;
+                                    
+            				if (name == ClientPrefs.data.extraKeyReturn4.toUpperCase() && extraControl.buttonExtra4 != null && extraControl.buttonExtra4.justPressed) return true;                       					
+            		    }
+            		    return Reflect.getProperty(FlxG.keys.justPressed, name);
+            		});
+            		set('keyboardPressed', function(name:String){
+            		    name = name.toUpperCase();
+            		    if (MusicBeatState.instance.mobileControls != null){		    
+            				var extraControl = MusicBeatState.instance.mobileControls.current;
+            				if (name == ClientPrefs.data.extraKeyReturn1.toUpperCase() && extraControl.buttonExtra1 != null && extraControl.buttonExtra1.pressed) return true;
+            				        
+            				if (name == ClientPrefs.data.extraKeyReturn2.toUpperCase() && extraControl.buttonExtra2 != null && extraControl.buttonExtra2.pressed) return true;
+                                    
+            				if (name == ClientPrefs.data.extraKeyReturn3.toUpperCase() && extraControl.buttonExtra3 != null && extraControl.buttonExtra3.pressed) return true;
+                                    
+            				if (name == ClientPrefs.data.extraKeyReturn4.toUpperCase() && extraControl.buttonExtra4 != null && extraControl.buttonExtra4.pressed) return true;                       					
+            		    }
+            		    return Reflect.getProperty(FlxG.keys.pressed, name);
+            	    });
+            		set('keyboardReleased', function(name:String){
+            		    name = name.toUpperCase();
+            		    if (MusicBeatState.instance.mobileControls != null){		    
+            				var extraControl = MusicBeatState.instance.mobileControls.current;
+            				if (name == ClientPrefs.data.extraKeyReturn1.toUpperCase() && extraControl.buttonExtra1 != null && extraControl.buttonExtra1.justReleased) return true;
+            				        
+            				if (name == ClientPrefs.data.extraKeyReturn2.toUpperCase() && extraControl.buttonExtra2 != null && extraControl.buttonExtra2.justReleased) return true;
+                                    
+            				if (name == ClientPrefs.data.extraKeyReturn3.toUpperCase() && extraControl.buttonExtra3 != null && extraControl.buttonExtra3.justReleased) return true;
+                                    
+            				if (name == ClientPrefs.data.extraKeyReturn4.toUpperCase() && extraControl.buttonExtra4 != null && extraControl.buttonExtra4.justReleased) return true;                       					
+            		    }
+            		    return Reflect.getProperty(FlxG.keys.justReleased, name);
+                    });
+                    
 					#if LUA_ALLOWED
 					set('createGlobalCallback', function(name:String, func:Dynamic)
 					{
