@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <project>
 	<!-- _________________________ Application Settings _________________________ -->
-
 	<app title="NovaFlare Engine" file="NovaFlare Engine" packageName="com.NovaFlareEngine" package="com.NovaFlareEngine" main="Main" version="1.2.0" company="beihu" />
 	<!--Switch Export with Unique ApplicationID and Icon-->
 	<set name="APP_ID" value="0x0100f6c013bbc000" />
@@ -18,7 +17,6 @@
 	<set name="SWF_VERSION" value="11.8" />
 	
 	<!-- ______________________ NOVAFLARE ENGINE CUSTOMIZATION ______________________ -->
-
 	<define name="MODS_ALLOWED" if="desktop || mobile || emscripten" />
 	<define name="LUA_ALLOWED" if="desktop || mobile" unless="hl"/>
 	<define name="HSCRIPT_ALLOWED" if="desktop || mobile || web" />
@@ -29,13 +27,11 @@
     <define name="CUSTOM_SHADERS_ALLOWED" if="LUA_ALLOWED"/>
 
 	<!--define name="TRACY_ALLOWED" if="desktop"/-->
-
 	<section if="officialBuild">
 		<!--define name="TITLE_SCREEN_EASTER_EGG"/-->
 	</section>
 
 	<!-- ____________________________ Window Settings ___________________________ -->
-
 	<!--These window settings apply to all targets-->
 	<window width="1280" height="720" fps="60" background="#000000" hardware="true" vsync="false" allow-shaders="true"/>
 
@@ -58,20 +54,17 @@
 	</section>
 
 	<!-- _____________________________ Path Settings ____________________________ -->
-
 	<set name="BUILD_DIR" value="export/debug" if="debug" />
 	<set name="BUILD_DIR" value="export/release" unless="debug" />
 	<set name="BUILD_DIR" value="export/32bit" if="32bits" />
-        <set name="BUILD_DIR" value="export/rpi" if="rpi" />
+    <set name="BUILD_DIR" value="export/rpi" if="rpi" />
 	<classpath name="source" />
 
 	<!-- __________________________ Game Assets & Etc. __________________________ -->
-
 	<define name="PRELOAD_ALL" unless="web" />
 	<define name="NO_PRELOAD_ALL" unless="PRELOAD_ALL"/>
 
 	<!-- Assets -->
-	
 	<assets path="assets/fonts" embed="false"/>
 	<assets path="assets/menuExtendHide" rename="assets/shared/images/menuExtendHide" embed="true"/>
 	<assets path="assets/shared"        exclude="*.ogg" if="web"/>
@@ -88,27 +81,22 @@
 	</section>
 
 	<library name="videos"        preload="true" if="VIDEOS_ALLOWED"/>
-
 	<section if="PRELOAD_ALL">
-	<library name="songs"         preload="true" />
-	<library name="week_assets"   preload="true" />
+		<library name="songs"         preload="true" />
+		<library name="week_assets"   preload="true" />
 	</section>
-
 	<section if="NO_PRELOAD_ALL">
-	<library name="songs"         preload="false" />
-	<library name="week_assets"   preload="false" />
+		<library name="songs"         preload="false" />
+		<library name="week_assets"   preload="false" />
 	</section>
 
 	<define name="CHECK_FOR_UPDATES" />
-
 	<section if="MODS_ALLOWED">
 		<assets path='example_mods' rename='mods' embed='false'/>
 	</section>
 	<assets path='art/readme.txt' rename='do NOT readme.txt' unless="mobile"/>
 
-
 	<!-- _______________________________ Libraries ______________________________ -->
-
 	<haxelib name="flixel" />
 	<haxelib name="flixel-ui" />
 	<haxelib name="flixel-addons" />
@@ -129,9 +117,7 @@
 
     <haxelib name="funkin.vis"/>
 	<haxelib name="grig.audio" />
-
 	<haxelib name="flxsoundfilters" />
-
 	<haxelib name="haxeui-core"/>
 	<haxelib name="haxeui-flixel"/>
 	
@@ -141,7 +127,6 @@
 	<!-- ModChart Specific-->
 	<haxedef name="FM_ENGINE" value="PSYCH"/>
 	<haxedef name="FM_ENGINE_VERSION" value="0.7"/>
-
 	<haxelib name="modcharts" />
 	<haxeflag name="--macro" value="modchart.backend.macros.Macro.includeFiles()"/>
 
@@ -157,23 +142,18 @@
 
 	<haxedef name="lime_threads" if="cpp || hl || neko || java || cs || nodejs" />
 	<!--haxedef name="openfl_enable_experimental_update_queue"/-->
-
 	<haxedef name="HXCPP_GC_DYNAMIC_SIZE" />
-
 	<haxedef name="HXCPP_ALIGN_ALLOC"/>
 	<haxedef name="HXCPP_GC_GENERATIONAL" />
-
 	<haxedef name="LIME_MT_RENDER" />
 
 	<!-- _______________________________ TRACY ______________________________ -->
-
 	<haxedef name="HXCPP_TRACY" if="TRACY_ALLOWED"/>
 	<haxedef name="HXCPP_TELEMETRY" if="TRACY_ALLOWED"/>
 	<haxedef name="HXCPP_STACK_TRACE" if="TRACY_ALLOWED"/>
 	<haxedef name="HXCPP_STACK_LINES" if="TRACY_ALLOWED"/>
 
 	<!-- ______________________________ Haxedefines _____________________________ -->
-
 	<!--Enable the Flixel core recording system-->
 	<!--<haxedef name="FLX_RECORD" />-->
 
@@ -209,9 +189,7 @@
 	<haxedef name="NAPE_RELEASE_BUILD" unless="debug" />
 
 	<haxedef name="message.reporting" value="pretty" />
-
 	<haxedef name='no-deprecation-warnings' />
-
 	<haxedef name='no-inline' if="html5"/>
 
 	<section if="cpp">
@@ -242,10 +220,9 @@
 	<haxeflag name="--macro" value="allowPackage('flash')" />
 	<haxeflag name="--macro" value="include('my.pack')" />
     <haxeflag name="-dce" value="no" unless="ios" />
+
 	<!-- _________________________________ Custom _______________________________ -->
-
 	<!--Place custom nodes like icons here (higher priority to override the HaxeFlixel icon)-->
-
 	<assets path='art/icon16.png' rename='icon.png' if="linux" />
 	<section if="mobile">
     	<icon path="art/icon16.png" size='16'/>
@@ -262,13 +239,15 @@
 
 	<architecture name="arm64" exclude="armv7" if="android" />
 
-<config>
-	<android gradle-version="8.7" />
-    <android gradle-plugin="8.6.0" />
-	<android minimum-sdk-version="24" />
-	<android target-sdk-version= "35" />
-    <!--Fuck you xcode-->
-    <ios deployment="13.6"/>
-</config>
+	<!-- ___________________________ Android/iOS 配置 ___________________________ -->
+	<config>
+		<android gradle-version="8.7" />
+        <android gradle-plugin="8.6.0" />
+		<android minimum-sdk-version="24" />
+		<android target-sdk-version= "35" />
+		<android languages="zh,en" />
+        <!--Fuck you xcode-->
+        <ios deployment="13.6"/>
+	</config>
     
 </project>
