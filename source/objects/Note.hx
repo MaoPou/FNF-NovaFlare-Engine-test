@@ -776,8 +776,6 @@ class Note extends FlxSprite
 		}
 
 		addSkinCache(skin);
-
-		var cacheSpr:Note = new Note(0, 0, 0);
 	}
 
 	static function addSkinCache(skin:String)

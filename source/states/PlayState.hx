@@ -4565,22 +4565,16 @@ class PlayState extends MusicBeatState
 				while (sustainIterator.hasNext())
 				{
 					var sustain:Note = sustainIterator.next();
-					sustain.active = sustain.visible = false;
-					if (!ClientPrefs.data.lowQuality || ClientPrefs.data.playOpponent ? !cpuControlled_opponent : !cpuControlled)
-						sustain.kill();
-					notes.remove(sustain, false);
-					sustainLayer.remove(sustain, false);
+					sustain.kill();
+					notes.remove(sustain, true);
+					sustainLayer.remove(sustain, true);
 					sustain.destroy();
-					sustain = null;
 				}
 			}
-			note.active = note.visible = false;
-			if (!ClientPrefs.data.lowQuality || ClientPrefs.data.playOpponent ? !cpuControlled_opponent : !cpuControlled)
-				note.kill();
-			notes.remove(note, false);
-			if (note.isSustainNote) sustainLayer.remove(note, false); else tapLayer.remove(note, false);
+			note.kill();
+			notes.remove(note, true);
+			if (note.isSustainNote) sustainLayer.remove(note, true); else tapLayer.remove(note, true);
 			note.destroy();
-			note = null;
 		}
 		killNotes = [];
 	}
