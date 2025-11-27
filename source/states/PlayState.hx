@@ -21,6 +21,7 @@ import flixel.addons.transition.FlxTransitionableState;
 import flixel.util.FlxSort;
 import flixel.util.FlxStringUtil;
 import flixel.util.FlxSave;
+import flixel.util.FlxDestroyUtil;
 import flixel.input.keyboard.FlxKey;
 import flixel.animation.FlxAnimationController;
 import flixel.input.touch.FlxTouch;
@@ -172,6 +173,7 @@ class PlayState extends MusicBeatState
 	public var killNotes:Array<Note> = [];
 	public var unspawnNotes:Array<Note> = [];
 	public var eventNotes:Array<EventNote> = [];
+	public var tempNotes:Array<Note> = [];
 
 	public var camFollow:FlxObject;
 	private static var prevCamFollow:FlxObject;
@@ -180,6 +182,8 @@ class PlayState extends MusicBeatState
 	public var opponentStrums:FlxTypedGroup<StrumNote>;
 	public var playerStrums:FlxTypedGroup<StrumNote>;
 	public var grpNoteSplashes:FlxTypedGroup<NoteSplash>;
+	public var sustainLayer:FlxTypedGroup<Note>;
+	public var tapLayer:FlxTypedGroup<Note>;
 
 	public var camZooming:Bool = false;
 	public var camZoomingMult:Float = 1;
@@ -196,6 +200,10 @@ class PlayState extends MusicBeatState
 	public var NoteTime:Array<Float> = [];
 
 	var numItems:FlxTypedGroup<FlxSprite>;
+	var onUpdateArgs:Array<Dynamic> = [0.0];
+	var onUpdatePostArgs:Array<Dynamic> = [0.0];
+	var spawnNoteArgs:Array<Dynamic> = [0, 0, null, false, 0.0];
+	var singleArg:Array<Dynamic> = [null];
 
 	var comboOffsetFix:Array<Array<Int>> = [
 		[0, 0], // num0
@@ -328,6 +336,10 @@ class PlayState extends MusicBeatState
 
 	var diffBotplay:Bool;
 
+	var _hold:Array<Bool> = [];
+	var _press:Array<Bool> = [];
+	var _release:Array<Bool> = [];
+
 	public function new()
 	{
 		super();
@@ -336,6 +348,7 @@ class PlayState extends MusicBeatState
 	override public function create()
 	{
 		Paths.clearStoredMemory();
+		Note.init();
 		
 		startCallback = startCountdown;
 		endCallback = endSong;
@@ -357,6 +370,16 @@ class PlayState extends MusicBeatState
 			}
 		}
 		else keysArray = ['note_left', 'note_down', 'note_up', 'note_right'];
+
+		_hold = [];
+		_press = [];
+		_release = [];
+		for (i in 0...keysArray.length)
+		{
+			_hold.push(false);
+			_press.push(false);
+			_release.push(false);
+		}
 
         if (FlxG.sound.music != null)
             FlxG.sound.music.stop();
@@ -688,8 +711,12 @@ class PlayState extends MusicBeatState
 		noteGroup = new FlxTypedGroup<FlxBasic>();
 		add(noteGroup);
 
+		sustainLayer = new FlxTypedGroup<Note>();
+		tapLayer = new FlxTypedGroup<Note>();
 		strumLineNotes = new FlxTypedGroup<StrumNote>();
+		noteGroup.add(sustainLayer);
 		noteGroup.add(strumLineNotes);
+		noteGroup.add(tapLayer);
 
 		NoteSplash.init();
 		var splash:NoteSplash = new NoteSplash(100, 100);
@@ -838,8 +865,6 @@ class PlayState extends MusicBeatState
 
 		if (eventNotes.length < 1)
 			checkEventNote();
-
-		//cpp.vm.Gc.enable(false);
 	}
 
 	function set_songSpeed(value:Float):Float
@@ -1240,12 +1265,7 @@ class PlayState extends MusicBeatState
 
             startedCountdown = true;
             Conductor.songPosition = -Conductor.crochet * 5;
-            new FlxTimer().start(0.00001, function(tmr:FlxTimer)
-            {
-				var saveTime:Float = Conductor.songPosition;
-                timing.setPosition(saveTime);
-                timing.enableTick();
-            });
+
 			setOnScripts('startedCountdown', true);
 			callOnScripts('onCountdownStarted');
 
@@ -1305,17 +1325,27 @@ class PlayState extends MusicBeatState
 						tick = START;
 				}
 
-				notes.forEachAlive(function(note:Note)
+				if (notes.length > 0)
 				{
-					if (ClientPrefs.data.opponentStrums || note.mustPress)
+					var len:Int = notes.length;
+					var i:Int = 0;
+					while (i < len)
 					{
-						note.copyAlpha = false;
-						note.alpha = note.multAlpha;
-						if ((ClientPrefs.data.middleScroll && !note.mustPress && !ClientPrefs.data.playOpponent)
-							|| (ClientPrefs.data.middleScroll && note.mustPress && ClientPrefs.data.playOpponent))
-							note.alpha *= 0.35;
+						var note:Note = cast notes.members[i];
+						if (note != null && note.exists && note.alive)
+						{
+							if (ClientPrefs.data.opponentStrums || note.mustPress)
+							{
+								note.copyAlpha = false;
+								note.alpha = note.multAlpha;
+								if ((ClientPrefs.data.middleScroll && !note.mustPress && !ClientPrefs.data.playOpponent)
+									|| (ClientPrefs.data.middleScroll && note.mustPress && ClientPrefs.data.playOpponent))
+									note.alpha *= 0.35;
+							}
+						}
+						i++;
 					}
-				});
+				}
 
 				stagesFunc(function(stage:BaseStage) stage.countdownTick(tick, swagCounter));
 				callOnLuas('onCountdownTick', [swagCounter]);
@@ -1550,7 +1580,6 @@ class PlayState extends MusicBeatState
 		startOnTime = 0;
 
 		if (timing != null) {
-			// 音频开始播放时设置基准并启动计时
 			timing.setPosition(FlxG.sound.music.time);
 			timing.play();
 		}
@@ -1645,7 +1674,9 @@ class PlayState extends MusicBeatState
 		FlxG.sound.list.add(inst);
 
 		notes = new FlxTypedGroup<Note>();
-		noteGroup.add(notes);
+		notes.active = true;
+		notes.visible = false;
+		//仅仅参加逻辑更新但是不参与渲染
 		try
 		{
 			var eventsChart:SwagSong = Song.getChart('events', songName);
@@ -1657,8 +1688,6 @@ class PlayState extends MusicBeatState
 		catch (e:Dynamic)
 		{
 		}
-
-		Note.init();
 
 		for (section in songData.notes)
 		{
@@ -2320,7 +2349,8 @@ class PlayState extends MusicBeatState
 		}
 		else
 			FlxG.camera.followLerp = 0;
-		callOnScripts('onUpdate', [elapsed]);
+		onUpdateArgs[0] = elapsed;
+		callOnScripts('onUpdate', onUpdateArgs);
 
 		super.update(elapsed);
 
@@ -2354,6 +2384,10 @@ class PlayState extends MusicBeatState
 				openChartEditor();
 			else if (controls.justPressed('debug_2'))
 				openCharacterEditor();
+			#if debug
+			//else if (controls.justPressed('debug_3'))
+				//runAddBenchmarkSynthetic(2000);
+			#end
 		}
 
 		if (healthBar.bounds.max != null && health > healthBar.bounds.max)
@@ -2364,9 +2398,12 @@ class PlayState extends MusicBeatState
 
         if (startedCountdown && !paused)
         {
-            Conductor.songPosition = timing.getPositionMs();
-            if (checkIfDesynced)
-            {
+            if (Conductor.songPosition < 0)
+                Conductor.songPosition += elapsed * 1000 * playbackRate;
+            else if (timing != null && (timing.isPlaying || timing.tickEnabled))
+                Conductor.songPosition = timing.getPositionMs();
+            if (checkIfDesynced && Conductor.songPosition >= 0)
+                {
                 var diff:Float = 50 * playbackRate; // 0.05秒的音乐延迟偏差
                 var timeSub:Float = Conductor.songPosition - Conductor.offset;
 
@@ -2390,12 +2427,11 @@ class PlayState extends MusicBeatState
 
 		if (startingSong)
 		{
-			if (startedCountdown && Conductor.songPosition >= 0)
-				startSong();
+            if (startedCountdown && Conductor.songPosition >= 0)
+                startSong();
             else if (!startedCountdown)
                 Conductor.songPosition = -Conductor.crochet * 5;
-            if (!startedCountdown) timing.setPosition(Conductor.songPosition);
-		}
+        }
 		else if (!paused && updateTime)
 		{
 			var curTime:Float = Math.max(0, Conductor.songPosition - ClientPrefs.data.noteOffset); //待修改
@@ -2442,20 +2478,9 @@ class PlayState extends MusicBeatState
 			while (unspawnNotes.length > 0 && unspawnNotes[0].strumTime - Conductor.songPosition < time)
 			{
 				var dunceNote:Note = unspawnNotes[0];
-				notes.insert(0, dunceNote); //待研究
-				dunceNote.spawned = true;
+				addNoteInternal(dunceNote);
 
-				callOnLuas('onSpawnNote', [
-					notes.members.indexOf(dunceNote),
-					dunceNote.noteData,
-					dunceNote.noteType,
-					dunceNote.isSustainNote,
-					dunceNote.strumTime
-				]);
-				callOnHScript('onSpawnNote', [dunceNote]);
-
-				var index:Int = unspawnNotes.indexOf(dunceNote);
-				unspawnNotes.splice(index, 1);
+				unspawnNotes.shift();
 			}
 		}
 
@@ -2474,86 +2499,96 @@ class PlayState extends MusicBeatState
 					if (startedCountdown)
 					{
 						var fakeCrochet:Float = (60 / SONG.bpm) * 1000;
-						notes.forEachAlive(function(daNote:Note)
+						var len:Int = notes.length;
+						var i:Int = 0;
+						while (i < len)
 						{
-							var strumGroup:FlxTypedGroup<StrumNote> = playerStrums;
-							if (!daNote.mustPress)
-								strumGroup = opponentStrums;
-
-							var strum:StrumNote = strumGroup.members[daNote.noteData];
-							daNote.followStrumNote(strum, fakeCrochet, songSpeed / playbackRate);
-
-							if (daNote.mustPress)
+							var daNote:Note = cast notes.members[i];
+							if (daNote != null && daNote.exists && daNote.alive)
 							{
-								if (!ClientPrefs.data.playOpponent)
+								var strumGroup:FlxTypedGroup<StrumNote> = daNote.mustPress ? playerStrums : opponentStrums;
+								var strum:StrumNote = strumGroup.members[daNote.noteData];
+								daNote.followStrumNote(strum, fakeCrochet, songSpeed / playbackRate);
+								if (daNote.mustPress)
 								{
-									if (cpuControlled
-										&& !daNote.blockHit
-										&& daNote.canBeHit
-										&& (daNote.isSustainNote || daNote.strumTime <= Conductor.songPosition))
+									if (!ClientPrefs.data.playOpponent)
 									{
-										goodNoteHit(daNote);
+										if (cpuControlled && !daNote.blockHit && daNote.canBeHit && (daNote.isSustainNote || daNote.strumTime <= Conductor.songPosition))
+											goodNoteHit(daNote);
+									}
+									else
+									{
+										if (daNote.wasGoodHit && !daNote.hitByOpponent && !daNote.ignoreNote)
+											goodNoteHitForOpponent(daNote);
 									}
 								}
 								else
 								{
-									if (daNote.wasGoodHit && !daNote.hitByOpponent && !daNote.ignoreNote)
-										goodNoteHitForOpponent(daNote);
-								}
-							}
-							else
-							{
-								if (!ClientPrefs.data.playOpponent)
-								{
-									if (daNote.wasGoodHit && !daNote.hitByOpponent && !daNote.ignoreNote)
+									if (!ClientPrefs.data.playOpponent)
 									{
-										opponentNoteHit(daNote);
+										if (daNote.wasGoodHit && !daNote.hitByOpponent && !daNote.ignoreNote)
+											opponentNoteHit(daNote);
+									}
+									else
+									{
+										if (cpuControlled_opponent && !daNote.blockHit && daNote.canBeHit && (daNote.isSustainNote || daNote.strumTime <= Conductor.songPosition))
+											opponentNoteHitForOpponent(daNote);
 									}
 								}
-								else
+								if (daNote.isSustainNote && strum.sustainReduce) daNote.clipToStrumNote(strum);
+								if (Conductor.songPosition - daNote.strumTime > noteKillOffset * 1.5)
+									invalidateNote(daNote);
+								else if (Conductor.songPosition - daNote.strumTime > noteKillOffset)
 								{
-									if (cpuControlled_opponent
-										&& !daNote.blockHit
-										&& daNote.canBeHit
-										&& (daNote.isSustainNote || daNote.strumTime <= Conductor.songPosition))
-									{
-										opponentNoteHitForOpponent(daNote);
-									}
+									if (((!daNote.mustPress && !cpuControlled_opponent && ClientPrefs.data.playOpponent) || (daNote.mustPress && !cpuControlled && !ClientPrefs.data.playOpponent))
+										&& !daNote.ignoreNote && !endingSong && (daNote.tooLate == true || daNote.wasGoodHit == false) && !daNote.missed)
+										noteMiss(daNote);
 								}
 							}
-
-							if (daNote.isSustainNote && strum.sustainReduce)
-								daNote.clipToStrumNote(strum);
-
-							// Kill extremely late notes and cause misses
-							if (Conductor.songPosition - daNote.strumTime > noteKillOffset * 1.5)
-							{
-								invalidateNote(daNote);
-							}
-							else if (Conductor.songPosition - daNote.strumTime > noteKillOffset)
-							{
-								if (((!daNote.mustPress && !cpuControlled_opponent && ClientPrefs.data.playOpponent)
-									|| (daNote.mustPress && !cpuControlled && !ClientPrefs.data.playOpponent))
-									&& !daNote.ignoreNote
-									&& !endingSong
-									&& (daNote.tooLate == true || daNote.wasGoodHit == false)
-									&& !daNote.missed)
-									noteMiss(daNote);
-							}
-						});
+							i++;
+						}
 					}
 					else
 					{
-						notes.forEachAlive(function(daNote:Note)
+						var len2:Int = notes.length;
+						var j:Int = 0;
+						while (j < len2)
 						{
-							daNote.canBeHit = false;
-							daNote.wasGoodHit = false;
-						});
+							var daNote2:Note = cast notes.members[j];
+							if (daNote2 != null && daNote2.exists && daNote2.alive)
+							{
+								daNote2.canBeHit = false;
+								daNote2.wasGoodHit = false;
+							}
+							j++;
+						}
 					}
 				}
 			}
 			checkEventNote();
 		}
+
+	#if debug
+    // 性能测试：合成基准，验证 addNoteInternal 的吞吐效率与事件兼容性
+    // 说明：生成轻量的临时 Note，执行 add/remove 流程并销毁，不影响实际游戏状态
+    public function runAddBenchmarkSynthetic(count:Int = 2000):Void
+    {
+        var t0:Float = Sys.time();
+        var i:Int = 0;
+        while (i < count)
+        {
+            var fake:Note = new Note(Conductor.songPosition, 0, null, (i & 1) == 1);
+            addNoteInternal(fake);
+            notes.remove(fake, false);
+            if (fake.isSustainNote) sustainLayer.remove(fake, false); else tapLayer.remove(fake, false);
+            fake.destroy();
+            i++;
+        }
+        var t1:Float = Sys.time();
+        var ms:Int = Std.int((t1 - t0) * 1000);
+        trace('AddBenchmarkSynthetic: ' + count + ' notes in ' + ms + ' ms');
+    }
+	#end
 
 		destroyNotes();
 
@@ -2609,18 +2644,10 @@ class PlayState extends MusicBeatState
 			shaderUpdate(elapsed);
 		#end
 
-		callOnScripts('onUpdatePost', [elapsed]);
+		onUpdatePostArgs[0] = elapsed;
+		callOnScripts('onUpdatePost', onUpdatePostArgs);
 
-		//memEnd = Gc.memInfo(0);
-		//allocDelta = Std.int(Math.max(0, memEnd - memStart));
-
-		#if desktop
-		/*
-		if (allocDelta > (256 * 1024)) {
-			backend.gc.GCManager.gc_tick(300, Std.int(256 * 0.7 * 1024 * 1024), 1);
-		}
-			*/
-		#end
+		GCManager.gc_update();
 	}
 
 	public function scoreTxtUpdate()
@@ -3736,6 +3763,21 @@ class PlayState extends MusicBeatState
 
 	public var strumsBlocked:Array<Bool> = [];
 
+    inline private function addNoteInternal(dunceNote:Note):Void
+    {
+        notes.add(dunceNote);
+        if (dunceNote.isSustainNote) sustainLayer.add(dunceNote); else tapLayer.add(dunceNote);
+        dunceNote.spawned = true;
+        spawnNoteArgs[0] = notes.length - 1;
+        spawnNoteArgs[1] = dunceNote.noteData;
+        spawnNoteArgs[2] = dunceNote.noteType;
+        spawnNoteArgs[3] = dunceNote.isSustainNote;
+        spawnNoteArgs[4] = dunceNote.strumTime;
+        callOnLuas('onSpawnNote', spawnNoteArgs);
+        singleArg[0] = dunceNote;
+        callOnHScript('onSpawnNote', singleArg);
+    }
+
 	public function onKeyPress(event:KeyboardEvent):Void
 	{
 		if (replayMode)
@@ -3775,13 +3817,14 @@ class PlayState extends MusicBeatState
 		// obtain notes that the player can hit
 		var plrInputNotes:Array<Note> = notes.members.filter(function(n:Note):Bool
 		{
+			if (n == null) return false;
 			var canHit:Bool = !strumsBlocked[n.noteData]
 				&& n.canBeHit
 				&& ((n.mustPress && !ClientPrefs.data.playOpponent) || (!n.mustPress && ClientPrefs.data.playOpponent))
 				&& !n.tooLate
 				&& !n.wasGoodHit
 				&& !n.blockHit;
-			return n != null && canHit && !n.isSustainNote && n.noteData == key;
+			return canHit && !n.isSustainNote && n.noteData == key;
 		});
 		plrInputNotes.sort(sortHitNotes);
 
@@ -3829,13 +3872,14 @@ class PlayState extends MusicBeatState
 		{
 			var plrInputNotes:Array<Note> = notes.members.filter(function(n:Note):Bool
 			{
+				if (n == null) return false;
 				var canHit:Bool = !strumsBlocked[n.noteData]
 					&& n.canBeHit
 					&& ((n.mustPress && !ClientPrefs.data.playOpponent) || (!n.mustPress && ClientPrefs.data.playOpponent))
 					&& !n.tooLate
 					&& !n.wasGoodHit
 					&& !n.blockHit;
-				return n != null && canHit && n.isSustainNote && n.noteData == key;
+				return canHit && n.isSustainNote && n.noteData == key;
 			});
 
 			var holdNote:Note = plrInputNotes[0];
@@ -3937,32 +3981,25 @@ class PlayState extends MusicBeatState
 	// Hold notes
 	public function keysCheck(?keyCount:Int, time:Float = -999999):Void
 	{
-		// HOLDING
-		var holdArray:Array<Bool> = [];
-		var pressArray:Array<Bool> = [];
-		var releaseArray:Array<Bool> = [];
-		for (key in keysArray)
+		for (i in 0...keysArray.length)
 		{
-			holdArray.push(controls.pressed(key));
-			pressArray.push(controls.justPressed(key));
-			releaseArray.push(controls.justReleased(key));
+			var key = keysArray[i];
+			_hold[i] = controls.pressed(key);
+			_press[i] = controls.justPressed(key);
+			_release[i] = controls.justReleased(key);
 		}
 		if (replayMode)
 		{
-			holdArray = [];
-			for (i in 0...4)
+			for (i in 0..._hold.length)
 			{
-				if (i != keyCount)
-					holdArray.push(false);
-				else
-					holdArray.push(true);
+				_hold[i] = (i == keyCount);
 			}
 		}
 
 		// TO DO: Find a better way to handle controller inputs, this should work for now
-		if (controls.controllerMode && pressArray.contains(true))
-			for (i in 0...pressArray.length)
-				if (pressArray[i] && strumsBlocked[i] != true)
+		if (controls.controllerMode && _press.contains(true))
+			for (i in 0..._press.length)
+				if (_press[i] && strumsBlocked[i] != true)
 					keyPressed(i);
 
 		var char:Character = ClientPrefs.data.playOpponent ? dad : boyfriend;
@@ -3971,31 +4008,33 @@ class PlayState extends MusicBeatState
 			// rewritten inputs???
 			if (notes.length > 0)
 			{
-				notes.forEachAlive(function(daNote:Note)
+				var len:Int = notes.length;
+				var i:Int = 0;
+				while (i < len)
 				{
-					// hold note functions
-					if (strumsBlocked[daNote.noteData] != true
-						&& daNote.isSustainNote
-						&& holdArray[daNote.noteData]
-						&& daNote.canBeHit
-						&& !daNote.tooLate
-						&& !daNote.wasGoodHit
-						&& !daNote.blockHit
-						&& daNote.canHold)
+					var daNote:Note = cast notes.members[i];
+					if (daNote != null && daNote.exists && daNote.alive)
 					{
-						if (daNote.mustPress && !ClientPrefs.data.playOpponent)
+						if (strumsBlocked[daNote.noteData] != true
+							&& daNote.isSustainNote
+							&& _hold[daNote.noteData]
+							&& daNote.canBeHit
+							&& !daNote.tooLate
+							&& !daNote.wasGoodHit
+							&& !daNote.blockHit
+							&& daNote.canHold)
 						{
-							goodNoteHit(daNote, time);
-						}
-						if (!daNote.mustPress && ClientPrefs.data.playOpponent)
-						{
-							opponentNoteHitForOpponent(daNote, time);
+							if (daNote.mustPress && !ClientPrefs.data.playOpponent)
+								goodNoteHit(daNote, time);
+							if (!daNote.mustPress && ClientPrefs.data.playOpponent)
+								opponentNoteHitForOpponent(daNote, time);
 						}
 					}
-				});
+					i++;
+				}
 			}
 
-			if (!holdArray.contains(true) || endingSong)
+			if (!_hold.contains(true) || endingSong)
 				ClientPrefs.data.playOpponent ? opponentDance() : playerDance();
 
 			#if ACHIEVEMENTS_ALLOWED
@@ -4005,24 +4044,34 @@ class PlayState extends MusicBeatState
 		}
 
 		// TO DO: Find a better way to handle controller inputs, this should work for now
-		if ((controls.controllerMode || strumsBlocked.contains(true)) && releaseArray.contains(true))
-			for (i in 0...releaseArray.length)
-				if (releaseArray[i] || strumsBlocked[i] == true)
+		if ((controls.controllerMode || strumsBlocked.contains(true)) && _release.contains(true))
+			for (i in 0..._release.length)
+				if (_release[i] || strumsBlocked[i] == true)
 					keyReleased(i);
-	}
+		}
 
 	public function noteMiss(daNote:Note):Void
 	{ // You didn't hit the key and let it go offscreen, also used by Hurt Notes
 		// Dupe note remove
-		notes.forEachAlive(function(note:Note)
+		if (notes.length > 0)
 		{
-			if (daNote != note
-				&& (!daNote.mustPress && ClientPrefs.data.playOpponent || daNote.mustPress && !ClientPrefs.data.playOpponent)
-				&& daNote.noteData == note.noteData
-				&& daNote.isSustainNote == note.isSustainNote
-				&& Math.abs(daNote.strumTime - note.strumTime) < 1)
-				invalidateNote(note);
-		});
+			var len:Int = notes.length;
+			var i:Int = 0;
+			while (i < len)
+			{
+				var note:Note = cast notes.members[i];
+				if (note != null && note.exists && note.alive)
+				{
+					if (daNote != note
+						&& (!daNote.mustPress && ClientPrefs.data.playOpponent || daNote.mustPress && !ClientPrefs.data.playOpponent)
+						&& daNote.noteData == note.noteData
+						&& daNote.isSustainNote == note.isSustainNote
+						&& Math.abs(daNote.strumTime - note.strumTime) < 1)
+						invalidateNote(note);
+				}
+				i++;
+			}
+		}
 
 		stagesFunc(function(stage:BaseStage) stage.noteMiss(daNote));
 		noteMissCommon(daNote.noteData, daNote);
@@ -4519,7 +4568,8 @@ class PlayState extends MusicBeatState
 					sustain.active = sustain.visible = false;
 					if (!ClientPrefs.data.lowQuality || ClientPrefs.data.playOpponent ? !cpuControlled_opponent : !cpuControlled)
 						sustain.kill();
-					notes.remove(sustain, true);
+					notes.remove(sustain, false);
+					sustainLayer.remove(sustain, false);
 					sustain.destroy();
 					sustain = null;
 				}
@@ -4527,7 +4577,8 @@ class PlayState extends MusicBeatState
 			note.active = note.visible = false;
 			if (!ClientPrefs.data.lowQuality || ClientPrefs.data.playOpponent ? !cpuControlled_opponent : !cpuControlled)
 				note.kill();
-			notes.remove(note, true);
+			notes.remove(note, false);
+			if (note.isSustainNote) sustainLayer.remove(note, false); else tapLayer.remove(note, false);
 			note.destroy();
 			note = null;
 		}
@@ -4554,8 +4605,21 @@ class PlayState extends MusicBeatState
 		grpNoteSplashes.add(splash);
 	}
 
+	public inline function registerTempNote(note:Note):Void
+	{
+		if (note != null) tempNotes.push(note);
+	}
+
+
+
 	override function destroy()
 	{
+		if (scripts.lua.CustomSubstate.instance != null)
+		{
+			closeSubState();
+			resetSubState();
+		}
+
 		#if LUA_ALLOWED
 		for (lua in luaArray)
 		{
@@ -4567,8 +4631,18 @@ class PlayState extends MusicBeatState
 		#end
 
 		#if HSCRIPT_ALLOWED
+		for (script in hscriptArray)
+			if(script != null)
+			{
+				if(script.exists('onDestroy')) script.call('onDestroy');
+				script.destroy();
+			}
+
+		hscriptArray = null;
 		hscriptGrp.destroy(true);
 		#end
+
+		stagesFunc(function(stage:BaseStage) stage.destroy());
 
 		FlxG.stage.removeEventListener(KeyboardEvent.KEY_DOWN, onKeyPress);
 		FlxG.stage.removeEventListener(KeyboardEvent.KEY_UP, onKeyRelease);
@@ -4582,7 +4656,57 @@ class PlayState extends MusicBeatState
 		FlxG.game._filters = [];
 		camGame.filters = camHUD.filters = camOther.filters = [];
 
-		//cpp.vm.Gc.enable(true);
+		if (tempNotes != null && tempNotes.length > 0)
+		{
+			for (note in tempNotes) if (note != null) note.destroy();
+			tempNotes = [];
+		}
+
+		if (unspawnNotes != null && unspawnNotes.length > 0)
+		{
+			for (note in unspawnNotes) if (note != null) note.destroy();
+			unspawnNotes = [];
+		}
+		
+		if (killNotes != null && killNotes.length > 0)
+		{
+			for (note in killNotes) if (note != null) note.destroy();
+			killNotes = [];
+		}
+
+		if (notes != null)
+		{
+			FlxDestroyUtil.destroy(notes);
+			notes = null;
+		}
+
+		if (grpNoteSplashes != null)
+		{
+			FlxDestroyUtil.destroy(grpNoteSplashes);
+			grpNoteSplashes = null;
+		}
+
+		if (strumLineNotes != null)
+		{
+			FlxDestroyUtil.destroy(strumLineNotes);
+			strumLineNotes = null;
+		}
+		if (opponentStrums != null)
+		{
+			FlxDestroyUtil.destroy(opponentStrums);
+			opponentStrums = null;
+		}
+		if (playerStrums != null)
+		{
+			FlxDestroyUtil.destroy(playerStrums);
+			playerStrums = null;
+		}
+
+		if (noteGroup != null)
+		{
+			FlxDestroyUtil.destroy(noteGroup);
+			noteGroup = null;
+		}
 	}
 
 	var checkIfDesynced:Bool = false;
@@ -4614,9 +4738,6 @@ class PlayState extends MusicBeatState
 			// trace('BEAT HIT: ' + curBeat + ', LAST HIT: ' + lastBeatHit);
 			return;
 		}
-
-		if (generatedMusic)
-			notes.sort(FlxSort.byY, ClientPrefs.data.downScroll ? FlxSort.ASCENDING : FlxSort.DESCENDING);
 
 		iconP1.scale.set(1.3, 1.3);
 		iconP2.scale.set(1.3, 1.3);

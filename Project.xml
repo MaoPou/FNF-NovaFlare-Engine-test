@@ -106,14 +106,13 @@
 	</section>
 	<assets path='art/readme.txt' rename='do NOT readme.txt' unless="mobile"/>
 
-
 	<!-- _______________________________ Libraries ______________________________ -->
 
 	<haxelib name="flixel" />
 	<haxelib name="flixel-ui" />
 	<haxelib name="flixel-addons" />
-	<haxelib name="crypto" />
-	<haxelib name="trandom" />
+    <haxelib name="crypto" />
+    <haxelib name="trandom" unless="android" />
 	<haxelib name="spine-haxe" />
 
 	<!--Psych stuff needed-->
@@ -159,7 +158,6 @@
 	<!--haxedef name="openfl_enable_experimental_update_queue"/-->
 
 	<haxedef name="HXCPP_GC_DYNAMIC_SIZE" />
-
 	<haxedef name="HXCPP_ALIGN_ALLOC"/>
 	<haxedef name="HXCPP_GC_GENERATIONAL" />
 
@@ -219,7 +217,7 @@
 		<haxedef name="HXCPP_STACK_LINE" />
 		<haxedef name="HXCPP_STACK_TRACE" />
 		<haxedef name="HXCPP_CATCH_SEGV" />
-		<haxedef name="HXCPP_GC_DISABLE" />
+		<haxedef name="HXCPP_GC_BIG_BLOCKS" />
 	</section>
 
 	<haxedef name="hscriptPos" if="HSCRIPT_ALLOWED" />

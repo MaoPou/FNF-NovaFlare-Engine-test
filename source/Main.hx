@@ -208,7 +208,7 @@ class Main extends Sprite
 		Data.setup();
 
 		#if !debug
-			cpp.NativeGc.enterGCFreeZone();
+			//cpp.NativeGc.enterGCFreeZone();
 		#end
 	}
 

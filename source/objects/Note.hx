@@ -711,7 +711,7 @@ class Note extends FlxSprite
 		{
 			//updateHitbox();
 			var swagRect:FlxRect = clipRect;
-			if(swagRect == null) swagRect = new FlxRect(0, 0, frameWidth, frameHeight);
+			if (swagRect == null) swagRect = FlxRect.get(0, 0, frameWidth, frameHeight);
 			
 			var time:Float = FlxMath.bound((Conductor.songPosition - strumTime) / (height / (0.45 * FlxMath.roundDecimal(PlayState.instance.songSpeed, 2))), 0, 1);
 			if (time >= 1) {
@@ -776,6 +776,8 @@ class Note extends FlxSprite
 		}
 
 		addSkinCache(skin);
+
+		var cacheSpr:Note = new Note(0, 0, 0);
 	}
 
 	static function addSkinCache(skin:String)

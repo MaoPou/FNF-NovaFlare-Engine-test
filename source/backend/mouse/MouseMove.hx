@@ -36,10 +36,9 @@ class MouseMove extends FlxBasic
     private var minVelocity:Float = 0.001;       // 最小速度阈值
     private var springStrength:Float = 25.0;
     private var releaseBoost:Float = 1.1;
-    private var maxInertiaTime:Float = 1.25;
     
     // 鼠标滚轮相关参数
-    public var mouseWheelSensitivity:Float = 20.0; // 鼠标滚轮更改量的控制变量(可被修改)
+    public var mouseWheelSensitivity:Float = 600.0; // 鼠标滚轮更改量的控制变量(可被修改)
     
     ////////////////////////////////////////////////////////////////////////////////////////////////
     
@@ -256,7 +255,7 @@ class MouseMove extends FlxBasic
                 velocity += acc2 * elapsed;
             }
         }
-        if (Math.abs(velocity) < minVelocity || _inertiaTime > maxInertiaTime) {
+        if (Math.abs(velocity) < minVelocity) {
             velocity = 0;
             return;
         }

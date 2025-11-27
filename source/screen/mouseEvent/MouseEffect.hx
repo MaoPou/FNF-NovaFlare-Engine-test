@@ -8,6 +8,7 @@ import openfl.events.MouseEvent;
 import openfl.geom.Point;
 import openfl.Lib;
 import openfl.geom.ColorTransform;
+import haxe.Timer;
 
 import developer.display.DataCalc;
 
@@ -226,8 +227,8 @@ class ClickEffect extends Sprite {
     
     public function init(x:Float, y:Float):Void {
         isComplete = false;
-        clickTimer = haxe.Timer.stamp();
-        circleTimer = haxe.Timer.stamp();
+        clickTimer = Timer.stamp();
+        circleTimer = Timer.stamp();
         xPos = x;
         yPos = y;
         
@@ -246,7 +247,7 @@ class ClickEffect extends Sprite {
     
     public function update():Void {
         // 更新click动画
-        var time = haxe.Timer.stamp() - clickTimer;
+        var time = Timer.stamp() - clickTimer;
 
         if (time < MouseEffect.clickDuration) {
             var progress = time / MouseEffect.clickDuration;
@@ -263,7 +264,7 @@ class ClickEffect extends Sprite {
         }
         
         // 更新circle动画
-        var time = haxe.Timer.stamp() - circleTimer;
+        var time = Timer.stamp() - circleTimer;
 
         if (time < MouseEffect.circleDuration) {
             var progress = time / MouseEffect.circleDuration;
@@ -315,7 +316,7 @@ class TrailEffect extends Sprite {
     
     public function init(x:Float, y:Float, color:Int, rotation:Float):Void {
         isComplete = false;
-        timer = haxe.Timer.stamp();
+        timer = Timer.stamp();
         
         this.x = x;
         this.y = y;
@@ -337,7 +338,7 @@ class TrailEffect extends Sprite {
     }
     
     public function update():Void {
-        var time = haxe.Timer.stamp() - timer;
+        var time = Timer.stamp() - timer;
         
         if (time < MouseEffect.trailDuration) {
             var progress = time / MouseEffect.trailDuration;

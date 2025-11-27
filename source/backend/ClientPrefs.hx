@@ -563,7 +563,7 @@ class ClientPrefs
 		if (FlxG.save.data.drawFramerate == null)
 		{
 			final refreshRate:Int = FlxG.stage.application.window.displayMode.refreshRate;
-			data.drawFramerate = Std.int(FlxMath.bound(refreshRate, 60, 1000));
+			data.drawFramerate = Std.int(FlxMath.bound(refreshRate, 60, 360));
 		}
 		#end
 

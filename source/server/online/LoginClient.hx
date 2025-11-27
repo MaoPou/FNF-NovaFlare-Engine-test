@@ -9,7 +9,9 @@ import haxe.crypto.Aes;
 import haxe.Http;
 import haxe.Json;
 
+#if windows
 import trandom.Native;
+#end
 
 class LoginClient {
     static final API_URL:String = "https://online.novaflare.top/user/login/api.php";
@@ -120,26 +122,26 @@ class LoginClient {
      */
 
     private function generateRandomIV():Bytes {
+        #if windows
         var iv = Bytes.alloc(BLOCK_SIZE);
-        
-        // 每次处理 4 字节（Native.get() 返回 Int32）
         for (i in 0...Std.int(BLOCK_SIZE / 4)) {
             iv.setInt32(i * 4, Native.get());
         }
-        
-        // 处理剩余字节（如果 BLOCK_SIZE 不是 4 的倍数）
         var remaining = BLOCK_SIZE % 4;
         if (remaining > 0) {
             var lastChunk = Native.get();
             for (i in 0...remaining) {
-                iv.set(
-                    (BLOCK_SIZE - remaining) + i,
-                    (lastChunk >> (8 * i)) & 0xFF  // 按位截取
-                );
+                iv.set((BLOCK_SIZE - remaining) + i, (lastChunk >> (8 * i)) & 0xFF);
             }
         }
-        
         return iv;
+        #else
+        var iv = Bytes.alloc(BLOCK_SIZE);
+        for (i in 0...BLOCK_SIZE) {
+            iv.set(i, Std.random(256));
+        }
+        return iv;
+        #end
     }
     
     /**
