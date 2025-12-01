@@ -157,7 +157,7 @@
 	<haxedef name="lime_threads" if="cpp || hl || neko || java || cs || nodejs" />
 	<!--haxedef name="openfl_enable_experimental_update_queue"/-->
 
-	<haxedef name="HXCPP_GC_DYNAMIC_SIZE" />
+	<!--haxedef name="HXCPP_GC_DYNAMIC_SIZE" /-->
 	<haxedef name="HXCPP_ALIGN_ALLOC"/>
 	<haxedef name="HXCPP_GC_GENERATIONAL" />
 

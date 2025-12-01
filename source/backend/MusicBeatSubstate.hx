@@ -147,6 +147,8 @@ class MusicBeatSubstate extends FlxSubState
 		}
 
 		super.update(elapsed);
+
+		GCManager.gc_update();
 	}
 
 	private function updateSection():Void

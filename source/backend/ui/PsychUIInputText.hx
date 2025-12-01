@@ -6,6 +6,7 @@ import flixel.util.FlxDestroyUtil;
 import flash.events.KeyboardEvent;
 import lime.system.Clipboard;
 import lime.math.Rectangle;
+import openfl.Lib;
 
 enum abstract AccentCode(Int) from Int from UInt to Int to UInt
 {
@@ -90,6 +91,8 @@ class PsychUIInputText extends FlxSpriteGroup
 		this.text = text;
 
 		FlxG.stage.addEventListener(KeyboardEvent.KEY_DOWN, onKeyDown);
+		Lib.application.window.onTextInput.add(_handleTextInput);
+		Lib.application.window.onTextEdit.add(_handleTextEditing);
 	}
 
 	public var selectIndex:Int = -1;
@@ -98,6 +101,8 @@ class PsychUIInputText extends FlxSpriteGroup
 	var _caretTime:Float = 0;
 
 	var _nextAccent:AccentCode = NONE;
+
+	var _composing:Bool = false;
 
 	public var inInsertMode:Bool = false;
 
@@ -410,6 +415,8 @@ class PsychUIInputText extends FlxSpriteGroup
 				onPressEnter(e);
 
 			default:
+				if (_composing)
+					return;
 				if (charCode < 1)
 					if ((charCode = getAccentCharCode(_nextAccent)) < 1)
 						return;
@@ -422,6 +429,46 @@ class PsychUIInputText extends FlxSpriteGroup
 				_nextAccent = NONE;
 		}
 		updateCaret();
+	}
+
+	function _handleTextInput(t:String):Void
+	{
+		if (focusOn != this)
+			return;
+		if (t == null || t.length == 0)
+			return;
+		if (selectIndex > -1 && selectIndex != caretIndex)
+			deleteSelection();
+		var toInsert = filter(t);
+		if (toInsert.length == 0)
+			return;
+		var allowed = toInsert;
+		if (maxLength > 0)
+		{
+			var remain = Std.int(Math.max(0, maxLength - text.length));
+			if (remain <= 0)
+				return;
+			allowed = toInsert.substr(0, remain);
+		}
+		var lastText = text;
+		if (!inInsertMode)
+			text = text.substring(0, caretIndex) + allowed + text.substring(caretIndex);
+		else
+			text = text.substring(0, caretIndex) + allowed + text.substring(caretIndex + allowed.length);
+		caretIndex += allowed.length;
+		if (onChange != null)
+			onChange(lastText, text);
+		if (broadcastInputTextEvent)
+			PsychUIEventHandler.event(CHANGE_EVENT, this);
+		_composing = false;
+		updateCaret();
+	}
+
+	function _handleTextEditing(t:String, start:Int, length:Int):Void
+	{
+		if (focusOn != this)
+			return;
+		_composing = true;
 	}
 
 	public dynamic function onPressEnter(e:KeyboardEvent)
@@ -457,7 +504,8 @@ class PsychUIInputText extends FlxSpriteGroup
 				else if (selectIndex == -1)
 					selectIndex = caretIndex;
 				focusOn = this;
-				FlxG.stage.window.textInputEnabled = true;
+				_safeEnableTextInput();
+				_updateTextInputRect();
 				caretIndex = 0;
 				var lastBound:Float = 0;
 				var txtX:Float = textObj.x - textObj.textField.scrollH;
@@ -476,13 +524,17 @@ class PsychUIInputText extends FlxSpriteGroup
 				updateCaret();
 			}
 			else if (focusOn == this)
+			{
 				focusOn = null;
+				_safeDisableTextInput();
+			}
 
 			// trace('changed focus to: ' + this);
 		}
 
 		if (focusOn == this)
 		{
+			_updateTextInputRect();
 			_caretTime = (_caretTime + elapsed) % 1;
 			if (textObj != null && textObj.exists)
 			{
@@ -518,6 +570,7 @@ class PsychUIInputText extends FlxSpriteGroup
 				selection.visible = false;
 			if (caret != null && caret.exists)
 				caret.visible = false;
+			_safeDisableTextInput();
 		}
 	}
 
@@ -606,9 +659,37 @@ class PsychUIInputText extends FlxSpriteGroup
 	{
 		_boundaries = null;
 		if (focusOn == this)
+		{
 			focusOn = null;
+			_safeDisableTextInput();
+		}
 		FlxG.stage.removeEventListener(KeyboardEvent.KEY_DOWN, onKeyDown);
+		Lib.application.window.onTextInput.remove(_handleTextInput);
+		Lib.application.window.onTextEdit.remove(_handleTextEditing);
 		super.destroy();
+	}
+
+	inline function _safeEnableTextInput():Void {
+		var win = FlxG.stage.window;
+		try {
+			FlxG.stage.window.textInputEnabled = true;
+		} catch (e:Dynamic) {}
+	}
+
+	inline function _safeDisableTextInput():Void {
+		var win = Lib.application.window;
+		try {
+				FlxG.stage.window.textInputEnabled = false;
+		} catch (e:Dynamic) {}
+	}
+
+	inline function _updateTextInputRect():Void {
+		var win = Lib.application.window;
+		try {
+			var p = behindText.getScreenPosition(camera);
+			var rect = new Rectangle(Std.int(p.x), Std.int(p.y + behindText.height), Std.int(behindText.width), Std.int(behindText.height));
+			win.setTextInputRect(rect);
+		}
 	}
 
 	function set_caretIndex(v:Int)

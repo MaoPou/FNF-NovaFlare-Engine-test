@@ -184,6 +184,8 @@ class FlxInputText extends FlxText
 	 * Stores last input text scroll.
 	 */
 	private var lastScroll:Int;
+
+	static public var imeComposing:Bool = false;
 	
 	/**
 	 * 用于跟踪Caps Lock状态
@@ -461,12 +463,16 @@ class FlxInputText extends FlxText
 				onChange(ENTER_ACTION);
 			}
 			// Actually add some text
-			else
+		else
+		{
+			if (imeComposing)
 			{
-				if (e.charCode == 0) // non-printable characters crash String.fromCharCode
-				{
-					return;
-				}
+				return;
+			}
+			if (e.charCode == 0) // non-printable characters crash String.fromCharCode
+			{
+				return;
+			}
 				
 				var charToAdd:String = "";
 				

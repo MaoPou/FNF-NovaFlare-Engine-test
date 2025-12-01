@@ -187,6 +187,7 @@ class MusicBeatState extends FlxUIState
 		});
 
 		super.update(elapsed);
+		GCManager.gc_update();
 	}
 
 	private function updateSection():Void

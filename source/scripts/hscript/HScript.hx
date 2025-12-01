@@ -17,6 +17,7 @@ import crowplexus.hscript.Printer;
 import crowplexus.hscript.ISharedScript;
 import scripts.stages.modules.ScriptedModuleNotify;
 import scripts.stages.modules.ModuleAgency;
+import scripts.hscript.HScriptTypeUtils;
 
 class HScript implements ISharedScript {
 	public static var instances:Map<String, HScript> = new Map<String, HScript>();
@@ -40,6 +41,8 @@ class HScript implements ISharedScript {
 	var expr:Expr;
 	var interp:Interp;
 	var parser:Parser;
+
+	var correctedScriptCode:Null<String> = null;
 
 	public function new(file:String, ?parent:Dynamic, ?manualRun:Bool = false) {
 		active = true;
@@ -193,7 +196,23 @@ class HScript implements ISharedScript {
 				Iris.error(Std.string(e), cast {fileName: this.origin, lineNumber: 0});
 				active = false;
 			}
+			if(expr != null) _postDetectAndUpdate();
 		}
+	}
+
+
+function _postDetectAndUpdate(): Void {
+    if (HScriptTypeUtils.enabled) {
+        var imp = HScriptTypeUtils.collectImports(this.expr);
+        HScriptTypeUtils.detectTypes(this.expr, imp);
+        this.correctedScriptCode = Printer.toString(this.expr);
+    } else {
+        this.correctedScriptCode = Printer.toString(this.expr);
+    }
+}
+
+	public function getCorrectedScript(): Null<String> {
+		return correctedScriptCode;
 	}
 
 	public function hget(name:String, ?e:Expr):Dynamic {

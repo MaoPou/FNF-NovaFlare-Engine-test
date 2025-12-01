@@ -11,14 +11,16 @@ import scripts.lua.FunkinLua;
 import crowplexus.hscript.Interp;
 import crowplexus.hscript.Expr;
 import crowplexus.hscript.Parser;
+import scripts.hscript.HScriptTypeUtils;
 import haxe.Exception;
 import haxe.ValueException;
 
 class HScriptBase
 {
-	public static var parser:Parser = new Parser();
+    public static var parser:Parser = new Parser();
 
-	public var interp:Interp;
+    public var interp:Interp;
+    var codeExprCache:Map<String, Expr> = new Map<String, Expr>();
 
 	public var variables(get, never):Map<String, Dynamic>;
 	public var parentLua:FunkinLua;
@@ -130,23 +132,43 @@ class HScriptBase
 		interp.variables.set('parentLua', parentLua);
 	}
 
-	public function execute(codeToRun:String, ?funcToRun:String = null, ?funcArgs:Array<Dynamic>):Dynamic
-	{
-		@:privateAccess
-		HScriptBase.parser.line = 1;
-		HScriptBase.parser.allowTypes = true;
-		var expr:Expr = HScriptBase.parser.parseString(codeToRun);
-		try
-		{
-			var value:Dynamic = interp.execute(HScriptBase.parser.parseString(codeToRun));
-			return (funcToRun != null) ? executeFunction(funcToRun, funcArgs) : value;
-		}
-		catch (e:Exception)
-		{
-			trace(e);
-			return null;
-		}
-	}
+    public function execute(codeToRun:String, ?funcToRun:String = null, ?funcArgs:Array<Dynamic>):Dynamic
+    {
+        @:privateAccess
+        HScriptBase.parser.line = 1;
+        HScriptBase.parser.allowTypes = true;
+        HScriptBase.parser.allowMetadata = true;
+        HScriptBase.parser.allowInterpolation = true;
+        HScriptBase.parser.allowJSON = true;
+        var expr:Expr = null;
+        if (codeExprCache.exists(codeToRun)) {
+            expr = codeExprCache.get(codeToRun);
+        } else {
+            expr = HScriptBase.parser.parseString(codeToRun);
+            if (HScriptTypeUtils.enabled) {
+                HScriptTypeUtils.detectTypes(expr, HScriptTypeUtils.collectImports(expr));
+            }
+            codeExprCache.set(codeToRun, expr);
+        }
+        try
+        {
+            var value:Dynamic = interp.execute(expr);
+            return (funcToRun != null) ? executeFunction(funcToRun, funcArgs) : value;
+        }
+        catch (e:Exception)
+        {
+            trace(e);
+            return null;
+        }
+    }
+
+    public static function setTypeDetectEnabled(v:Bool):Void {
+        HScriptTypeUtils.setEnabled(v);
+    }
+
+    @:finalize function finalize():Void {
+        codeExprCache = null;
+    }
 
 	public function executeFunction(funcToRun:String = null, funcArgs:Array<Dynamic>)
 	{

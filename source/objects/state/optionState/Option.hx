@@ -24,7 +24,7 @@ enum OptionType
 class Option extends FlxSpriteGroup
 {
 	public var onChange:Void->Void = null;
-	public var type:OptionType = BOOL;
+	public var experMode(default, set):Bool = false; //实验性设置
 
 	//STRING
 	public var strGroup:Array<String> = null;
@@ -47,6 +47,10 @@ class Option extends FlxSpriteGroup
 	public var follow:OptionCata;
 	public var modsData:Map<String, Dynamic> = []; //mod数据
 	public var modAdd:Bool;
+
+	/////////////////////////////////////////////
+
+	public var type:OptionType = BOOL;
 
 	/////////////////////////////////////////////
 
@@ -229,6 +233,15 @@ class Option extends FlxSpriteGroup
 			OptionsState.instance.changeTip(tips);
 			alreadyShowTip = true;
 		}
+	}
+
+	private function set_experMode(value:Bool):Bool {
+		experMode = value;
+		if (value) {
+			if (baseTar != null)
+				baseTar.text += '  (experimentMode)';
+		}
+		return value;
 	}
 
 	////////////////////////////////////////////////////////
@@ -431,6 +444,8 @@ class Option extends FlxSpriteGroup
 
 		saveHeight = baseBG.height + inter;
 	}
+
+	////////////////////////////////////////////////////////////////////////////
 
 	public function changeLanguage() {
 		this.description = Language.get(variable, 'op');

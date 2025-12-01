@@ -2646,8 +2646,6 @@ class PlayState extends MusicBeatState
 
 		onUpdatePostArgs[0] = elapsed;
 		callOnScripts('onUpdatePost', onUpdatePostArgs);
-
-		GCManager.gc_update();
 	}
 
 	public function scoreTxtUpdate()

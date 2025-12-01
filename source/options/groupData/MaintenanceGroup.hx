@@ -12,6 +12,7 @@ class MaintenanceGroup extends OptionCata
         addOption(option);
 
         var option:Option = new Option(this, 'developerMode', BOOL);
+		option.experMode = true;
         addOption(option);
         
         var option:Option = new Option(this, 'DevConScale', FLOAT, [0.5, 3, 1]);
