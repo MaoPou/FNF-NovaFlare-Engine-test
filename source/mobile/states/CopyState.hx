@@ -184,7 +184,13 @@ class CopyState extends MusicBeatState
 
 	public static function getFileBytes(file:String):ByteArray
 	{
-		return OpenflAssets.getBytes(file);
+		switch (Path.extension(file))
+		{
+			case 'otf' | 'ttf':
+				return ByteArray.fromFile(file);
+			default:
+				return OpenflAssets.getBytes(file);
+		}
 	}
 
 	public static function getFile(file:String):String
