@@ -184,13 +184,7 @@ class CopyState extends MusicBeatState
 
 	public static function getFileBytes(file:String):ByteArray
 	{
-		switch (Path.extension(file))
-		{
-			case 'otf' | 'ttf':
-				return ByteArray.fromFile(file);
-			default:
-				return OpenflAssets.getBytes(file);
-		}
+		return OpenflAssets.getBytes(file);
 	}
 
 	public static function getFile(file:String):String
@@ -268,7 +262,7 @@ class CopyState extends MusicBeatState
 			if (FileSystem.exists(toFile))
 			{
 				var internalBytes:ByteArray = getFileBytes(getFile(file));
-				var externalBytes:ByteArray = File.getBytes(toFile);
+				var externalBytes:haxe.io.Bytes = File.getBytes(toFile);
 				if (internalBytes.length == externalBytes.length)
 				{
 					filesToRemove.push(file);
@@ -288,7 +282,7 @@ class CopyState extends MusicBeatState
 
 		maxLoopTimes = locatedFiles.length;
 
-		return (maxLoopTimes < 0);
+		return (maxLoopTimes <= 0);
 		#else
 		locatedFiles = OpenflAssets.list();
 		// removes unwanted assets

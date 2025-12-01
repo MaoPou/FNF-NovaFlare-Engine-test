@@ -32,7 +32,7 @@ class FlxUIInputText extends FlxInputText implements IResizable implements IFlxU
         super(X, Y, Width, Text, size, TextColor, BackgroundColor, EmbeddedFont);
         #if (lime >= "7.0")
         Lib.application.window.onTextInput.add(_handleTextInput);
-        Lib.application.window.onTextEditing.add(_handleTextEditing);
+        Lib.application.window.onTextEdit.add(_handleTextEditing);
         #end
     }
 
@@ -111,23 +111,23 @@ class FlxUIInputText extends FlxInputText implements IResizable implements IFlxU
 
     private function _filterIME(text:String):String
     {
-        if (forceCase == UPPER_CASE)
+        if (forceCase == FlxInputText.UPPER_CASE)
             text = text.toUpperCase();
-        else if (forceCase == LOWER_CASE)
+        else if (forceCase == FlxInputText.LOWER_CASE)
             text = text.toLowerCase();
 
-        if (filterMode != NO_FILTER)
+        if (filterMode != FlxInputText.NO_FILTER)
         {
             var pattern:EReg;
             switch (filterMode)
             {
-                case ONLY_ALPHA:
+                case FlxInputText.ONLY_ALPHA:
                     pattern = ~/[^a-zA-Z]*/g;
-                case ONLY_NUMERIC:
+                case FlxInputText.ONLY_NUMERIC:
                     pattern = ~/[^0-9]*/g;
-                case ONLY_ALPHANUMERIC:
+                case FlxInputText.ONLY_ALPHANUMERIC:
                     pattern = ~/[^a-zA-Z0-9]*/g;
-                case CUSTOM_FILTER:
+                case FlxInputText.CUSTOM_FILTER:
                     pattern = customFilterPattern;
                 default:
                     pattern = null;
@@ -152,7 +152,7 @@ class FlxUIInputText extends FlxInputText implements IResizable implements IFlxU
     {
         #if (lime >= "7.0")
         Lib.application.window.onTextInput.remove(_handleTextInput);
-        Lib.application.window.onTextEditing.remove(_handleTextEditing);
+        Lib.application.window.onTextEdit.remove(_handleTextEditing);
         #end
         super.destroy();
     }

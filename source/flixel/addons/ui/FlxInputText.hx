@@ -463,6 +463,7 @@ class FlxInputText extends FlxText
 				onChange(ENTER_ACTION);
 			}
 			// Actually add some text
+		}
 		else
 		{
 			if (imeComposing)
@@ -474,49 +475,48 @@ class FlxInputText extends FlxText
 				return;
 			}
 				
-				var charToAdd:String = "";
+			var charToAdd:String = "";
+			
+			// 处理Shift+数字键的特殊符号
+			if (e.shiftKey && key >= 48 && key <= 57) // 数字键0-9
+			{
+				switch (key)
+				{
+					case 48: charToAdd = ")"; // 0 -> )
+					case 49: charToAdd = "!"; // 1 -> !
+					case 50: charToAdd = "@"; // 2 -> @
+					case 51: charToAdd = "#"; // 3 -> #
+					case 52: charToAdd = "$"; // 4 -> $
+					case 53: charToAdd = "%"; // 5 -> %
+					case 54: charToAdd = "^"; // 6 -> ^
+					case 55: charToAdd = "&"; // 7 -> &
+					case 56: charToAdd = "*"; // 8 -> *
+					case 57: charToAdd = "("; // 9 -> (
+				}
+			}
+			else
+			{
+				// 处理普通字符输入，考虑Caps Lock状态
+				charToAdd = String.fromCharCode(e.charCode);
 				
-				// 处理Shift+数字键的特殊符号
-				if (e.shiftKey && key >= 48 && key <= 57) // 数字键0-9
+				// 如果Caps Lock开启，则切换大小写
+				if (capsLockEnabled)
 				{
-					switch (key)
-					{
-						case 48: charToAdd = ")"; // 0 -> )
-						case 49: charToAdd = "!"; // 1 -> !
-						case 50: charToAdd = "@"; // 2 -> @
-						case 51: charToAdd = "#"; // 3 -> #
-						case 52: charToAdd = "$"; // 4 -> $
-						case 53: charToAdd = "%"; // 5 -> %
-						case 54: charToAdd = "^"; // 6 -> ^
-						case 55: charToAdd = "&"; // 7 -> &
-						case 56: charToAdd = "*"; // 8 -> *
-						case 57: charToAdd = "("; // 9 -> (
-					}
+					// 如果是小写字母，转为大写
+					if (charToAdd >= "a" && charToAdd <= "z")
+						charToAdd = charToAdd.toUpperCase();
+					// 如果是大写字母，转为小写
+					else if (charToAdd >= "A" && charToAdd <= "Z")
+						charToAdd = charToAdd.toLowerCase();
 				}
-				else
-				{
-					// 处理普通字符输入，考虑Caps Lock状态
-					charToAdd = String.fromCharCode(e.charCode);
-					
-					// 如果Caps Lock开启，则切换大小写
-					if (capsLockEnabled)
-					{
-						// 如果是小写字母，转为大写
-						if (charToAdd >= "a" && charToAdd <= "z")
-							charToAdd = charToAdd.toUpperCase();
-						// 如果是大写字母，转为小写
-						else if (charToAdd >= "A" && charToAdd <= "Z")
-							charToAdd = charToAdd.toLowerCase();
-					}
-				}
-				
-				var newText:String = filter(charToAdd);
-				if (newText.length > 0 && (maxLength == 0 || (text.length + newText.length) < maxLength))
-				{
-					text = insertSubstring(text, newText, caretIndex);
-					caretIndex++;
-					onChange(INPUT_ACTION);
-				}
+			}
+			
+			var newText:String = filter(charToAdd);
+			if (newText.length > 0 && (maxLength == 0 || (text.length + newText.length) < maxLength))
+			{
+				text = insertSubstring(text, newText, caretIndex);
+				caretIndex++;
+				onChange(INPUT_ACTION);
 			}
 		}
 	}
