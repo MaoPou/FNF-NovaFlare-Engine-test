@@ -169,6 +169,7 @@ class Main extends Sprite
 
 		fpsVar = new FPSViewer(5, 5);
 		FlxG.addChildBelowMouse(fpsVar);
+		FlxG.spriteBelowMouse.push(fpsVar);
 
 		Lib.current.stage.align = "tl";
 		Lib.current.stage.scaleMode = StageScaleMode.NO_SCALE;

@@ -1529,17 +1529,30 @@ class PlayState extends MusicBeatState
 		#if FLX_PITCH FlxG.sound.music.pitch = playbackRate; #end
 		FlxG.sound.music.play();
 
+		#if FLX_PITCH
+		vocals.pitch = playbackRate;
+		opponentVocals.pitch = playbackRate;
+		#end
+
 		if (Conductor.songPosition <= vocals.length)
 		{
 			vocals.time = time;
-			opponentVocals.time = time;
-			#if FLX_PITCH
-			vocals.pitch = playbackRate;
-			opponentVocals.pitch = playbackRate;
-			#end
+			if (!vocals.playing) vocals.play();
 		}
-		vocals.play();
-		opponentVocals.play();
+		else
+		{
+			vocals.stop();
+		}
+
+		if (Conductor.songPosition <= opponentVocals.length)
+		{
+			opponentVocals.time = time;
+			if (!opponentVocals.playing) opponentVocals.play();
+		}
+		else
+		{
+			opponentVocals.stop();
+		}
 		if (videoCutscene != null)
 		{
 			videoCutscene.resume();
@@ -1655,6 +1668,8 @@ class PlayState extends MusicBeatState
 		catch (e:Dynamic)
 		{
 		}
+
+		vocals.looped = opponentVocals.looped = false;
 
 		#if FLX_PITCH
 		vocals.pitch = playbackRate;
@@ -2264,15 +2279,16 @@ class PlayState extends MusicBeatState
 
 	public var fixDesyncedStep:Int = 0;
 
-	function musicCheck(music:FlxSound, getTime:Float, deviation:Float):Bool
-	{
-		if (music == null)
-			return false;
-		if (music.length > 0 && Math.abs(music.time - getTime) > deviation) {
-			return true;
-		}
-		return false;
-	}
+function musicCheck(music:FlxSound, getTime:Float, deviation:Float):Bool
+{
+    if (music == null)
+        return false;
+    if (music.length > 0) {
+        if (getTime > music.length) return false;
+        if (Math.abs(music.time - getTime) > deviation) return true;
+    }
+    return false;
+}
 
 	public var paused:Bool = false;
 	public var canReset:Bool = true;

@@ -13,7 +13,7 @@ class SongRect extends FlxSpriteGroup {
 
     /////////////////////////////////////////////////////////////////////
 
-    static public final fixHeight:Int = #if mobile 80 #else 60 #end;
+    static public final fixHeight:Int = #if mobile 80 #else 70 #end;
 
     static public var focusRect:SongRect;
 
@@ -101,7 +101,7 @@ class SongRect extends FlxSpriteGroup {
 	{
         if (lineShape == null) {
             lineShape = new Shape();
-            var lineSize:Int = 2;
+            var lineSize:Int = 1;
             var round:Int = Std.int(bitmap.height / 2);
             lineShape.graphics.beginFill(EngineSet.mainColor);
             lineShape.graphics.lineStyle(1, EngineSet.mainColor, 1);

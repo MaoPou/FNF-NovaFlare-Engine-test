@@ -50,7 +50,6 @@ class FreeplayState extends MusicBeatState
 
 	public var songGroup:Array<SongRect> = [];
 	public var songsMove:MouseMove;
-	var songsScroll:ScrollManager;
 
 	public static var vocals:FlxSound = null;
 
@@ -286,17 +285,13 @@ class FreeplayState extends MusicBeatState
 		}
 
 		songsMove = new MouseMove(FreeplayState, 'songPosiData', 
-								[], //无限滑动
+								[-songGroup.length * SongRect.fixHeight, 0],
 								[	
 									[FlxG.width * 0.5, FlxG.width], 
 									[0, FlxG.height]
 								],
 								songMoveEvent);
 		add(songsMove);
-
-		songsScroll = new ScrollManager(songGroup);
-		songMoveEvent();
-		songsScroll.moveElementToPosition('stop');
 
 		////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 		
@@ -361,7 +356,6 @@ class FreeplayState extends MusicBeatState
 	public static var songPosiData:Float = 720 * 0.30; //神人haxe不能用FlxG.height
 	public var inter:Float = 0.95;
 	public function songMoveEvent(){
-		songsScroll.check(songsMove.state);
 		if (songGroup.length <= 0) return;
 		for (i in 0...songGroup.length) {
 			songGroup[i].moveY(songPosiData + songGroup[i].diffY + (songGroup[i].currect) * SongRect.fixHeight * inter);

@@ -32,6 +32,7 @@ import scripts.lua.DebugLuaText;
 import scripts.lua.ModchartSprite;
 import flixel.input.keyboard.FlxKey;
 import flixel.input.gamepad.FlxGamepadInputID;
+import flixel.math.FlxMatrix;
 import haxe.Json;
 
 class FunkinLua
