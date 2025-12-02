@@ -70,14 +70,14 @@
       "type": "git",
       "dir": null,
       "ref": "main",
-      "url": "https://github.com/NovaFlare-Engine-haxelib/hxcpp-legacy"
+      "url": "https://github.com/NovaFlare-Engine-haxelib/hxcpp-4.3.2-change"
     },
     {
       "name": "hxvlc",
       "type": "git",
       "dir": null,
       "ref": "main",
-      "url": "https://github.com/NovaFlare-Engine-haxelib/hxvlc-2.1.4"
+      "url": "https://github.com/NovaFlare-Engine-haxelib/hxvlc-2.2.4"
     },
     {
       "name": "hscript-iris-improved",
