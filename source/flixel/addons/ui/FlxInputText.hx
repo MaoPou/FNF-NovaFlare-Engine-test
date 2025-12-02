@@ -564,8 +564,8 @@ class FlxInputText extends FlxText
 	private function getCaretIndex():Int
 	{
 		#if FLX_MOUSE
-		var hit = FlxPoint.get(FlxG.mouse.x - x, FlxG.mouse.y - y);
-		return getCharIndexAtPoint(hit.x, hit.y);
+		var hit = FlxG.mouse.getWorldPosition(camera);
+		return getCharIndexAtPoint(hit.x - x, hit.y - y);
 		#else
 		return 0;
 		#end

@@ -536,21 +536,7 @@ class PsychUIInputText extends FlxSpriteGroup
 				focusOn = this;
 				_safeEnableTextInput();
 				_updateTextInputRect();
-				caretIndex = 0;
-				var lastBound:Float = 0;
-				var txtX:Float = textObj.x - textObj.textField.scrollH;
-
-				for (i => bound in _boundaries)
-				{
-					if (FlxG.mouse.screenX >= txtX + (bound - lastBound) / 2)
-					{
-						caretIndex = i + 1;
-						txtX += bound - lastBound;
-						lastBound = bound;
-					}
-					else
-						break;
-				}
+				caretIndex = _getCaretIndexFromMouse();
 				updateCaret();
 			}
 			else if (focusOn == this)
@@ -786,6 +772,40 @@ class PsychUIInputText extends FlxSpriteGroup
 	}
 
 	var _boundaries:Array<Float> = [];
+	inline function _getCaretIndexFromMouse():Int
+	{
+		var res:Int = 0;
+		if (_boundaries != null && _boundaries.length > 0)
+		{
+			var m = FlxG.mouse.getWorldPosition(camera);
+			var baseX:Float = textObj.x + 1 - textObj.textField.scrollH;
+			var mouseX:Float = m.x;
+
+			var totalWidth:Float = _boundaries[_boundaries.length - 1];
+			if (mouseX <= baseX)
+				res = 0;
+			else if (mouseX >= baseX + totalWidth)
+				res = _boundaries.length;
+			else
+			{
+				var lastBound:Float = 0;
+				for (i => bound in _boundaries)
+				{
+					var left:Float = baseX + lastBound;
+					var right:Float = baseX + bound;
+					var center:Float = (left + right) / 2;
+					if (mouseX < center)
+					{
+						res = i;
+						break;
+					}
+					lastBound = bound;
+					res = i + 1;
+				}
+			}
+		}
+		return res;
+	}
 
 	function set_text(v:String)
 	{
