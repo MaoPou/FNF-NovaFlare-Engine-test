@@ -25,6 +25,9 @@ class FlxUIInputText extends FlxInputText implements IResizable implements IFlxU
     public static inline var CUT_EVENT:String = "cut_input_text"; // cut text in this text field
 
     var _composing:Bool = false;
+    var _compBackupText:String = null;
+    var _compBackupCaret:Int = -1;
+    var _compPreviewText:String = null;
 
     public function new(X:Float = 0, Y:Float = 0, Width:Int = 150, ?Text:String, size:Int = 8, TextColor:Int = FlxColor.BLACK,
             BackgroundColor:Int = FlxColor.WHITE, EmbeddedFont:Bool = true)
@@ -87,10 +90,15 @@ class FlxUIInputText extends FlxInputText implements IResizable implements IFlxU
                 return;
             allowed = toInsert.substr(0, remain);
         }
-        text = text.substring(0, caretIndex) + allowed + text.substring(caretIndex);
-        caretIndex += allowed.length;
+        var baseText = (_composing && _compBackupText != null) ? _compBackupText : text;
+        var baseCaret = (_composing && _compBackupCaret >= 0) ? _compBackupCaret : caretIndex;
+        text = baseText.substring(0, baseCaret) + allowed + baseText.substring(baseCaret);
+        caretIndex = baseCaret + allowed.length;
         _composing = false;
         FlxInputText.imeComposing = false;
+        _compBackupText = null;
+        _compBackupCaret = -1;
+        _compPreviewText = null;
         onChange(FlxInputText.INPUT_ACTION);
     }
 
@@ -98,6 +106,16 @@ class FlxUIInputText extends FlxInputText implements IResizable implements IFlxU
     {
         if (!hasFocus)
             return;
+        if (!_composing)
+        {
+            _compBackupText = text;
+            _compBackupCaret = caretIndex;
+        }
+        var preview = t == null ? "" : t;
+        _compPreviewText = preview;
+        text = _compBackupText.substring(0, _compBackupCaret) + preview + _compBackupText.substring(_compBackupCaret);
+        caretIndex = _compBackupCaret + preview.length;
+        onChange(FlxInputText.INPUT_ACTION);
         _composing = true;
         FlxInputText.imeComposing = true;
     }

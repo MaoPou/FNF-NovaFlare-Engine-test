@@ -470,6 +470,12 @@ class FlxInputText extends FlxText
 			{
 				return;
 			}
+			var _txtEnabled:Bool = false;
+			try { _txtEnabled = FlxG.stage.window.textInputEnabled; } catch (e:Dynamic) {}
+			if (_txtEnabled)
+			{
+				return;
+			}
 			if (e.charCode == 0) // non-printable characters crash String.fromCharCode
 			{
 				return;

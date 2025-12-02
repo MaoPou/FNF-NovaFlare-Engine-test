@@ -103,6 +103,9 @@ class PsychUIInputText extends FlxSpriteGroup
 	var _nextAccent:AccentCode = NONE;
 
 	var _composing:Bool = false;
+	var _compBackupText:String = null;
+	var _compBackupCaret:Int = -1;
+	var _compPreviewText:String = null;
 
 	public var inInsertMode:Bool = false;
 
@@ -371,7 +374,9 @@ class PsychUIInputText extends FlxSpriteGroup
 				}
 				if (_nextAccent != NONE)
 					charCode += grave - capital + _nextAccent;
-
+				var _txtEnabled:Bool = false;
+				try { _txtEnabled = FlxG.stage.window.textInputEnabled; } catch (e:Dynamic) {}
+				if (_txtEnabled) return;
 				_typeLetter(charCode);
 				_nextAccent = NONE;
 
@@ -395,7 +400,9 @@ class PsychUIInputText extends FlxSpriteGroup
 					charCode += grave - capital + _nextAccent;
 				else if (_nextAccent == TILDE) // Unsupported accent
 					_typeLetter(getAccentCharCode(_nextAccent));
-
+				var _txtEnabled2:Bool = false;
+				try { _txtEnabled2 = FlxG.stage.window.textInputEnabled; } catch (e:Dynamic) {}
+				if (_txtEnabled2) return;
 				_typeLetter(charCode);
 				_nextAccent = NONE;
 
@@ -404,7 +411,9 @@ class PsychUIInputText extends FlxSpriteGroup
 					charCode += 0xD1 - 0x4E;
 				else
 					_typeLetter(getAccentCharCode(_nextAccent));
-
+				var _txtEnabled3:Bool = false;
+				try { _txtEnabled3 = FlxG.stage.window.textInputEnabled; } catch (e:Dynamic) {}
+				if (_txtEnabled3) return;
 				_typeLetter(charCode);
 				_nextAccent = NONE;
 
@@ -417,10 +426,13 @@ class PsychUIInputText extends FlxSpriteGroup
 			default:
 				if (_composing)
 					return;
+				var _txtEnabled4:Bool = false;
+				try { _txtEnabled4 = FlxG.stage.window.textInputEnabled; } catch (e:Dynamic) {}
+				if (_txtEnabled4) return;
 				if (charCode < 1)
 					if ((charCode = getAccentCharCode(_nextAccent)) < 1)
 						return;
-
+				
 				if (lastAccent != NONE)
 					_typeLetter(getAccentCharCode(lastAccent));
 				else if (_nextAccent != NONE)
@@ -450,17 +462,22 @@ class PsychUIInputText extends FlxSpriteGroup
 				return;
 			allowed = toInsert.substr(0, remain);
 		}
-		var lastText = text;
+		var baseText = (_composing && _compBackupText != null) ? _compBackupText : text;
+		var baseCaret = (_composing && _compBackupCaret >= 0) ? _compBackupCaret : caretIndex;
+		var lastText = baseText;
 		if (!inInsertMode)
-			text = text.substring(0, caretIndex) + allowed + text.substring(caretIndex);
+			text = baseText.substring(0, baseCaret) + allowed + baseText.substring(baseCaret);
 		else
-			text = text.substring(0, caretIndex) + allowed + text.substring(caretIndex + allowed.length);
-		caretIndex += allowed.length;
+			text = baseText.substring(0, baseCaret) + allowed + baseText.substring(baseCaret + allowed.length);
+		caretIndex = baseCaret + allowed.length;
 		if (onChange != null)
 			onChange(lastText, text);
 		if (broadcastInputTextEvent)
 			PsychUIEventHandler.event(CHANGE_EVENT, this);
 		_composing = false;
+		_compBackupText = null;
+		_compBackupCaret = -1;
+		_compPreviewText = null;
 		updateCaret();
 	}
 
@@ -468,7 +485,20 @@ class PsychUIInputText extends FlxSpriteGroup
 	{
 		if (focusOn != this)
 			return;
+		if (!_composing)
+		{
+			_compBackupText = text;
+			_compBackupCaret = caretIndex;
+		}
+		var preview = t == null ? "" : t;
+		_compPreviewText = preview;
+		text = _compBackupText.substring(0, _compBackupCaret) + preview + _compBackupText.substring(_compBackupCaret);
+		caretIndex = _compBackupCaret + preview.length;
 		_composing = true;
+		if (onChange != null)
+			onChange(_compBackupText, text);
+		if (broadcastInputTextEvent)
+			PsychUIEventHandler.event(CHANGE_EVENT, this);
 	}
 
 	public dynamic function onPressEnter(e:KeyboardEvent)
