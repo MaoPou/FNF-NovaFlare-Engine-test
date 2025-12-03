@@ -2162,31 +2162,34 @@ class PlayState extends MusicBeatState
 
 		if (paused)
 		{
-			persistentDraw = false;
-			persistentUpdate = false;
-			new FlxTimer().start(0.2, function(tmr:FlxTimer)
-			{
-				persistentUpdate = true;
-				persistentDraw = true;
-				if (FlxG.sound.music != null && !startingSong)
-					resyncVocals(true);
+			persistentUpdate = true;
+			persistentDraw = true;
+			if (FlxG.sound.music != null && !startingSong)
+				resyncVocals(true, pausedSongPos);
 
-				FlxTimer.globalManager.forEach(function(tmr:FlxTimer) if (!tmr.finished)
-					tmr.active = true);
-				FlxTween.globalManager.forEach(function(twn:FlxTween) if (!twn.finished)
-					twn.active = true);
+			FlxTimer.globalManager.forEach(function(tmr:FlxTimer) if (!tmr.finished)
+				tmr.active = true);
+			FlxTween.globalManager.forEach(function(twn:FlxTween) if (!twn.finished)
+				twn.active = true);
 
-                paused = false;
-                if (timing != null) timing.resume();
-                if (mobileControls != null)
-                    mobileControls.visible = true;
-                callOnScripts('onResume');
-                resetRPC(startTimer != null && startTimer.finished);
-            });
+			paused = false;
+			if (timing != null) timing.resume();
+			if (mobileControls != null)
+				mobileControls.visible = true;
+			callOnScripts('onResume');
+			resetRPC(startTimer != null && startTimer.finished);
 
 			for (key in 0...keyboardViewer.keys) {
-				if (!Controls.instance.pressed(keysArray[key]))
+				if (!Controls.instance.pressed(keysArray[key])) {
 					keyboardViewer.released(key);
+					
+					var spr:StrumNote = ClientPrefs.data.playOpponent ? opponentStrums.members[key] : playerStrums.members[key];
+					if (spr != null)
+					{
+						spr.playAnim('static');
+						spr.resetAnim = 0;
+					}
+				}
 			}
 		}
 	}
@@ -2244,15 +2247,20 @@ class PlayState extends MusicBeatState
 		#end
 	}
 
-	function resyncVocals(?fixVocals:Bool = false):Void
+	function resyncVocals(?fixVocals:Bool = false, ?fixTime:Float):Void
 	{
 		if (finishTimer != null)
 			return;
+		
+		if (fixVocals == null)
+			fixVocals = false;
 
 		if (!ClientPrefs.data.developerMode) trace('resynced vocals at ' + Math.floor(Conductor.songPosition));
 
 		FlxG.sound.music.play();
 		#if FLX_PITCH FlxG.sound.music.pitch = playbackRate; #end
+		if (fixVocals && fixTime != null)
+			FlxG.sound.music.time = Std.int(fixTime);
         Conductor.songPosition = FlxG.sound.music.time;
         if (timing != null) timing.setPosition(Conductor.songPosition);
 
@@ -2302,6 +2310,7 @@ function musicCheck(music:FlxSound, getTime:Float, deviation:Float):Bool
 	var memStart:Float = 0;
 	var memEnd:Float = 0;
 	var allocDelta:Int = 0;
+	var pausedSongPos:Float = 0;
 
 	override public function update(elapsed:Float)
 	{
@@ -2757,8 +2766,9 @@ function musicCheck(music:FlxSound, getTime:Float, deviation:Float):Bool
 		FlxG.camera.followLerp = 0;
 		persistentUpdate = false;
 		persistentDraw = true;
-                paused = true;
-                if (timing != null) timing.pause();
+		paused = true;
+		if (timing != null) timing.pause();
+		pausedSongPos = Conductor.songPosition;
 
 		keyboardViewer.save();
 

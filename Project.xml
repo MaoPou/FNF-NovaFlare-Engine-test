@@ -261,8 +261,6 @@
 	<architecture name="arm64" exclude="armv7" if="android" />
 
 <config>
-	<!--android gradle-version="8.7" /-->
-    <!--ndroid gradle-plugin="8.6.0" /-->
 	<android minimum-sdk-version="24" />
 	<android target-sdk-version= "35" />
     <!--Fuck you xcode-->

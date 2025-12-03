@@ -285,7 +285,7 @@ class FreeplayState extends MusicBeatState
 		}
 
 		songsMove = new MouseMove(FreeplayState, 'songPosiData', 
-								[-songGroup.length * SongRect.fixHeight, 0],
+								[-songGroup.length * SongRect.fixHeight, 720 * 0.3],
 								[	
 									[FlxG.width * 0.5, FlxG.width], 
 									[0, FlxG.height]

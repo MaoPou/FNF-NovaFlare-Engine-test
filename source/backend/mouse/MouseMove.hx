@@ -14,13 +14,15 @@ class MouseMove extends FlxBasic
     public var moveLimit:Array<Float> = [0, 0];  //[min, max]
     public var mouseLimit:Array<Array<Float>> = [];   //[ X[min, max], Y[min, max] ]
 
+    public var mouseWheelSensitivity:Float = 1000.0; // 鼠标滚轮更改量的控制变量
     public var lerpData:Float = 0; //用于lerp到指定数据的
+    public var enableMouseWheel:Bool = true;
 
-    public var infScroll:Bool = false;
-    
     public var event:Void->Void = null;
 
     ////////////////////////////////////////////////////////////////////////////////////////////////
+
+    public var infScroll:Bool = false; //是否无限滚动
     
     private var isDragging:Bool = false;
     private var lastMouseY:Float = 0;
@@ -36,9 +38,6 @@ class MouseMove extends FlxBasic
     private var minVelocity:Float = 0.001;       // 最小速度阈值
     private var springStrength:Float = 25.0;
     private var releaseBoost:Float = 1.1;
-    
-    // 鼠标滚轮相关参数
-    public var mouseWheelSensitivity:Float = 600.0; // 鼠标滚轮更改量的控制变量(可被修改)
     
     ////////////////////////////////////////////////////////////////////////////////////////////////
     
@@ -78,7 +77,7 @@ class MouseMove extends FlxBasic
         
         if (checkInput && inputAllow) {
             // 鼠标滚轮
-            if (mouse.wheel!= 0) {
+            if (enableMouseWheel && mouse.wheel!= 0) {
                 velocity += mouse.wheel * mouseWheelSensitivity;
                 lerpData = 0;
             }
