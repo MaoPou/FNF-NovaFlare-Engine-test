@@ -16,10 +16,10 @@ class MouseMove extends FlxBasic
     public var mouseLimit:Array<Array<Float>> = [];   //[ X[min, max], Y[min, max] ]
 
     public var mouseWheelSensitivity:Float = 1000.0; // 鼠标滚轮更改量的控制变量
-    public var tweenData(default, set):Float = 0; //用于tween到指定数据的
+    public var tweenData(default, set):Float = 0; //用于tween/lerp到指定数据的
     public var tweenTime:Float = 0.3; //tween时间
     public var tweenType:String = 'linear'; //tween类型
-    public var useLerp:Bool = false; //是否使用lerp
+    public var useLerp:Bool = true; //是否使用lerp而不是tween
     public var lerpSmooth:Float = 15; //lerp平滑度
 
     public var event:Void->Void = null;
