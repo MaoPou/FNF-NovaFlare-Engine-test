@@ -143,7 +143,7 @@ class OptionsState extends MusicBeatState
 								],
 								cataMoveEvent);
 		add(cataMove);
-		cataMove.useLerp -= false;
+		cataMove.useLerp = false;
 		cataMove.tweenTime = 0.45;
 		cataMove.tweenType = 'expoInOut';
 		cataMoveEvent();
