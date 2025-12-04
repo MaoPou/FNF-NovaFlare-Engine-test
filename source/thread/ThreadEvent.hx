@@ -1,6 +1,7 @@
 package thread;
 
 import sys.thread.Thread;
+import haxe.ds.IntMap;
 
 /**
  * 在使用此类时，请确保你在以前已经研究过haxe线程的用法
@@ -17,6 +18,7 @@ class ThreadEvent {
 
     static var IDcount:Int = 0;
     private var id:Int; //线程的专属id
+    static var pendingMessages:IntMap<Array<Dynamic>> = new IntMap();
 
     public static function create(job:()->Void, event:Void->Void):ThreadEvent
     {
@@ -46,14 +48,38 @@ class ThreadEvent {
     }
 
     public function checkCompletion(blocking:Bool = false) {
-        var msg = Thread.readMessage(blocking);
-        if (msg != null && Reflect.hasField(msg, "type") && msg.type.toLowerCase() == "complete" && msg.data.id == id) {
+        var list = pendingMessages.get(id);
+        if (list != null && list.length > 0) {
             if (event != null) {
                 event();
             }
-
             if (updateListener != null) {
                 removeIndividualListener();
+            }
+            list.shift();
+            if (list.length == 0) {
+                pendingMessages.remove(id);
+            }
+            return;
+        }
+
+        var msg = Thread.readMessage(blocking);
+        if (msg != null && Reflect.hasField(msg, "type") && Std.string(msg.type).toLowerCase() == "complete" && Reflect.hasField(msg, "data") && Reflect.hasField(msg.data, "id")) {
+            var mid:Int = msg.data.id;
+            if (mid == id) {
+                if (event != null) {
+                    event();
+                }
+                if (updateListener != null) {
+                    removeIndividualListener();
+                }
+            } else {
+                var other = pendingMessages.get(mid);
+                if (other == null) {
+                    other = [];
+                    pendingMessages.set(mid, other);
+                }
+                other.push(msg);
             }
         }
     }

@@ -157,7 +157,7 @@ class FreeplayState extends MusicBeatState
 	
 		//////////////////////////////////////////////////////////////////////////////////////////
 
-		background = new ChangeSprite(0, 0).load(Paths.image('menuDesat'));
+		background = new ChangeSprite(0, 0).load(Paths.image('menuDesat'), 1.05);
 		background.antialiasing = ClientPrefs.data.antialiasing;
 		add(background);
 
@@ -288,8 +288,9 @@ class FreeplayState extends MusicBeatState
 									[0, FlxG.height]
 								],
 								songMoveEvent);
-		songsMove.tweenTime = SongRect.moveTime;
-		songsMove.tweenType = 'expoInOut';
+		songsMove.useLerp = true;
+		songsMove.lerpSmooth = 30;
+		songsMove.enableMouseWheel = false;
 		add(songsMove);
 
 		////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -398,6 +399,12 @@ class FreeplayState extends MusicBeatState
 				holdTime = 0;
 			}
 
+			if (FlxG.mouse.wheel != 0) {
+				changeSelection(-FlxG.mouse.wheel);
+				var target = songGroup[curSelected];		        
+			    target.createDiff();
+			}
+
 			if (controls.UI_DOWN || controls.UI_UP)
 			{
 				var checkLastHold:Int = Math.floor((holdTime - 0.5) * 30);
@@ -409,21 +416,16 @@ class FreeplayState extends MusicBeatState
 			}
 			
 			if (controls.ACCEPT) {
-			    var target = songGroup[curSelected];
-			    if (!target.diffAdded) {			        
-			        target.createDiff();
-			    } else {
-			    
-			    }
+			    var target = songGroup[curSelected];			        
+			    target.createDiff();
 			}
 		}
 	}
 
 	public function changeSelection(change:Int = 0, playSound:Bool = true)
 	{
-	    songsMove.tweenData = songPosiStart - curSelected * SongRect.fixHeight * inter;
-
 		curSelected = FlxMath.wrap(curSelected + change, 0, songGroup.length - 1);
+		songsMove.tweenData = songPosiStart - curSelected * SongRect.fixHeight * inter;
 		SongRect.updateFocus();
 
 		if (playSound)
@@ -443,7 +445,6 @@ class FreeplayState extends MusicBeatState
 
 		Mods.currentModDirectory = songsData[curSelected].folder;
 		PlayState.storyWeek = songsData[curSelected].week;
-		
 	}
 	
 	function changeDiff(change:Int = 0)

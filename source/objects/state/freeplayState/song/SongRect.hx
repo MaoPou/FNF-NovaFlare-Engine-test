@@ -26,7 +26,7 @@ class SongRect extends FlxSpriteGroup {
     public function new(songNameSt:String, songChar:String, songMusican:String, songCharter:Array<String>, songColor:Array<Int>) {
         super(0, 0);
 
-        light = new Rect(0, 0, 560, fixHeight, fixHeight / 2, fixHeight / 2, FlxColor.WHITE, 1, 1, EngineSet.mainColor);
+        light = new Rect(0, 0, 560, fixHeight, fixHeight / 2, fixHeight / 2, FlxColor.WHITE, 1, 0, EngineSet.mainColor);
         light.antialiasing = ClientPrefs.data.antialiasing;
         add(light);
         
@@ -93,19 +93,15 @@ class SongRect extends FlxSpriteGroup {
 	{
 		super.update(elapsed);
 
-        calcX();
-
         var mouse = FreeplayState.instance.mouseEvent;
 
 		var overlaps = mouse.overlaps(this);
 
         if (overlaps) {
             if (mouse.justReleased) {
-                choose();
+                overForce();
             }
         }
-
-        updateFocus();
 	}
 
     public static function updateFocus() {
@@ -114,7 +110,7 @@ class SongRect extends FlxSpriteGroup {
 	
     //////////////////////////////////////////////////////////////////////////////////////////////
 	
-	function choose() {
+	function overForce() {
 	    FreeplayState.curSelected = this.id;
 	    FreeplayState.instance.changeSelection();   
         updateFocus();

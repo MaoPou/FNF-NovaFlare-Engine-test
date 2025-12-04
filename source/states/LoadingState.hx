@@ -194,16 +194,17 @@ class LoadingState extends MusicBeatState
 
 		cpp.vm.Gc.enable(false);
 
-		//ThreadEvent.create(function() {
-			//prepareMutex.acquire();
-			startPrepare();
-			startThreads();
-			//prepareMutex.release();
-		//}, startThreads);
-
+		new FlxTimer().start(0.0001, function(tmr:FlxTimer)
+		{
+			ThreadEvent.create(function() {
+				prepareMutex.acquire();
+				startPrepare();
+				prepareMutex.release();
+			}, startThreads);
+		});
+		
 		super.create();
 	}
-
 
 	public static var imagesToPrepare:Array<String> = [];
 	public static var soundsToPrepare:Array<String> = [];

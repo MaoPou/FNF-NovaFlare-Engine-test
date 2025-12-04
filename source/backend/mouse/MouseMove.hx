@@ -19,14 +19,14 @@ class MouseMove extends FlxBasic
     public var tweenData(default, set):Float = 0; //用于tween到指定数据的
     public var tweenTime:Float = 0.3; //tween时间
     public var tweenType:String = 'linear'; //tween类型
+    public var useLerp:Bool = false; //是否使用lerp
+    public var lerpSmooth:Float = 15; //lerp平滑度
 
     public var event:Void->Void = null;
 
-    public var threshold:Float = 1; // 检测阈值
-
     ////////////////////////////////////////////////////////////////////////////////////////////////
 
-    public var infScroll:Bool = false; //是否无限滚动
+    public var infScroll:Bool = false; //是否为无限滚动
     
     private var isDragging:Bool = false;
     private var lastMouseY:Float = 0;
@@ -42,6 +42,8 @@ class MouseMove extends FlxBasic
     private var minVelocity:Float = 0.001;       // 最小速度阈值
     private var springStrength:Float = 25.0;
     private var releaseBoost:Float = 1.1;
+
+    public var saveElapsed:Float = 0; //保存上一次更新的时间
     
     ////////////////////////////////////////////////////////////////////////////////////////////////
     
@@ -64,11 +66,14 @@ class MouseMove extends FlxBasic
     private var __lastDragTick:Int = 0;
     private var _inertiaTime:Float = 0;
     public var inputAllow:Bool = true;
+    private var allowLerp:Bool = false;
     override function update(elapsed:Float) {
         if (!allowUpdate) {
             super.update(elapsed);
             return;
         }
+
+        saveElapsed = elapsed;
 
         var mouse = FlxG.mouse;
 
@@ -109,6 +114,16 @@ class MouseMove extends FlxBasic
         // 惯性滑动
         if (!isDragging && Math.abs(velocity) > minVelocity) {
             applyInertia(elapsed);
+        }
+
+        if (tweenData != 0 && allowLerp) {
+            if (Math.abs(target - tweenData) < 0.5) {
+                target = tweenData;
+                tweenData = 0;
+                allowLerp = false;
+            } else {
+                target = FlxMath.lerp(tweenData, target, Math.exp(-elapsed * lerpSmooth));
+            }
         }
         
         if(!infScroll) {
@@ -189,11 +204,16 @@ class MouseMove extends FlxBasic
 
     private var moveTween:FlxTween = null;
     private function moveTo(data:Float) {
-        if (moveTween != null) moveTween.cancel();
-        moveTween = FlxTween.num(target, data, tweenTime, {ease:CoolUtil.getTweenEaseByString(tweenType)}, function(v){target = v;});
+        if (!useLerp) {
+            if (moveTween != null) moveTween.cancel();
+            moveTween = FlxTween.num(target, data, tweenTime, {ease:CoolUtil.getTweenEaseByString(tweenType)}, function(v){target = v;});
+        } else {
+            allowLerp = true;
+        }
     }
 
     private function cancelMoveTo() {
+        allowLerp = false;
         if (moveTween != null) moveTween.cancel();
     }
 
