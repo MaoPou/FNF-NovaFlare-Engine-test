@@ -29,11 +29,14 @@ class SongRect extends FlxSpriteGroup {
         add(light);
         
         var path:String = PreThreadLoad.bgPathCheck(Mods.currentModDirectory, 'data/${songNameSt}/bg');
-        if (Cache.getFrame(path + ' r:' + songColor[0] + ' g:' + songColor[1] + ' b:' + songColor[2]) == null) addBGCache(path, songColor);
+        if (Cache.getFrame(path) == null) addBGCache(path);
+        //else trace('reuse' + path);
 
         bg = new FlxSprite();
-        bg.frames = Cache.getFrame(path + ' r:' + songColor[0] + ' g:' + songColor[1] + ' b:' + songColor[2]);
+        bg.frames = Cache.getFrame(path);
 		bg.antialiasing = ClientPrefs.data.antialiasing;
+        if (path.indexOf('menuDesat') != -1)
+            bg.color = FlxColor.fromRGB(songColor[0], songColor[1], songColor[2]);
 		add(bg);
 
         icon = new HealthIcon(songChar, false, false);
@@ -60,7 +63,7 @@ class SongRect extends FlxSpriteGroup {
 		add(musican);
     }
 
-    function addBGCache(filesLoad:String, songColor:Array<Int>) {
+    function addBGCache(filesLoad:String) {
         var newGraphic:FlxGraphic = Paths.cacheBitmap(filesLoad, null, false);
 
         var matrix:Matrix = new Matrix();
@@ -73,45 +76,14 @@ class SongRect extends FlxSpriteGroup {
         var resizedBitmapData:BitmapData = new BitmapData(Std.int(light.width), Std.int(light.height), true, 0x00000000);
         resizedBitmapData.draw(newGraphic.bitmap, matrix);
         
-        if (filesLoad.indexOf('menuDesat') != -1)
-        {
-            var colorTransform:ColorTransform = new ColorTransform();
-            var color:FlxColor = FlxColor.fromRGB(songColor[0], songColor[1], songColor[2]);
-            colorTransform.redMultiplier = color.redFloat;
-            colorTransform.greenMultiplier = color.greenFloat;
-            colorTransform.blueMultiplier = color.blueFloat;
-            
-            resizedBitmapData.colorTransform(new Rectangle(0, 0, resizedBitmapData.width, resizedBitmapData.height), colorTransform);
-        }
-
-        drawLine(resizedBitmapData);
-        
         resizedBitmapData.copyChannel(light.pixels, new Rectangle(0, 0, light.width, light.height), new Point(), BitmapDataChannel.ALPHA, BitmapDataChannel.ALPHA);
 
         newGraphic = FlxGraphic.fromBitmapData(resizedBitmapData);
 
-        Cache.setFrame(filesLoad + ' r:' + songColor[0] + ' g:' + songColor[1] + ' b:' + songColor[2], newGraphic.imageFrame);
+        Cache.setFrame(filesLoad, newGraphic.imageFrame);
 
         var mainBGcache:FlxGraphic = Paths.cacheBitmap(filesLoad, null, false);
         Cache.setFrame('freePlayBG-' + filesLoad, mainBGcache.imageFrame); //预加载大界面的图像
-	}
-
-    static var lineShape:Shape = null;
-    function drawLine(bitmap:BitmapData)
-	{
-        if (lineShape == null) {
-            lineShape = new Shape();
-            var lineSize:Int = 1;
-            var round:Int = Std.int(bitmap.height / 2);
-            lineShape.graphics.beginFill(EngineSet.mainColor);
-            lineShape.graphics.lineStyle(1, EngineSet.mainColor, 1);
-            lineShape.graphics.drawRoundRect(0, 0, bitmap.width, bitmap.height, round, round);
-            lineShape.graphics.lineStyle(0, 0, 0);
-            lineShape.graphics.drawRoundRect(lineSize, lineSize, bitmap.width - lineSize * 2, bitmap.height - lineSize * 2, round - lineSize * 2, round - lineSize * 2);
-            lineShape.graphics.endFill();
-        }
-
-		bitmap.draw(lineShape);
 	}
 
     public var onFocus(default, set):Bool = true; //是当前这个歌曲被选择
@@ -132,7 +104,6 @@ class SongRect extends FlxSpriteGroup {
         }
 
         updateFocus();
-        
 	}
 
     public static function updateFocus() {
@@ -143,7 +114,6 @@ class SongRect extends FlxSpriteGroup {
 	
 	function choose() {
 	    FreeplayState.curSelected = this.id;
-	    FreeplayState.moveSelected = this.currect;
 	    FreeplayState.instance.changeSelection();   
         updateFocus();
         createDiff();
@@ -267,7 +237,7 @@ class SongRect extends FlxSpriteGroup {
         this.x = FlxG.width - this.light.width + 70 + moveX + chooseX + diffX;
     }
     
-    var moveTime:Float = 0.3;
+    public static var moveTime:Float = 0.3;
 
     public var interY:Float = 0;
     public var diffY:Float = 0;    

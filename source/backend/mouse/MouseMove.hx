@@ -6,6 +6,7 @@ import flixel.math.FlxMath;
 class MouseMove extends FlxBasic
 {
     public var allowUpdate:Bool = true;
+    public var enableMouseWheel:Bool = true;
     
     public var follow:Dynamic; //数据跟谁
     public var followData:String; //数据变量的名称
@@ -15,10 +16,13 @@ class MouseMove extends FlxBasic
     public var mouseLimit:Array<Array<Float>> = [];   //[ X[min, max], Y[min, max] ]
 
     public var mouseWheelSensitivity:Float = 1000.0; // 鼠标滚轮更改量的控制变量
-    public var lerpData:Float = 0; //用于lerp到指定数据的
-    public var enableMouseWheel:Bool = true;
+    public var tweenData(default, set):Float = 0; //用于tween到指定数据的
+    public var tweenTime:Float = 0.3; //tween时间
+    public var tweenType:String = 'linear'; //tween类型
 
     public var event:Void->Void = null;
+
+    public var threshold:Float = 1; // 检测阈值
 
     ////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -41,7 +45,7 @@ class MouseMove extends FlxBasic
     
     ////////////////////////////////////////////////////////////////////////////////////////////////
     
-    public function new(follow:Dynamic, followData:String, moveData:Array<Float>, mouseData:Array<Array<Float>>, onClick:Void->Void = null, needUpdate:Bool = true) {
+    public function new(follow:Dynamic, followData:String, moveData:Array<Float>, mouseData:Array<Array<Float>>, putEvent:Void->Void = null, needUpdate:Bool = true) {
         super();
         this.allowUpdate = needUpdate;
         
@@ -53,7 +57,7 @@ class MouseMove extends FlxBasic
         else this.moveLimit = moveData;
         this.mouseLimit = mouseData;
         
-        this.event = onClick;
+        this.event = putEvent;
     }
     
     private var _lastUpdateTime:Int = 0;
@@ -79,13 +83,13 @@ class MouseMove extends FlxBasic
             // 鼠标滚轮
             if (enableMouseWheel && mouse.wheel!= 0) {
                 velocity += mouse.wheel * mouseWheelSensitivity;
-                lerpData = 0;
+                cancelMoveTo();
             }
             
             // 鼠标按下
             if (mouse.justPressed) {
                 startDrag(mouse.y);
-                lerpData = 0;
+                cancelMoveTo();
             }
             
             // 拖动中更新位置
@@ -106,21 +110,11 @@ class MouseMove extends FlxBasic
         if (!isDragging && Math.abs(velocity) > minVelocity) {
             applyInertia(elapsed);
         }
-
-        if (lerpData != 0) {
-            if (Math.abs(target - lerpData) < 0.01) {
-                target = lerpData;
-                lerpData = 0;
-            } else {
-                target = FlxMath.lerp(lerpData, target, Math.exp(-elapsed * 20));
-            }
-        }
         
         if(!infScroll) {
             if (target < moveLimit[0]) target = FlxMath.lerp(moveLimit[0], target, Math.exp(-elapsed * 20));
             if (target > moveLimit[1]) target = FlxMath.lerp(moveLimit[1], target, Math.exp(-elapsed * 20));
         }
-
         
         if (__target > target) state = 'up';
         else if (__target < target)state = 'down';
@@ -183,6 +177,24 @@ class MouseMove extends FlxBasic
         velocityChange();
         velocity *= releaseBoost;
         _inertiaTime = 0;
+    }
+
+    private function set_tweenData(value:Float) {
+        var doNotStop:Bool = value == tweenData;
+        tweenData = value;
+        if (!doNotStop) moveTo(tweenData);
+
+        return tweenData;
+    }
+
+    private var moveTween:FlxTween = null;
+    private function moveTo(data:Float) {
+        if (moveTween != null) moveTween.cancel();
+        moveTween = FlxTween.num(target, data, tweenTime, {ease:CoolUtil.getTweenEaseByString(tweenType)}, function(v){target = v;});
+    }
+
+    private function cancelMoveTo() {
+        if (moveTween != null) moveTween.cancel();
     }
 
     var isPositive:Bool = true; //正数检测

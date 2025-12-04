@@ -143,6 +143,8 @@ class OptionsState extends MusicBeatState
 								],
 								cataMoveEvent);
 		add(cataMove);
+		cataMove.tweenTime = 0.45;
+		cataMove.tweenType = 'expoInOut';
 		cataMoveEvent();
 			
 		/////////////////////////////////////////////////////////////
@@ -237,7 +239,7 @@ class OptionsState extends MusicBeatState
 			outputData -= FlxG.width * (0.8 / 40);
 		}
 		outputData = Math.max(outputData, cataMove.moveLimit[0]);
-		cataMove.lerpData = outputData;
+		cataMove.tweenData = outputData;
 	}
 
 	public function changeTip(str:String) {

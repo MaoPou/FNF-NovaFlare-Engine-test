@@ -211,13 +211,13 @@ class RoundRect extends FlxSpriteGroup
 
 	function widthScaleTween(tag:Dynamic, duration:Float, time:Float, easeType:String)
 	{
-		var tween = FlxTween.tween(tag, {x: duration}, time, {ease: getTweenEaseByString(easeType)});
+		var tween = FlxTween.tween(tag, {x: duration}, time, {ease: CoolUtil.getTweenEaseByString(easeType)});
 		widthTweenArray.push(tween);
 	}
 
 	function widthBaseTween(tag:Dynamic, duration:Float, time:Float, easeType:String)
 	{
-		var tween = FlxTween.num(tag.moveX, duration, time, {ease: getTweenEaseByString(easeType)}, function(v){tag.x = mainX + v; tag.moveX = v;});
+		var tween = FlxTween.num(tag.moveX, duration, time, {ease: CoolUtil.getTweenEaseByString(easeType)}, function(v){tag.x = mainX + v; tag.moveX = v;});
 		widthTweenArray.push(tween);
 	}
 
@@ -315,13 +315,13 @@ class RoundRect extends FlxSpriteGroup
 
 	function heightScaleTween(tag:Dynamic, duration:Float, time:Float, easeType:String)
 	{
-		var tween = FlxTween.tween(tag, {y: duration}, time, {ease: getTweenEaseByString(easeType)});
+		var tween = FlxTween.tween(tag, {y: duration}, time, {ease: CoolUtil.getTweenEaseByString(easeType)});
 		heightTweenArray.push(tween);
 	}
 
 	function heightBaseTween(tag:Dynamic, duration:Float, time:Float, easeType:String)
 	{
-		var tween = FlxTween.num(tag.moveY, duration, time, {ease: getTweenEaseByString(easeType)}, function(v){tag.y = mainY + v; tag.moveY = v;});
+		var tween = FlxTween.num(tag.moveY, duration, time, {ease: CoolUtil.getTweenEaseByString(easeType)}, function(v){tag.y = mainY + v; tag.moveY = v;});
 		heightTweenArray.push(tween);
 	}
 
@@ -379,86 +379,6 @@ class RoundRect extends FlxSpriteGroup
 		newGraphic.persist = true;
 		newGraphic.destroyOnNoUse = false;
 		Cache.setFrame('roundRect-rect-w'+width+'-h:'+height, newGraphic.imageFrame);
-	}
-
-	public static function getTweenEaseByString(?ease:String = '')
-	{
-		switch (ease.toLowerCase().trim())
-		{
-			case 'backin':
-				return FlxEase.backIn;
-			case 'backinout':
-				return FlxEase.backInOut;
-			case 'backout':
-				return FlxEase.backOut;
-			case 'bouncein':
-				return FlxEase.bounceIn;
-			case 'bounceinout':
-				return FlxEase.bounceInOut;
-			case 'bounceout':
-				return FlxEase.bounceOut;
-			case 'circin':
-				return FlxEase.circIn;
-			case 'circinout':
-				return FlxEase.circInOut;
-			case 'circout':
-				return FlxEase.circOut;
-			case 'cubein':
-				return FlxEase.cubeIn;
-			case 'cubeinout':
-				return FlxEase.cubeInOut;
-			case 'cubeout':
-				return FlxEase.cubeOut;
-			case 'elasticin':
-				return FlxEase.elasticIn;
-			case 'elasticinout':
-				return FlxEase.elasticInOut;
-			case 'elasticout':
-				return FlxEase.elasticOut;
-			case 'expoin':
-				return FlxEase.expoIn;
-			case 'expoinout':
-				return FlxEase.expoInOut;
-			case 'expoout':
-				return FlxEase.expoOut;
-			case 'quadin':
-				return FlxEase.quadIn;
-			case 'quadinout':
-				return FlxEase.quadInOut;
-			case 'quadout':
-				return FlxEase.quadOut;
-			case 'quartin':
-				return FlxEase.quartIn;
-			case 'quartinout':
-				return FlxEase.quartInOut;
-			case 'quartout':
-				return FlxEase.quartOut;
-			case 'quintin':
-				return FlxEase.quintIn;
-			case 'quintinout':
-				return FlxEase.quintInOut;
-			case 'quintout':
-				return FlxEase.quintOut;
-			case 'sinein':
-				return FlxEase.sineIn;
-			case 'sineinout':
-				return FlxEase.sineInOut;
-			case 'sineout':
-				return FlxEase.sineOut;
-			case 'smoothstepin':
-				return FlxEase.smoothStepIn;
-			case 'smoothstepinout':
-				return FlxEase.smoothStepInOut;
-			case 'smoothstepout':
-				return FlxEase.smoothStepInOut;
-			case 'smootherstepin':
-				return FlxEase.smootherStepIn;
-			case 'smootherstepinout':
-				return FlxEase.smootherStepInOut;
-			case 'smootherstepout':
-				return FlxEase.smootherStepOut;
-		}
-		return FlxEase.linear;
 	}
 }
 

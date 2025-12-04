@@ -41,7 +41,6 @@ class FreeplayState extends MusicBeatState
 	static public var instance:FreeplayState;
 	
 	static public var curSelected:Int = 0;
-	static public var moveSelected:Int = 0;
 	static public var curDifficulty:Int = -1;
 
 	///////////////////////////////////////////////////////////////////////////////////////////////
@@ -291,6 +290,8 @@ class FreeplayState extends MusicBeatState
 									[0, FlxG.height]
 								],
 								songMoveEvent);
+		songsMove.tweenTime = SongRect.moveTime;
+		songsMove.tweenType = 'expoInOut';
 		add(songsMove);
 
 		////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -422,8 +423,7 @@ class FreeplayState extends MusicBeatState
 
 	public function changeSelection(change:Int = 0, playSound:Bool = true)
 	{
-		moveSelected += change;
-	    songsMove.lerpData = songPosiStart - moveSelected * SongRect.fixHeight * inter;
+	    songsMove.tweenData = songPosiStart - curSelected * SongRect.fixHeight * inter;
 
 		curSelected = FlxMath.wrap(curSelected + change, 0, songGroup.length - 1);
 		SongRect.updateFocus();
