@@ -14,7 +14,7 @@ class MoveSprite extends FlxSprite{
 
 	private var realWidth:Float;
 	private var realHeight:Float;
-    public function load(graphic:FlxGraphicAsset, scaleValue:Float = 1.1) {
+    public function load(graphic:FlxGraphicAsset, scaleValue:Float = 1.05) {
         this.loadGraphic(graphic, false, 0, 0, false);
         var scale = Math.max(FlxG.width * scaleValue / this.width, FlxG.height * scaleValue / this.height);
 		realWidth = this.width * scale;

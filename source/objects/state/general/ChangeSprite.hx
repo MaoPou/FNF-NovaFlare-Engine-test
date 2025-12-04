@@ -21,7 +21,7 @@ class ChangeSprite extends FlxSpriteGroup //背景切换
 		add(bg2);
 	}
 
-    public function load(graphic:FlxGraphicAsset, scaleValue:Float = 1.1) {
+    public function load(graphic:FlxGraphicAsset, scaleValue:Float = 1.05) {
         bg1.load(graphic, scaleValue);
         bg2.load(graphic, scaleValue);
         return this;
