@@ -3,7 +3,19 @@ package objects.state.freeplayState.song;
 import objects.HealthIcon;
 
 class SongRect extends FlxSpriteGroup {
+
+    static public final fixHeight:Int = #if mobile 80 #else 70 #end;
+
+    static public var focusRect:SongRect;
+
+    public var id:Int = 0;
     
+    public var onSelectChange:String->Void;
+
+    public var bgPath:String;
+
+    /////////////////////////////////////////////////////////////////////
+
     public var light:Rect;
     private var bg:FlxSprite;
     public var diffGroup:Array<DiffRect> = [];
@@ -11,16 +23,6 @@ class SongRect extends FlxSpriteGroup {
 	private var songName:FlxText;
 	private var musican:FlxText;
 
-    /////////////////////////////////////////////////////////////////////
-
-    static public final fixHeight:Int = #if mobile 80 #else 70 #end;
-
-    static public var focusRect:SongRect;
-
-    public var id:Int = 0;
-    public var currect:Int = 0;
-    
-    public var onSelectChange:String->Void;
     public function new(songNameSt:String, songChar:String, songMusican:String, songCharter:Array<String>, songColor:Array<Int>) {
         super(0, 0);
 
@@ -30,7 +32,7 @@ class SongRect extends FlxSpriteGroup {
         
         var path:String = PreThreadLoad.bgPathCheck(Mods.currentModDirectory, 'data/${songNameSt}/bg');
         if (Cache.getFrame(path) == null) addBGCache(path);
-        //else trace('reuse' + path);
+        bgPath = path;
 
         bg = new FlxSprite();
         bg.frames = Cache.getFrame(path);
@@ -143,16 +145,15 @@ class SongRect extends FlxSpriteGroup {
 
         for (mem in FreeplayState.instance.songGroup) {
             mem.diffAdded = false;
-            if (mem.currect > focusRect.currect) mem.addInterY(fixHeight * 0.15);
-            else if (mem.currect == focusRect.currect) mem.addInterY(fixHeight * 0.1);
+            if (mem.id > focusRect.id) mem.addInterY(fixHeight * 0.15);
+            else if (mem.id == focusRect.id) mem.addInterY(fixHeight * 0.1);
             else mem.addInterY(0);
             
-            if (mem.currect > focusRect.currect) mem.addDiffY();
+            if (mem.id > focusRect.id) mem.addDiffY();
             else mem.addDiffY(false);
             
             if (mem != focusRect) mem.destoryDiff();
         }
-        
         diffAdded = true;
     }
     
@@ -163,25 +164,6 @@ class SongRect extends FlxSpriteGroup {
     }
 
     //////////////////////////////////////////////////////////////////////////////////////////////
-
-    public function setCurrect(state:String, put:Int) {
-        if (state == 'up') {
-            var nextRect = FreeplayState.instance.songGroup[FlxMath.wrap(this.id - 1, 0, FreeplayState.instance.songGroup.length - 1)];
-            
-            if (this.currect < put) {
-                this.interY = nextRect.interY;
-                this.diffY = nextRect.diffY;
-            }
-        } else if (state == 'down') {
-            var lastRect = FreeplayState.instance.songGroup[FlxMath.wrap(this.id + 1, 0, FreeplayState.instance.songGroup.length - 1)];
-            if (this.currect > put) {
-                this.interY = lastRect.interY;
-                this.diffY = lastRect.diffY;
-            }
-        }
-
-        this.currect = put;
-    }
 
     /*
     public function createDiff(color:FlxColor, charter:Array<String>, imme:Bool = false)

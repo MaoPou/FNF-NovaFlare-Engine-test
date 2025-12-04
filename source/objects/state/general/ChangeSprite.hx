@@ -1,6 +1,7 @@
 package objects.state.general;
 
 import flixel.system.FlxAssets.FlxGraphicAsset;
+import flixel.graphics.frames.FlxFramesCollection;
 
 class ChangeSprite extends FlxSpriteGroup //背景切换
 {
@@ -27,18 +28,32 @@ class ChangeSprite extends FlxSpriteGroup //背景切换
     }
 
 	var mainTween:FlxTween;
-    public function changeSprite(graphic:FlxGraphicAsset, time:Float = 0.6) {
+    public function changeSprite(graphic:Dynamic, time:Float = 0.6) {
         if (mainTween != null) { 
             mainTween.cancel();
         }
 
-        bg2.loadGraphic(graphic, false, 0, 0, false, null);
+        if ((graphic is FlxFramesCollection))
+		{
+			bg2.frames = graphic;
+		}
+		else
+		{
+			bg2.loadGraphic(graphic, false, 0, 0, false, null);
+		}
         
         mainTween = FlxTween.tween(bg1, {alpha: 0}, time, {
             ease: FlxEase.expoIn,
             onComplete: function(twn:FlxTween)
             {
-              bg1.loadGraphic(bg2.graphic);
+              if ((graphic is FlxFramesCollection))
+                {
+                    bg1.frames = graphic;
+                }
+                else
+                {
+                    bg1.loadGraphic(graphic, false, 0, 0, false, null);
+                }
               bg1.alpha = 1;
             }
 		});

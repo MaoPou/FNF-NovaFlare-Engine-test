@@ -271,16 +271,14 @@ class FreeplayState extends MusicBeatState
 		prepareLoad.start(songRectload); //狗屎haxe，多线程无效了
 		*/
 
-		for (time in 0...Math.ceil((Math.ceil(FlxG.height / SongRect.fixHeight * inter) + 2) / songsData.length)){
-			for (i in 0...songsData.length)
-			{
-				Mods.currentModDirectory = songsData[i].folder;
-				var data = songsData[i];
-				var rect = new SongRect(data.songName, data.songCharacter, data.songMusican, data.songCharter, data.color);
-				rect.id = rect.currect = time * songsData.length + i;
-				add(rect);
-				songGroup.push(rect);
-			}
+		for (i in 0...songsData.length)
+		{
+			Mods.currentModDirectory = songsData[i].folder;
+			var data = songsData[i];
+			var rect = new SongRect(data.songName, data.songCharacter, data.songMusican, data.songCharter, data.color);
+			rect.id = i;
+			add(rect);
+			songGroup.push(rect);
 		}
 
 		songsMove = new MouseMove(FreeplayState, 'songPosiData', 
@@ -359,7 +357,7 @@ class FreeplayState extends MusicBeatState
 	public function songMoveEvent(){
 		if (songGroup.length <= 0) return;
 		for (i in 0...songGroup.length) {
-			songGroup[i].moveY(songPosiData + songGroup[i].diffY + (songGroup[i].currect) * SongRect.fixHeight * inter);
+			songGroup[i].moveY(songPosiData + songGroup[i].diffY + (songGroup[i].id) * SongRect.fixHeight * inter);
 			songGroup[i].calcX();
 		}
 	}
@@ -430,6 +428,8 @@ class FreeplayState extends MusicBeatState
 
 		if (playSound)
 			FlxG.sound.play(Paths.sound('scrollMenu'), 0.4);
+
+		background.changeSprite(Cache.getFrame('freePlayBG-' + songGroup[curSelected].bgPath));
 
 		/*
 		var newColor:Int = songsData[curSelected].color;
