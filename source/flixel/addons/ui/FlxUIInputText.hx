@@ -82,14 +82,15 @@ class FlxUIInputText extends FlxInputText implements IResizable implements IFlxU
         var toInsert = _filterIME(t);
         if (toInsert.length == 0)
             return;
-        var allowed = toInsert;
-        if (maxLength > 0)
-        {
-            var remain = Std.int(Math.max(0, maxLength - text.length));
-            if (remain <= 0)
-                return;
-            allowed = toInsert.substr(0, remain);
-        }
+		var allowed = toInsert;
+		if (maxLength > 0)
+		{
+			var baseLen = (_composing && _compBackupText != null) ? _compBackupText.length : text.length;
+			var remain = Std.int(Math.max(0, maxLength - baseLen));
+			if (remain <= 0)
+				return;
+			allowed = toInsert.substr(0, remain);
+		}
         var baseText = (_composing && _compBackupText != null) ? _compBackupText : text;
         var baseCaret = (_composing && _compBackupCaret >= 0) ? _compBackupCaret : caretIndex;
         text = baseText.substring(0, baseCaret) + allowed + baseText.substring(baseCaret);
@@ -111,10 +112,16 @@ class FlxUIInputText extends FlxInputText implements IResizable implements IFlxU
             _compBackupText = text;
             _compBackupCaret = caretIndex;
         }
-        var preview = t == null ? "" : t;
-        _compPreviewText = preview;
-        text = _compBackupText.substring(0, _compBackupCaret) + preview + _compBackupText.substring(_compBackupCaret);
-        caretIndex = _compBackupCaret + preview.length;
+		var preview = t == null ? "" : t;
+		_compPreviewText = preview;
+		var previewAllowed = preview;
+		if (maxLength > 0)
+		{
+			var remain = Std.int(Math.max(0, maxLength - _compBackupText.length));
+			previewAllowed = preview.substr(0, remain);
+		}
+		text = _compBackupText.substring(0, _compBackupCaret) + previewAllowed + _compBackupText.substring(_compBackupCaret);
+		caretIndex = _compBackupCaret + previewAllowed.length;
         onChange(FlxInputText.INPUT_ACTION);
         _composing = true;
         FlxInputText.imeComposing = true;

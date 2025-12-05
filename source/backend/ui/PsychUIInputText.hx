@@ -315,16 +315,20 @@ class PsychUIInputText extends FlxSpriteGroup
 
 				if (selectIndex > -1 && selectIndex != caretIndex)
 					deleteSelection();
-				else
-				{
-					var lastText = text;
-					text = text.substring(0, caretIndex - 1) + text.substring(caretIndex);
-					caretIndex--;
-					if (onChange != null)
-						onChange(lastText, text);
-					if (broadcastInputTextEvent)
-						PsychUIEventHandler.event(CHANGE_EVENT, this);
-				}
+			else
+			{
+				var lastText = text;
+				_suppressCaretUpdate = true;
+				var newText = text.substring(0, caretIndex - 1) + text.substring(caretIndex);
+				@:bypassAccessor caretIndex = caretIndex - 1;
+				text = newText;
+				_suppressCaretUpdate = false;
+				updateCaret();
+				if (onChange != null)
+					onChange(lastText, text);
+				if (broadcastInputTextEvent)
+					PsychUIEventHandler.event(CHANGE_EVENT, this);
+			}
 				_nextAccent = NONE;
 
 			case DELETE: // Delete letter to the right of caret
@@ -338,19 +342,25 @@ class PsychUIInputText extends FlxSpriteGroup
 				if (caretIndex >= text.length)
 					return;
 
-				var lastText = text;
-				if (caretIndex < 1)
-					text = text.substr(1);
-				else
-					text = text.substring(0, caretIndex) + text.substring(caretIndex + 1);
+			var lastText = text;
+			_suppressCaretUpdate = true;
+			var newText2:String;
+			if (caretIndex < 1)
+				newText2 = text.substr(1);
+			else
+				newText2 = text.substring(0, caretIndex) + text.substring(caretIndex + 1);
 
-				if (caretIndex >= text.length)
-					caretIndex = text.length;
+			if (caretIndex > newText2.length)
+				@:bypassAccessor caretIndex = newText2.length;
 
-				if (onChange != null)
-					onChange(lastText, text);
-				if (broadcastInputTextEvent)
-					PsychUIEventHandler.event(CHANGE_EVENT, this);
+			text = newText2;
+			_suppressCaretUpdate = false;
+			updateCaret();
+
+			if (onChange != null)
+				onChange(lastText, text);
+			if (broadcastInputTextEvent)
+				PsychUIEventHandler.event(CHANGE_EVENT, this);
 
 			case SPACE: // space or last accent pressed
 				if (_nextAccent != NONE)
@@ -440,7 +450,7 @@ class PsychUIInputText extends FlxSpriteGroup
 				_typeLetter(charCode);
 				_nextAccent = NONE;
 		}
-		updateCaret();
+		// caret will be updated via set_text or specific handlers
 	}
 
 	function _handleTextInput(t:String):Void
@@ -457,7 +467,8 @@ class PsychUIInputText extends FlxSpriteGroup
 		var allowed = toInsert;
 		if (maxLength > 0)
 		{
-			var remain = Std.int(Math.max(0, maxLength - text.length));
+			var baseLen = (_composing && _compBackupText != null) ? _compBackupText.length : text.length;
+			var remain = Std.int(Math.max(0, maxLength - baseLen));
 			if (remain <= 0)
 				return;
 			allowed = toInsert.substr(0, remain);
@@ -492,8 +503,15 @@ class PsychUIInputText extends FlxSpriteGroup
 		}
 		var preview = t == null ? "" : t;
 		_compPreviewText = preview;
-		text = _compBackupText.substring(0, _compBackupCaret) + preview + _compBackupText.substring(_compBackupCaret);
-		caretIndex = _compBackupCaret + preview.length;
+		var previewAllowed = preview;
+		if (maxLength > 0)
+		{
+			var remain = Std.int(Math.max(0, maxLength - _compBackupText.length));
+			previewAllowed = preview.substr(0, remain);
+		}
+		text = _compBackupText.substring(0, _compBackupCaret) + previewAllowed + _compBackupText.substring(_compBackupCaret);
+		caretIndex = _compBackupCaret + previewAllowed.length;
+		//trace('编辑中: ' + previewAllowed + ' | 插入点: ' + _compBackupCaret + ' | 预览长度: ' + previewAllowed.length + ' | 总长度: ' + text.length);
 		_composing = true;
 		if (onChange != null)
 			onChange(_compBackupText, text);
@@ -603,22 +621,58 @@ class PsychUIInputText extends FlxSpriteGroup
 			return;
 
 		var textField = textObj.textField;
-		textField.setSelection(caretIndex, caretIndex);
+		var ci:Int = caretIndex;
+		var len:Int = text != null ? text.length : 0;
+		if (ci < 0) ci = 0;
+		if (ci > len) ci = len;
+		@:bypassAccessor caretIndex = ci;
+		textField.setSelection(ci, ci);
 		_caretTime = 0;
 		if (caret != null && caret.exists)
 		{
 			caret.y = textObj.y + 2;
-			caret.x = textObj.x + 1 - textObj.textField.scrollH;
-			if (caretIndex > 0)
-				caret.x += _boundaries[Std.int(Math.max(0, Math.min(_boundaries.length - 1, caretIndex - 1)))];
+			var baseX:Float = textObj.x + 1;
+			var tf = textObj.textField;
+			var ci1:Int = caretIndex - 1;
+			if (caretIndex <= 0)
+			{
+				caret.x = baseX;
+			}
+			else
+			{
+				var rb = tf.getCharBoundaries(ci1);
+				if (rb != null)
+				{
+					caret.x = baseX + (rb.x + rb.width) - tf.scrollH;
+				}
+				else
+				{
+					caret.x = baseX - tf.scrollH + _boundaries[Std.int(Math.max(0, Math.min(_boundaries.length - 1, ci1)))];
+				}
+			}
 		}
 
 		if (selection != null && selection.exists)
 		{
 			selection.y = textObj.y + 2;
-			selection.x = textObj.x + 1 - textObj.textField.scrollH;
-			if (selectIndex > 0)
-				selection.x += _boundaries[Std.int(Math.max(0, Math.min(_boundaries.length - 1, selectIndex - 1)))];
+			var baseSelX:Float = textObj.x + 1;
+			var si1:Int = selectIndex - 1;
+			if (selectIndex <= 0)
+			{
+				selection.x = baseSelX;
+			}
+			else
+			{
+				var sb = textObj.textField.getCharBoundaries(si1);
+				if (sb != null)
+				{
+					selection.x = baseSelX + sb.x - textObj.textField.scrollH;
+				}
+				else
+				{
+					selection.x = baseSelX - textObj.textField.scrollH + _boundaries[Std.int(Math.max(0, Math.min(_boundaries.length - 1, si1)))];
+				}
+			}
 
 			selection.scale.y = textField.textHeight;
 			selection.scale.x = caret.x - selection.x;
@@ -699,14 +753,20 @@ class PsychUIInputText extends FlxSpriteGroup
 		} catch (e:Dynamic) {}
 	}
 
-	inline function _updateTextInputRect():Void {
-		var win = Lib.application.window;
-		try {
-			var p = behindText.getScreenPosition(camera);
-			var rect = new Rectangle(Std.int(p.x), Std.int(p.y + behindText.height), Std.int(behindText.width), Std.int(behindText.height));
-			win.setTextInputRect(rect);
-		}
-	}
+inline function _updateTextInputRect():Void {
+    var win = Lib.application.window;
+    try {
+            var p = behindText.getScreenPosition(camera);
+            var cx:Int = Std.int(p.x);
+            if (caret != null)
+            {
+                var cpos = caret.getScreenPosition(camera);
+                cx = Std.int(cpos.x);
+            }
+            var rect = new Rectangle(cx, Std.int(p.y + behindText.height), Std.int(behindText.width), Std.int(behindText.height));
+            win.setTextInputRect(rect);
+    }
+}
 
 	function set_caretIndex(v:Int)
 	{
@@ -834,7 +894,8 @@ class PsychUIInputText extends FlxSpriteGroup
 			}
 		}
 		text = v;
-		updateCaret();
+		if (!_suppressCaretUpdate)
+			updateCaret();
 		return v;
 	}
 
@@ -856,6 +917,7 @@ class PsychUIInputText extends FlxSpriteGroup
 	}
 
 	public var broadcastInputTextEvent:Bool = true;
+	var _suppressCaretUpdate:Bool = false;
 
 	function _typeLetter(charCode:Int)
 	{

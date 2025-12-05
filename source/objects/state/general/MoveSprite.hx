@@ -14,14 +14,20 @@ class MoveSprite extends FlxSprite{
 
 	private var realWidth:Float;
 	private var realHeight:Float;
+	private var scaleValue:Float = 1.05;
     public function load(graphic:FlxGraphicAsset, scaleValue:Float = 1.05) {
         this.loadGraphic(graphic, false, 0, 0, false);
-        var scale = Math.max(FlxG.width * scaleValue / this.width, FlxG.height * scaleValue / this.height);
+		this.scaleValue = scaleValue;
+        updateSize();
+    }
+
+	public function updateSize() {
+		var scale = Math.max(FlxG.width * scaleValue / this.width, FlxG.height * scaleValue / this.height);
 		realWidth = this.width * scale;
 		realHeight = this.height * scale;
 		this.scale.x = this.scale.y = scale;
 		this.offset.x = this.offset.y = 0;
-		updateHitbox();
+        updateHitbox();
     }
     
 	private var offsetX:Float = 0;
@@ -47,4 +53,16 @@ class MoveSprite extends FlxSprite{
 			this.y = centerY - realHeight / 2 + offsetY;
 		}
     }
+
+	var colorTween:FlxTween = null;
+	public function changeColor(color:Int, time:Float = 0.6) {
+		if (colorTween != null) colorTween.cancel();
+		var sr = this.color;
+		var er = color;
+		var startRGB:FlxColor = FlxColor.fromRGB((sr >> 16) & 0xFF, (sr >> 8) & 0xFF, sr & 0xFF);
+		var endRGB:FlxColor = FlxColor.fromRGB((er >> 16) & 0xFF, (er >> 8) & 0xFF, er & 0xFF);
+		colorTween = FlxTween.num(0, 1, time, null, function(v:Float) {
+			this.color = FlxColor.interpolate(startRGB, endRGB, v);
+		});
+	}
 }

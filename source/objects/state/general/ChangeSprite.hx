@@ -14,11 +14,13 @@ class ChangeSprite extends FlxSpriteGroup //背景切换
 
         bg1 = new MoveSprite(0, 0);
         bg1.antialiasing = ClientPrefs.data.antialiasing;
-		add(bg1);
+		
 
 		bg2 = new MoveSprite(0, 0);
         bg2.antialiasing = ClientPrefs.data.antialiasing;
 		add(bg2);
+
+        add(bg1);
 	}
 
     public function load(graphic:FlxGraphicAsset, scaleValue:Float = 1.05) {
@@ -28,34 +30,57 @@ class ChangeSprite extends FlxSpriteGroup //背景切换
     }
 
 	var mainTween:FlxTween;
+    var fixTween:FlxTween;
+    var lastLoadGraphic:Dynamic;
     public function changeSprite(graphic:Dynamic, time:Float = 0.6) {
-        if (mainTween != null) { 
-            mainTween.cancel();
+        if (lastLoadGraphic == graphic) return;
+        lastLoadGraphic = graphic;
+
+        if (mainTween != null || fixTween != null) {
+            if (mainTween != null) mainTween.cancel();
+            if (fixTween != null) fixTween.cancel();
+
+            fixTween = FlxTween.tween(bg1, {alpha: 1}, time / 2, {
+                ease: FlxEase.linear,
+                onComplete: function(twn:FlxTween)
+                {
+                    updateGraphic(bg2, graphic);
+                    mainTween = FlxTween.tween(bg1, {alpha: 0}, time, {
+                        ease: FlxEase.linear,
+                        onComplete: function(twn:FlxTween)
+                        {
+                        updateGraphic(bg1, graphic);
+                        bg1.alpha = 1;
+                        }
+                    });
+                }
+            });
+
+            return;
         }
 
-        if ((graphic is FlxFramesCollection))
-		{
-			bg2.frames = graphic;
-		}
-		else
-		{
-			bg2.loadGraphic(graphic, false, 0, 0, false, null);
-		}
-        
+        updateGraphic(bg2, graphic);
         mainTween = FlxTween.tween(bg1, {alpha: 0}, time, {
-            ease: FlxEase.expoIn,
+            ease: FlxEase.linear,
             onComplete: function(twn:FlxTween)
             {
-              if ((graphic is FlxFramesCollection))
-                {
-                    bg1.frames = graphic;
-                }
-                else
-                {
-                    bg1.loadGraphic(graphic, false, 0, 0, false, null);
-                }
-              bg1.alpha = 1;
+                updateGraphic(bg1, graphic);
+                bg1.alpha = 1;
             }
 		});
+    }
+
+    private function updateGraphic(bg:MoveSprite, graphic:Dynamic) {
+        if ((graphic is FlxFramesCollection))
+			bg.frames = graphic;
+		else
+			bg.loadGraphic(graphic, false, 0, 0, false, null);
+
+        bg.updateSize();
+    }
+
+    public function changeColor(color:Int, time:Float = 0.6) {
+        bg1.changeColor(color, time);
+        bg2.changeColor(color, time);
     }
 }

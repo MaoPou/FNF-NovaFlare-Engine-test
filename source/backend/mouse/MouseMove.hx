@@ -127,8 +127,8 @@ class MouseMove extends FlxBasic
         }
         
         if(!infScroll) {
-            if (target < moveLimit[0]) target = FlxMath.lerp(moveLimit[0], target, Math.exp(-elapsed * 20));
-            if (target > moveLimit[1]) target = FlxMath.lerp(moveLimit[1], target, Math.exp(-elapsed * 20));
+            if (target < moveLimit[0]) target = FlxMath.lerp(moveLimit[0], target, Math.exp(-elapsed * lerpSmooth * 2));
+            if (target > moveLimit[1]) target = FlxMath.lerp(moveLimit[1], target, Math.exp(-elapsed * lerpSmooth * 2));
         }
         
         if (__target > target) state = 'up';
@@ -214,6 +214,7 @@ class MouseMove extends FlxBasic
 
     private function cancelMoveTo() {
         allowLerp = false;
+        tweenData = 0;
         if (moveTween != null) moveTween.cancel();
     }
 

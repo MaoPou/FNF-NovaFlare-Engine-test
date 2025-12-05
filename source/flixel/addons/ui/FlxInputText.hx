@@ -972,9 +972,9 @@ class FlxInputText extends FlxText
 		return alignStr;
 	}
 
-	private function set_caretIndex(newCaretIndex:Int):Int
-	{
-		var offx:Float = 0;
+private function set_caretIndex(newCaretIndex:Int):Int
+{
+    var offx:Float = 0;
 
 		var alignStr:FlxTextAlign = getAlignStr();
 
@@ -996,13 +996,17 @@ class FlxInputText extends FlxText
 				offx = 0;
 		}
 
-		caretIndex = newCaretIndex;
+    var ci:Int = newCaretIndex;
+    var len:Int = text != null ? text.length : 0;
+    if (ci < 0) ci = 0;
+    if (ci > len) ci = len;
+    @:bypassAccessor caretIndex = ci;
 
 		// If caret is too far to the right something is wrong
-		if (caretIndex > (text.length + 1))
-		{
-			caretIndex = -1;
-		}
+    if (caretIndex > (text.length + 1))
+    {
+        caretIndex = -1;
+    }
 
 		// Caret is OK, proceed to position
 		if (caretIndex != -1)
