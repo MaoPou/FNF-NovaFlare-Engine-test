@@ -402,6 +402,7 @@ class FreeplayState extends MusicBeatState
 			songGroup[i].moveY(songPosiData + songGroup[i].diffY + (songGroup[i].id) * SongRect.fixHeight * inter);
 			songGroup[i].calcX();
 		}
+		updateSongVisibility();
 	}
 
 	var holdTime:Float = 0;
@@ -450,10 +451,13 @@ class FreeplayState extends MusicBeatState
 					changeSelection((checkNewHold - checkLastHold) * (controls.UI_UP ? -shiftMult : shiftMult));
 			}
 			
-			if (controls.ACCEPT) {		        
+			if (controls.ACCEPT) 			
+			{			
 			   songGroup[curSelected].createDiff();
 			}
 		}
+
+		updateSongVisibility();
 	}
 
 	public function changeSelection(change:Int = 0, playSound:Bool = true)
@@ -496,6 +500,23 @@ class FreeplayState extends MusicBeatState
 		for (rect in sorted) {
 			insert(idx, rect);
 			idx++;
+		}
+	}
+
+	function rectOnScreen(r:SongRect):Bool {
+		var cy:Float = camSongs.scroll.y;
+		var ch:Float = camSongs.height;
+		var ry:Float = r.y;
+		var rh:Float = r.light.height;
+		return ry + rh > cy && ry < cy + ch;
+	}
+
+	public function updateSongVisibility():Void {
+		if (songGroup.length == 0) return;
+		for (r in songGroup) {
+			var ons:Bool = rectOnScreen(r);
+			r.visible = ons;
+			r.active = ons;
 		}
 	}
 	
