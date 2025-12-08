@@ -10,8 +10,8 @@ class TimingSystem {
     public var rateSecondary:Float = 1.0;
     var positionBaseMs:Float = 0.0;
     var timestampBaseSec:Float = 0.0;
-    var baseTimerMs:Int = 0;
-    var lastTimerMs:Int = -1;
+    var baseTimerMs:Float = 0;
+    var lastTimerMs:Float = -1;
     var wrapOffsetMs:Float = 0.0;
     var pauseStartSec:Float = 0.0;
     var accumulatedPauseSec:Float = 0.0;
@@ -19,11 +19,11 @@ class TimingSystem {
     public function new() {}
 
     inline function nowSec():Float {
-        return Timer.stamp();
+        return System.getTimerNano() / 1000;
     }
 
     inline function nowTimerMs():Float {
-        var t:Int = System.getTimer();
+        var t:Float = System.getTimerNano();
         if (lastTimerMs < 0) lastTimerMs = t;
         if (t < lastTimerMs) wrapOffsetMs += 4294967296.0;
         lastTimerMs = t;
@@ -37,7 +37,7 @@ class TimingSystem {
     public function play():Void {
         if (isPlaying) return;
         timestampBaseSec = nowSec();
-        baseTimerMs = Std.int(nowTimerMs());
+        baseTimerMs = nowTimerMs();
         isPlaying = true;
         tickEnabled = true;
     }
@@ -55,7 +55,7 @@ class TimingSystem {
         var n:Float = nowSec();
         if (pauseStartSec > 0) accumulatedPauseSec += (n - pauseStartSec);
         timestampBaseSec = n;
-        baseTimerMs = Std.int(nowTimerMs());
+        baseTimerMs = nowTimerMs();
         isPlaying = true;
         tickEnabled = true;
     }

@@ -12,6 +12,7 @@ import states.TitleState;
 	// General
 	public var framerate:Int = 60;
 	public var drawFramerate:Int = 60;
+	public var newFrameGeneration:Bool = false;
 	public var splitUpdate:Bool = #if desktop false #else true #end;
 	public var colorblindMode:String = 'None';
 	public var lowQuality:Bool = false;

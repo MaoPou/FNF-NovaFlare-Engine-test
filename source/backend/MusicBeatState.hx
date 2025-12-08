@@ -252,9 +252,9 @@ class MusicBeatState extends FlxUIState
 			return;
 		}
 
-		if (FlxTransitionableState.skipNextTransIn) {
+		if (FlxTransitionableState.skipNextTransIn)
 			FlxG.switchState(nextState);
-		} else
+		else
 			startTransition(nextState);
 		FlxTransitionableState.skipNextTransIn = false;
 	}

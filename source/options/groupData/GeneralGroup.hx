@@ -19,19 +19,23 @@ class GeneralGroup extends OptionCata
 		addOption(option);
 		option.onChange = onChangeDrawFramerate;
 
-		var langArray:Array<String> = languageArray();
-		var option:Option = new Option(this, 'language', STRING, langArray);
+		var option:Option = new Option(this, 'newFrameGeneration', BOOL);
 		addOption(option);
-		option.onChange = onChangeLanguage;
+		option.onChange = onChangeFrameGeneration;
 
 		var option:Option = new Option(this, 'splitUpdate', BOOL);
 		addOption(option, true);
 		option.onChange = onChangeSplitUpdate;
 
-		var option:Option = new Option(this, 'gameQuality', INT, [0, 3]);
+		var langArray:Array<String> = languageArray();
+		var option:Option = new Option(this, 'language', STRING, langArray);
 		addOption(option);
+		option.onChange = onChangeLanguage;
 
 		var option:Option = new Option(this, 'lowQuality', BOOL);
+		addOption(option, true);
+
+		var option:Option = new Option(this, 'gameQuality', INT, [0, 3]);
 		addOption(option);
 
 		var colorblindFilterArray:Array<String> = [
@@ -45,10 +49,6 @@ class GeneralGroup extends OptionCata
 			'Achromatopsia',
 			'Achromatomaly'
 		];
-
-		var option:Option = new Option(this, 'colorblindMode', STRING, colorblindFilterArray);
-		addOption(option, true);
-		option.onChange = onChangeFilter;
 
 		var option:Option = new Option(this, 'antialiasing', BOOL);
 		addOption(option);
@@ -66,9 +66,9 @@ class GeneralGroup extends OptionCata
 		addOption(option);
 		option.onChange = onChangePause;
 
-		var option:Option = new Option(this, 'gcFreeZone', BOOL);
+		var option:Option = new Option(this, 'colorblindMode', STRING, colorblindFilterArray);
 		addOption(option, true);
-		option.onChange = onChangeGcZone;
+		option.onChange = onChangeFilter;
 
 		changeHeight(0); //初始化真正的height
 	}
@@ -116,6 +116,11 @@ class GeneralGroup extends OptionCata
 		FlxG.stage.application.window.drawFrameRate = ClientPrefs.data.drawFramerate;
 	}
 
+	function onChangeFrameGeneration()
+	{
+		FlxG.stage.application.window.newFrameGeneration = ClientPrefs.data.newFrameGeneration;
+	}
+
 	function onChangeSplitUpdate()
 	{
 		FlxG.stage.application.window.splitUpdate = ClientPrefs.data.splitUpdate;
@@ -135,10 +140,5 @@ class GeneralGroup extends OptionCata
 	{
 		Language.resetData();
 		OptionsState.instance.changeLanguage();
-	}
-
-	function onChangeGcZone()
-	{
-		Main.GcZoneChange();
 	}
 }

@@ -17,6 +17,14 @@ import haxe.ValueException;
 class HScriptBase
 {
 	public static var parser:Parser = new Parser();
+	public static var syntaxFixEnabled:Bool = true;
+	private static var _syntaxFixRegex:EReg = ~/(\bvar\s+)?(\b[a-zA-Z0-9_]+)\s*=\s*new\s+([a-zA-Z0-9_]+)/g;
+
+	public static function fixSyntax(code:String):String
+	{
+		if (!syntaxFixEnabled) return code;
+		return _syntaxFixRegex.replace(code, "var $2:$3 = new $3");
+	}
 
 	public var interp:Interp;
 
@@ -168,6 +176,9 @@ class HScriptBase
 	public static function implement(funk:FunkinLua)
 	{
 		var lua:State = funk.lua;
+		Lua_helper.add_callback(lua, "setHaxeSyntaxFix", function(enabled:Bool) {
+			HScriptBase.syntaxFixEnabled = enabled;
+		});
 		Lua_helper.add_callback(lua, "runHaxeCode",
 			function(codeToRun:String, ?varsToBring:Any = null, ?funcToRun:String = null, ?funcArgs:Array<Dynamic> = null)
 			{
@@ -177,6 +188,7 @@ class HScriptBase
 				HScriptBase.initHaxeModule(funk);
 				try
 				{
+					codeToRun = HScriptBase.fixSyntax(codeToRun);
 					if (varsToBring != null)
 					{
 						for (key in Reflect.fields(varsToBring))
@@ -240,6 +252,9 @@ class HScriptBase
 	#if LUA_ALLOWED
 	public static function implement(funk:FunkinLua)
 	{
+		funk.addLocalCallback("setHaxeSyntaxFix", function(enabled:Bool) {
+			PlayState.instance.addTextToDebug('HScript is not supported on this platform!', FlxColor.RED);
+		});
 		funk.addLocalCallback("runHaxeCode",
 			function(codeToRun:String, ?varsToBring:Any = null, ?funcToRun:String = null, ?funcArgs:Array<Dynamic> = null):Dynamic
 			{

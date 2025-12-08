@@ -271,21 +271,4 @@ class Main extends Sprite
 		if (Controls.instance.justReleased('fullscreen'))
 			FlxG.fullscreen = !FlxG.fullscreen;
 	}
-
-	static public var type:Bool = ClientPrefs.data.gcFreeZone;
-	static public function GcZoneChange()
-	{
-		#if !debug
-		if (type == true)
-		{
-			//cpp.NativeGc.exitGCFreeZone();
-			type = false;
-		}
-		else
-		{
-			//cpp.NativeGc.enterGCFreeZone();
-			type = true;
-		}
-		#end
-	}
 }

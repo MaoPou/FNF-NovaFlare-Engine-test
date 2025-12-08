@@ -73,4 +73,35 @@ class TraceInterceptor {
         }
     }
     #end
+
+    /*
+    class Main {
+        static function main() {
+            #if cpp
+            // 1. 开启 C++ 控制台日志 (可选)
+            NativeGC.enableLog(true);
+
+            // 2. 设置回调函数
+            NativeGC.setCallback(onGCCallback);
+            
+            // 测试：触发一些分配
+            trace("Allocating memory...");
+            var a = [];
+            for(i in 0...100000) a.push(i);
+            #end
+        }
+
+        // 回调函数实现
+        static function onGCCallback(major:Bool, used:Float, reserved:Float, garbage:Float):Void {
+            // 注意：这里是在 GC 刚结束的 C++ 线程中调用的
+            // 建议不要做复杂操作，直接 trace 或者存状态
+            
+            var type = major ? "Major (Full)" : "Minor (Partial)";
+            var usedMB = Std.int(used / 1024 / 1024 * 100) / 100;
+            var garbageMB = Std.int(garbage / 1024 / 1024 * 100) / 100;
+            
+            trace('[GC Monitor] Type: $type, Used: ${usedMB}MB, Est.Garbage: ${garbageMB}MB');
+        }
+    }
+    */
 }

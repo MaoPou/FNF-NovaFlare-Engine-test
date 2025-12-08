@@ -7,9 +7,11 @@ import openfl.text.TextFormat;
 import openfl.ui.Mouse;
 import openfl.ui.MouseCursor;
 import openfl.geom.Rectangle;
+import openfl.text.TextFieldAutoSize;
 
 class Console extends Sprite {
     public static var consoleInstance(get, null):Console;
+    private var textContainer:Sprite;
     private var output:TextField;
     private var buffer:Array<String> = [];
     private var isDragging:Bool = false;
@@ -17,7 +19,7 @@ class Console extends Sprite {
     private var dragOffsetY:Float = 0;
     private var isScrolling:Bool = false;
     private var scrollStartY:Float = 0;
-    private var scrollStartV:Int = 0;
+    private var scrollStartV:Float = 0;
     private var captureEnabled:Bool = true;
     private var autoScroll:Bool = true;
     
@@ -36,6 +38,7 @@ class Console extends Sprite {
     private var pendingColoredLogs:Array<{head:String, message:String, color:Int}> = [];
     private var renderTimer:haxe.Timer = null;
     private var maxBatchSize:Int = 100; // 每批处理的最大日志数
+    private var maxLogLines:Int = 1000; // 最大日志行数
     private var renderDelay:Int = 100; // 渲染延迟(毫秒)
     
     private static var _consoleInstance:Console = null;
@@ -88,18 +91,22 @@ class Console extends Sprite {
         graphics.drawRoundRect(0, 0, initialWidth, initialHeight, 10);
         graphics.endFill();
         
+        textContainer = new Sprite();
+        textContainer.x = 15;
+        textContainer.y = 50;
+        textContainer.scrollRect = new Rectangle(0, 0, initialWidth - 30, initialHeight - 100);
+        addChild(textContainer);
+        
         output = new TextField();
         output.defaultTextFormat = new TextFormat(Paths.font('Lang-ZH.ttf'), 14, 0xFFFFFF);
         output.width = initialWidth - 30;
-        output.height = initialHeight - 100; // 增加底部空间给按钮
-        output.x = 15;
-        output.y = 50;
+        output.autoSize = TextFieldAutoSize.LEFT;
         output.multiline = true;
         output.wordWrap = true;
         output.selectable = false;
         output.htmlText = "";
         output.addEventListener(MouseEvent.MOUSE_DOWN, startTextScroll);
-        addChild(output);
+        textContainer.addChild(output);
         
         createTitleBar();
         createControlButtons();
@@ -271,15 +278,29 @@ class Console extends Sprite {
     private function startTextScroll(e:MouseEvent):Void {
         isScrolling = true;
         scrollStartY = e.stageY;
-        scrollStartV = output.scrollV;
+        scrollStartV = output.y;
         stage.addEventListener(MouseEvent.MOUSE_MOVE, doTextScroll);
         stage.addEventListener(MouseEvent.MOUSE_UP, stopTextScroll);
     }
     
     private function doTextScroll(e:MouseEvent):Void {
         if (isScrolling) {
-            var deltaY:Int = Std.int((e.stageY - scrollStartY) / 3);
-            output.scrollV = scrollStartV - deltaY;
+            var deltaY:Float = e.stageY - scrollStartY;
+            var newY:Float = scrollStartV + deltaY;
+            
+            var visibleHeight = textContainer.scrollRect.height;
+            var contentHeight = output.height;
+            
+            if (contentHeight <= visibleHeight) {
+                newY = 0;
+            } else {
+                var minY = visibleHeight - contentHeight;
+                if (newY < minY) newY = minY;
+                if (newY > 0) newY = 0;
+            }
+            
+            output.y = newY;
+            
             if (autoScroll) {
                 toggleAutoScroll(false);
             }
@@ -315,7 +336,13 @@ class Console extends Sprite {
     }
     
     private function scrollToBottom():Void {
-        output.scrollV = output.maxScrollV;
+        var visibleHeight = textContainer.scrollRect.height;
+        var contentHeight = output.height;
+        if (contentHeight > visibleHeight) {
+            output.y = visibleHeight - contentHeight;
+        } else {
+            output.y = 0;
+        }
     }
     
     private function toggleCapture():Void {
@@ -331,6 +358,8 @@ class Console extends Sprite {
     
     private function clearLogs():Void {
         output.htmlText = "";
+        output.y = 0;
+        buffer = [];
     }
     
     private function closeConsole():Void {
@@ -422,7 +451,7 @@ class Console extends Sprite {
         // 处理普通日志
         while (pendingLogs.length > 0 && batchCount < maxBatchSize) {
             var message = pendingLogs.shift();
-            appendToOutput(message);
+            buffer.push(message);
             hasNewContent = true;
             batchCount++;
         }
@@ -431,26 +460,27 @@ class Console extends Sprite {
         while (pendingColoredLogs.length > 0 && batchCount < maxBatchSize) {
             var log = pendingColoredLogs.shift();
             var htmlLine = '<font color="#${StringTools.hex(log.color, 6)}">${StringTools.htmlEscape(log.head)}</font>${StringTools.htmlEscape(log.message)}';
-            appendToOutput(htmlLine);
+            buffer.push(htmlLine);
             hasNewContent = true;
             batchCount++;
         }
         
-        if (hasNewContent && autoScroll) {
-            scrollToBottom();
+        if (hasNewContent) {
+            // 限制日志行数
+            while (buffer.length > maxLogLines) {
+                buffer.shift();
+            }
+            
+            output.htmlText = buffer.join("<br/>");
+            
+            if (autoScroll) {
+                scrollToBottom();
+            }
         }
         
         // 如果还有待处理日志，继续调度下一批
         if (pendingLogs.length > 0 || pendingColoredLogs.length > 0) {
             scheduleRender();
-        }
-    }
-    
-    private function appendToOutput(content:String):Void {
-        if (output.htmlText != "") {
-            output.htmlText += "<br/>" + content;
-        } else {
-            output.htmlText = content;
         }
     }
     
@@ -532,7 +562,7 @@ class Console extends Sprite {
         graphics.endFill();
         
         output.width = newWidth - 30;
-        output.height = newHeight - 100;
+        textContainer.scrollRect = new Rectangle(0, 0, newWidth - 30, newHeight - 100);
         
         resizeHandle.x = newWidth - 40;
         resizeHandle.y = newHeight - 40;
@@ -540,6 +570,8 @@ class Console extends Sprite {
         updateTitleBar(newWidth);
         updateWindowButtons(newWidth);
         updateControlButtons(newHeight);
+
+        if (autoScroll) scrollToBottom();
     }
     
     private function toggleMaximize():Void {
@@ -659,7 +691,7 @@ class Console extends Sprite {
     
     private function updateAllElements(newWidth:Float, newHeight:Float):Void {
         output.width = newWidth - 30;
-        output.height = newHeight - 100;
+        textContainer.scrollRect = new Rectangle(0, 0, newWidth - 30, newHeight - 100);
         
         updateTitleBar(newWidth);
         

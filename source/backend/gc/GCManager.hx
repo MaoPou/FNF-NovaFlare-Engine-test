@@ -236,4 +236,11 @@ extern class GCManager {
        @return 0 未启用，1 已启用
       */
       @:native("__hxcpp_gc_get_parallel_ref_proc_enabled") extern static function gcGetParallelRefProcEnabled():Int;
+
+
+      /**
+       获取当前估计的垃圾字节数。
+       @return 字节数
+      */
+      @:native("__hxcpp_gc_garbage_estimate") extern static function gcGarbageEstimate():Int;
 }
