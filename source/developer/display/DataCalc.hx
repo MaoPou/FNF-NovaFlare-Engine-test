@@ -7,7 +7,8 @@ class DataCalc
 	static public var updateFPS:Float = 0;
 	static public var updateFrameTime:Float = 0;
 
-	static public var memory:Float = 0;
+	static public var appMem:Float = 0;
+	static public var gcMem:Float = 0;
 
 	static public var drawFPS:Float = 0;
 	static public var drawFrameTime:Float = 0;
@@ -42,7 +43,8 @@ class DataCalc
 		//	FlxG.stage.window.frameRate = ClientPrefs.data.framerate;
 		//}
 
-		memory = getMem();
+		appMem = getAppMem();
+		gcMem = getGcMem();
 
 		/////////////////// →memory计算
 
@@ -87,9 +89,14 @@ class DataCalc
 		drawCount = 0;
 	}
 
-	static public function getMem():Float
+	static public function getAppMem():Float
 	{
 		return FlxMath.roundDecimal(Gc.memInfo64(4) / 1024 / 1024, 2); //转化为MB
+	}
+
+	static public function getGcMem():Float
+	{
+		return FlxMath.roundDecimal(GCManager.gcGarbageEstimate() / 1024 / 1024, 2); //转化为MB
 	}
 }
 

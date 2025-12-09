@@ -98,7 +98,6 @@ class Paths
 		}
 
 		// run the garbage collector for good measure lmfao
-		cpp.vm.Gc.compact();
 		cpp.vm.Gc.run(true);
 	}
 
