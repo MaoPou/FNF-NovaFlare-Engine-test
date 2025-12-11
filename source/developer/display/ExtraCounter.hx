@@ -7,6 +7,8 @@ class ExtraCounter extends Sprite
 
 	public var bgSprite:FPSBG;
 
+	public var graphMonitor:GraphMonitor;
+
 	public function new(x:Float = 10, y:Float = 10)
 	{
 		super();
@@ -14,7 +16,7 @@ class ExtraCounter extends Sprite
 		this.x = x;
 		this.y = y;
 
-		bgSprite = new FPSBG(320, 75);
+		bgSprite = new FPSBG(320, 75, 10, 0.3);
 		addChild(bgSprite);
 
 		this.typeName = new TextField();
@@ -30,6 +32,25 @@ class ExtraCounter extends Sprite
 			label.mouseEnabled = false;
 			addChild(label);
 		}
+
+		graphMonitor = new GraphMonitor(0, 80, 350, 200);
+		graphMonitor.setBackground(FlxColor.fromRGB(100, 100, 100, 255), 0.3);
+		graphMonitor.maxHistory = 30;
+
+		graphMonitor.inputFixX = this.x;
+		graphMonitor.inputFixY = this.y;
+
+		graphMonitor.setSmoothCurve(false);
+		graphMonitor.graphLineThickness = 2;
+		graphMonitor.graphFillAlpha = 0.2;
+		graphMonitor.graphLineAlpha = 1.0;
+		graphMonitor.tabSelectorAlpha = 0.3;
+
+        graphMonitor.addMonitor("Update Frame", "FPS", function() return DataCalc.updateFPS, 0, function() return ClientPrefs.data.framerate, 0xFFFF005D, 0xFF00FF91);
+        graphMonitor.addMonitor("Draw Frame", "FPS", function() return DataCalc.drawFPS, 0, function() return (ClientPrefs.data.splitUpdate ? ClientPrefs.data.drawFramerate : ClientPrefs.data.framerate), 0xFFFF005D, 0xFF00FF91);
+		graphMonitor.addMonitor("App Mem", "MB", function() return DataCalc.getAppMem(), 0, 4096, 0xFF00FF91, 0xFFFF005D);
+		graphMonitor.addMonitor("GC Mem", "MB", function() return DataCalc.getGcMem(), 0, 100, 0xFF00FF91, 0xFFFF005D);
+		addChild(graphMonitor);
 
 		typeName.x -= 10;
 		typeData.x += 100;
@@ -65,5 +86,7 @@ class ExtraCounter extends Sprite
 		this.typeData.text = outputText;
 		typeData.width = typeData.textWidth;
 		typeData.x = bgSprite.x + bgSprite.width - typeData.width - 10;
+
+		graphMonitor.update();
 	}
 }

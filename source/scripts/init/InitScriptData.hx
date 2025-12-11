@@ -31,5 +31,7 @@ class InitScriptData {
         Iris.proxyImports.set("VideoHandler", VideoHandler);
         Iris.proxyImports.set("hxcodec.VideoHandler", VideoHandler);
         Iris.proxyImports.set("hxcodec.flixel.FlxVideo", FlxVideo);
+
+        
     }
 }

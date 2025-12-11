@@ -289,7 +289,7 @@ class Console extends Sprite {
             var newY:Float = scrollStartV + deltaY;
             
             var visibleHeight = textContainer.scrollRect.height;
-            var contentHeight = output.height;
+            var contentHeight = getContentHeight();
             
             if (contentHeight <= visibleHeight) {
                 newY = 0;
@@ -337,11 +337,27 @@ class Console extends Sprite {
     
     private function scrollToBottom():Void {
         var visibleHeight = textContainer.scrollRect.height;
-        var contentHeight = output.height;
+        var contentHeight = getContentHeight();
         if (contentHeight > visibleHeight) {
             output.y = visibleHeight - contentHeight;
         } else {
             output.y = 0;
+        }
+    }
+
+    private function getContentHeight():Float {
+        return output.textHeight + 4;
+    }
+
+    private function clampOutputY():Void {
+        var visibleHeight = textContainer.scrollRect.height;
+        var contentHeight = getContentHeight();
+        if (contentHeight <= visibleHeight) {
+            output.y = 0;
+        } else {
+            var minY = visibleHeight - contentHeight;
+            if (output.y < minY) output.y = minY;
+            if (output.y > 0) output.y = 0;
         }
     }
     
@@ -570,8 +586,7 @@ class Console extends Sprite {
         updateTitleBar(newWidth);
         updateWindowButtons(newWidth);
         updateControlButtons(newHeight);
-
-        if (autoScroll) scrollToBottom();
+        if (autoScroll) scrollToBottom() else clampOutputY();
     }
     
     private function toggleMaximize():Void {
@@ -701,6 +716,7 @@ class Console extends Sprite {
         
         resizeHandle.x = newWidth - 40;
         resizeHandle.y = newHeight - 40;
+        if (autoScroll) scrollToBottom() else clampOutputY();
     }
     
     public function updateScale(newScale:Float):Void {

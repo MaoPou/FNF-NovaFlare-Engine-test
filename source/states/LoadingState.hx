@@ -192,7 +192,7 @@ class LoadingState extends MusicBeatState
 			JustSay.text = Std.string(e);
 		}
 
-		cpp.vm.Gc.enable(false);
+		GCManager.enable(false);
 
 		new FlxTimer().start(0.0001, function(tmr:FlxTimer)
 		{
@@ -720,7 +720,7 @@ class LoadingState extends MusicBeatState
 		musicToPrepare = [];
 		songsToPrepare = [];
 
-		cpp.vm.Gc.enable(true);
+		GCManager.enable(true);
 
 		if (isPlayState)
 		{

@@ -553,7 +553,7 @@ class ClientPrefs
 			Main.fpsVar.visible = data.showFPS;
 
 		#if (!html5 && !switch)
-		FlxG.autoPause = ClientPrefs.data.autoPause;
+		FlxG.autoPause = data.autoPause;
 
 		if (FlxG.save.data.framerate == null)
 		{
@@ -568,6 +568,7 @@ class ClientPrefs
 		}
 		#end
 
+		FlxG.stage.application.window.newFrameGeneration = data.newFrameGeneration;
 		FlxG.stage.application.window.splitUpdate = data.splitUpdate;
 		FlxG.stage.application.window.drawFrameRate = data.drawFramerate;
 

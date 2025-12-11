@@ -82,8 +82,8 @@ class Main extends Sprite
 		Lib.current.addChild(new Main());
 		#if cpp
 
-		cpp.vm.Gc.enable(true);
-		cpp.vm.Gc.run(true);  
+		GCManager.enable(true);
+		GCManager.run(true);  
 		#end
 	}
 	
@@ -167,7 +167,7 @@ class Main extends Sprite
 		var flxGame:FlxGame = new FlxGame(#if (openfl >= "9.2.0") 1280, 720 #else game.width, game.height #end,game.initialState, #if (flixel < "5.0.0") game.zoom, #end game.framerate, game.framerate, game.skipSplash, game.startFullscreen);
 		addChild(flxGame);
 
-		fpsVar = new FPSViewer(5, 5);
+		fpsVar = new FPSViewer(0, 0);
 		FlxG.addChildBelowMouse(fpsVar);
 		FlxG.spriteBelowMouse.push(fpsVar);
 

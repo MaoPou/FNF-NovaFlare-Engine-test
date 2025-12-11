@@ -1115,7 +1115,10 @@ class PlayState extends MusicBeatState
 						FlxG.camera.snapToTarget();
 					}
 					videoCutscene = null;
-					canPause = true;
+					new FlxTimer().start(0.00001, function(tmr:FlxTimer)
+					{
+						canPause = true;
+					}, 1);
 					inCutscene = false;
 					startAndEnd();
 				}
@@ -2307,15 +2310,10 @@ function musicCheck(music:FlxSound, getTime:Float, deviation:Float):Bool
 	var allowDebugKeys:Bool = true;
 	var pressPaue:Int = 0;
 
-	var memStart:Float = 0;
-	var memEnd:Float = 0;
-	var allocDelta:Int = 0;
 	var pausedSongPos:Float = 0;
 
 	override public function update(elapsed:Float)
 	{
-		//memStart = Gc.memInfo(0);
-
 		if (ClientPrefs.data.pauseButton)
 		{
 			var Pressed:Bool = false;

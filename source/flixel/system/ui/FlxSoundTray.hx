@@ -157,10 +157,10 @@ class FlxSoundTray extends Sprite
         {
             if (up) {
                 _volumeUpSound.stop();
-                _volumeUpSound.play(true);
+				FlxG.sound.play(FlxAssets.getSound(volumeUpSound));
             } else {
                 _volumeDownSound.stop();
-                _volumeDownSound.play(true);
+				FlxG.sound.play(FlxAssets.getSound(volumeDownSound));
             }
         }
 		_timer = 1;
