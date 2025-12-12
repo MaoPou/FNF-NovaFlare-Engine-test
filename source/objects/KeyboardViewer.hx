@@ -363,7 +363,7 @@ class TimeDis extends FlxSprite
 		this.line = Line;
 		super(X + Line * (KeyButton.size + 4), Y - 4 - DisBitmap.Height);
 		this.startTime = Time;
-		frames = Cache.currentTrackedFrames.get('keyboardViewer');
+		frames = Cache.getFrame('keyboardViewer');
 		_frame.frame.height = 1;
 		color = OptionsHelpers.colorArray(ClientPrefs.data.keyboardBGColor);
 		alpha = ClientPrefs.data.keyboardAlpha;

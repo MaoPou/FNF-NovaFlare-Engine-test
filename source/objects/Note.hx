@@ -338,7 +338,7 @@ class Note extends FlxSprite
 				flipY = true;
 
 			offsetX += width / 2;
-			copyAngle = false;
+			//copyAngle = false;
 
 			var mania = 3;
 			if (PlayState.SONG != null)
@@ -454,9 +454,9 @@ class Note extends FlxSprite
 		}
 		else
 		{
-			if (Cache.currentTrackedFrames.get(skin) == null) addSkinCache(skin);
+			if (Cache.checkFrame(skin) == false) addSkinCache(skin);
 				
-			frames = Cache.currentTrackedFrames.get(skin);
+			frames = Cache.getFrame(skin);
 
 			if (Cache.currentTrackedAnims.get(skin) != null) {
 			    animation.copyFrom(Cache.currentTrackedAnims.get(skin));
@@ -489,7 +489,7 @@ class Note extends FlxSprite
 	static var skinPixel:String; //像素箭头路径（数据保存形式类似于defaultNoteSkin）
 	static var customSkin:String = '';
 	static var skinPostfix:String = ''; //箭头设置给的后缀
-	static var loadedNote:Map<String, {texture:String, postfix:String, skin:String}> = new Map<String, {texture:String, postfix:String, skin:String}>();
+	public static var loadedNote:Map<String, {texture:String, postfix:String, skin:String}> = new Map<String, {texture:String, postfix:String, skin:String}>();
 
 	public static function reloadPath(texture:String = '', postfix:String = '')
 	{
@@ -508,9 +508,9 @@ class Note extends FlxSprite
 		if (texture == defaultNoteSkin) //如果是默认箭头路径
 		{
 			skin = PlayState.SONG != null ? PlayState.SONG.arrowSkin : null; //兼容了铺面json设置的箭头
-			if (skin == null || skin.length < 1) {//当发现铺面json的箭头读取有问题时
-				skin = texture + postfix;
-			} else {
+			if (skin != null && skin.length > 0) {//当发现铺面json的箭头读取没问题时
+				if (!Paths.fileExists('images/' + skin + '.png', IMAGE))
+					skin = defaultNoteSkin + getNoteSkinPostfix(defaultNoteSkin); //返回为默认贴图
 				loadedNote.set(currentKey, {texture: texture, postfix: postfix, skin: skin});
 				return; //直接跳过后续读取,获取为铺面json的路径
 			}
@@ -543,7 +543,7 @@ class Note extends FlxSprite
 		return skin;
 	}
 
-	static function getLoadDataKey(texture:String, postfix:String):String
+	public static function getLoadDataKey(texture:String, postfix:String):String
 	{
 		return '${texture}::${postfix}';
 	}
@@ -673,8 +673,12 @@ class Note extends FlxSprite
 			distance *= -1;
 
 		var angleDir = strumDirection * Math.PI / 180;
-		if (copyAngle)
-			angle = strumDirection - 90 + strumAngle + offsetAngle;
+		if (copyAngle) {
+			if (!isSustainNote)
+				angle = strumDirection - 90 + strumAngle + offsetAngle;
+			else
+				angle = strumDirection - 90 + offsetAngle;
+		}
 
 		if (copyAlpha)
 			alpha = strumAlpha * multAlpha;
@@ -706,14 +710,12 @@ class Note extends FlxSprite
 			Mscale = ExtraKeysHandler.instance.data.pixelScales[mania];
 		var sWidth = Note.swagWidthUnscaled * Mscale;
 
-		var center:Float = myStrum.y + offsetY + sWidth / 2;
 		if (isSustainNote && (mustPress || !ignoreNote) && (!mustPress || (wasGoodHit || (prevNote.wasGoodHit && !canBeHit))))
 		{
-			//updateHitbox();
 			var swagRect:FlxRect = clipRect;
 			if (swagRect == null) swagRect = FlxRect.get(0, 0, frameWidth, frameHeight);
 			
-			var time:Float = FlxMath.bound((Conductor.songPosition - strumTime) / (height / (0.45 * FlxMath.roundDecimal(PlayState.instance.songSpeed, 2))), 0, 1);
+			var time:Float = FlxMath.bound((Conductor.songPosition - strumTime) / (swagRect.height * scale.y / (0.45 * FlxMath.roundDecimal(PlayState.instance.songSpeed, 2))), 0, 1);
 			if (time >= 1) {
 				PlayState.instance.invalidateNote(this);
 				return;

@@ -3,6 +3,7 @@ package backend;
 import flixel.graphics.frames.FlxFrame.FlxFrameAngle;
 import flixel.graphics.frames.FlxFramesCollection;
 import flixel.graphics.frames.FlxAtlasFrames;
+import flixel.graphics.frames.FlxFrame;
 import flixel.graphics.FlxGraphic;
 import flixel.animation.FlxAnimationController;
 import flixel.math.FlxRect;
@@ -21,8 +22,6 @@ class Cache {
 	public static var localTrackedAssets:Array<String> = [];  //用于列举当前状态的所有资源（包括图形，声音）
 
     public static var currentTrackedAssets:Map<String, FlxGraphic> = []; //用于列举当前状态的所有图形资源
-
-	public static var currentTrackedBitmaps:Map<String, BitmapData> = []; //用于列举当前状态的所有动画资源
 
     public static var currentTrackedSounds:Map<String, Sound> = []; //用于列举当前状态的所有声音资源
 
@@ -48,8 +47,18 @@ class Cache {
 		Cache.localTrackedAssets.push(key);
 	}
 
+	public static function checkFrame(key:String):Bool
+	{
+		if (currentTrackedFrames.get(key) == null) return false;
+		if (currentTrackedFrames.get(key).frames == null || currentTrackedFrames.get(key).frames.length == 0) {
+			currentTrackedFrames.remove(key);
+			return false;
+		}
+		return true;
+	}
+
 	public static function getFrame(key:String):FlxFramesCollection
 	{
-		return Cache.currentTrackedFrames.get(key);
+		return currentTrackedFrames.get(key);
 	}
 }

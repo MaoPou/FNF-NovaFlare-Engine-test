@@ -31,7 +31,7 @@ class HealthIcon extends FlxSprite
 	{
 		if (this.char != char)
 		{
-			if (Cache.currentTrackedFrames.get('icon-' + Mods.currentModDirectory + '-' + char) == null) {
+			if (Cache.checkFrame('icon-' + Mods.currentModDirectory + '-' + char) == false) {
 				var spr = new FlxSprite();
 				var name:String = 'icons/' + char;
 				if (!Paths.fileExists('images/' + name + '.png', IMAGE))
@@ -46,7 +46,7 @@ class HealthIcon extends FlxSprite
 				Cache.setFrame('icon-' + Mods.currentModDirectory + '-' + char, spr.frames);
 			}
 
-			frames = Cache.currentTrackedFrames.get('icon-' + Mods.currentModDirectory + '-' + char);
+			frames = Cache.getFrame('icon-' + Mods.currentModDirectory + '-' + char);
 			animation.add(char, [for (i in 0...numFrames) i], 0, false, isPlayer);
 			updateHitbox();
 			animation.play(char);

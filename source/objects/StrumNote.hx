@@ -77,12 +77,8 @@ class StrumNote extends FlxSprite
 		var skin:String = null;
 		var pixelPath:String = PlayState.isPixelStage ? 'pixelUI/' : '';
 
-		skin = pixelPath + Note.defaultNoteSkin;
-		if (Note.defaultNoteSkin == Note.initSkin) {
-			skin += Note.getNoteSkinPostfix(Note.defaultNoteSkin);
-		}
+		skin = pixelPath + Note.loadedNote.get(Note.getLoadDataKey(Note.defaultNoteSkin, '')).skin;
 			
-
 		texture = skin; // Load texture and anims
 		scrollFactor.set();
 

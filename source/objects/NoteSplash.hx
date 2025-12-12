@@ -180,19 +180,19 @@ class NoteSplash extends FlxSprite
 	{
 		maxAnims = 0;
 
-		if (Cache.getFrame(skin) == null) addSkinCache(skin);	
+		if (Cache.checkFrame(skin) == false) addSkinCache(skin);	
 		frames = Cache.getFrame(skin);
 
 		var config:NoteSplashConfig = null;
 		if (frames == null)
 		{
 			skin = defaultNoteSplash + getSplashSkinPostfix();
-			if (Cache.getFrame(skin) == null) addSkinCache(skin);	
+			if (Cache.checkFrame(skin) == false) addSkinCache(skin);	
 			frames = Cache.getFrame(skin);
 			if (frames == null) // if you really need this, you really fucked something up
 			{
 				skin = defaultNoteSplash;
-				if (Cache.getFrame(skin) == null) addSkinCache(skin);	
+				if (Cache.checkFrame(skin) == false) addSkinCache(skin);	
 				frames = Cache.getFrame(skin);
 			}
 		}
