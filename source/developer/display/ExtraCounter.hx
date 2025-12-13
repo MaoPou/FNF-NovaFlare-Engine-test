@@ -60,6 +60,7 @@ class ExtraCounter extends Sprite
 	{
 		for (label in [this.typeData, this.typeName])
 		{
+			var maxValue:Float = ClientPrefs.data.splitUpdate ? ClientPrefs.data.drawFramerate : ClientPrefs.data.framerate;
 			if (ClientPrefs.data.rainbowFPS)
 			{
 				label.textColor = ColorReturn.transfer(DataCalc.drawFPS, ClientPrefs.data.drawFramerate);

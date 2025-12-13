@@ -980,9 +980,10 @@ class GraphMonitor extends Sprite
         gradAlphas[1] = graphFillAlpha;
         segFillShape.graphics.beginGradientFill(GradientType.LINEAR, gradColors, gradAlphas, gradRatios, gradientMatrix);
         strokeShape.graphics.clear();
-        var avgVal = (prevVal + lastVal) * 0.5;
-        var strokeColor = getColorForValueCached(m, avgVal, minVal, maxVal);
-        strokeShape.graphics.lineStyle(graphLineThickness, strokeColor, graphLineAlpha);
+        var leftColor = getColorForValueCached(m, prevVal, minVal, maxVal);
+        var rightColor = getColorForValueCached(m, lastVal, minVal, maxVal);
+        strokeShape.graphics.lineStyle(graphLineThickness, 0, graphLineAlpha);
+        strokeShape.graphics.lineGradientStyle(GradientType.LINEAR, [leftColor, rightColor], [graphLineAlpha, graphLineAlpha], gradRatios, gradientMatrix);
 
         if (useSmoothCurve)
         {
@@ -1006,9 +1007,7 @@ class GraphMonitor extends Sprite
             segFillShape.graphics.lineTo(0, graphH);
 
             strokeShape.graphics.moveTo(0, yPrev);
-            strokeShape.graphics.lineStyle(graphLineThickness, leftColor, graphLineAlpha);
             strokeShape.graphics.curveTo(c0x, c0y, midX, midY);
-            strokeShape.graphics.lineStyle(graphLineThickness, rightColor, graphLineAlpha);
             strokeShape.graphics.curveTo(c1x, c1y, colWidth, yCurr);
         }
         else
@@ -1022,9 +1021,7 @@ class GraphMonitor extends Sprite
             var midX = colWidth * 0.5;
             var midY = (yPrev + yCurr) * 0.5;
             strokeShape.graphics.moveTo(0, yPrev);
-            strokeShape.graphics.lineStyle(graphLineThickness, leftColor, graphLineAlpha);
             strokeShape.graphics.lineTo(midX, midY);
-            strokeShape.graphics.lineStyle(graphLineThickness, rightColor, graphLineAlpha);
             strokeShape.graphics.lineTo(colWidth, yCurr);
         }
 
@@ -1098,9 +1095,10 @@ class GraphMonitor extends Sprite
             segFillShape.graphics.beginGradientFill(GradientType.LINEAR, gradColors, gradAlphas, gradRatios, gradientMatrix);
 
             strokeShape.graphics.clear();
-            var avgVal = (vPrev + vCurr) * 0.5;
             var leftColor = getColorForValueCached(m, vPrev, minVal, maxVal);
             var rightColor = getColorForValueCached(m, vCurr, minVal, maxVal);
+            strokeShape.graphics.lineStyle(graphLineThickness, 0, graphLineAlpha);
+            strokeShape.graphics.lineGradientStyle(GradientType.LINEAR, [leftColor, rightColor], [graphLineAlpha, graphLineAlpha], gradRatios, gradientMatrix);
 
             if (useSmoothCurve)
             {
@@ -1122,9 +1120,7 @@ class GraphMonitor extends Sprite
                 segFillShape.graphics.lineTo(0, graphH);
 
                 strokeShape.graphics.moveTo(0, yPrev);
-                strokeShape.graphics.lineStyle(graphLineThickness, leftColor, graphLineAlpha);
                 strokeShape.graphics.curveTo(c0x, c0y, midX, midY);
-                strokeShape.graphics.lineStyle(graphLineThickness, rightColor, graphLineAlpha);
                 strokeShape.graphics.curveTo(c1x, c1y, colWidth, yCurr);
             }
             else
@@ -1138,9 +1134,7 @@ class GraphMonitor extends Sprite
                 var midX = colWidth * 0.5;
                 var midY = (yPrev + yCurr) * 0.5;
                 strokeShape.graphics.moveTo(0, yPrev);
-                strokeShape.graphics.lineStyle(graphLineThickness, leftColor, graphLineAlpha);
                 strokeShape.graphics.lineTo(midX, midY);
-                strokeShape.graphics.lineStyle(graphLineThickness, rightColor, graphLineAlpha);
                 strokeShape.graphics.lineTo(colWidth, yCurr);
             }
             tmpMatrix.identity();

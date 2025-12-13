@@ -33,8 +33,10 @@
     },
     {
       "name": "haxeui-flixel",
-      "type": "haxelib",
-      "version": "1.7.0"
+      "type": "git",
+      "dir": null,
+      "ref": "main",
+      "url": "https://github.com/NovaFlare-Engine-haxelib/haxeui-flixel.git"
     },
     {
       "name": "flixel-ui",
