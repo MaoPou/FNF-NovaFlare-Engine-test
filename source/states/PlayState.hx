@@ -1691,6 +1691,16 @@ class PlayState extends MusicBeatState
 		}
 		FlxG.sound.list.add(inst);
 
+		@:privateAccess
+		FlxG.sound.playMusic(inst._sound, 1, false);
+		#if FLX_PITCH FlxG.sound.music.pitch = playbackRate; #end
+		vocals.play();
+		opponentVocals.play();
+
+		FlxG.sound.music.pause();
+		vocals.pause();
+		opponentVocals.pause();
+
 		notes = new FlxTypedGroup<Note>();
 		notes.active = true;
 		notes.visible = false;
