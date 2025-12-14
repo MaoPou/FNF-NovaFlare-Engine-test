@@ -35,7 +35,7 @@ class ExtraCounter extends Sprite
 
 		graphMonitor = new GraphMonitor(0, 80, 350, 200);
 		graphMonitor.setBackground(FlxColor.fromRGB(100, 100, 100, 255), 0.3);
-		graphMonitor.maxHistory = 30;
+		graphMonitor.maxHistory = 40;
 
 		graphMonitor.inputFixX = this.x;
 		graphMonitor.inputFixY = this.y;

@@ -84,8 +84,6 @@ class TitleState extends MusicBeatState
 
 		curWacky = FlxG.random.getObject(getIntroTextShit());
 
-		FlxG.save.bind('funkin', CoolUtil.getSavePath());
-
 		ClientPrefs.loadPrefs();
 
 		if (ExtraKeysHandler.instance.data.scales == null)

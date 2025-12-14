@@ -615,7 +615,7 @@ class GraphMonitor extends Sprite
     {
         if (colWidthCache == -1 || lastGraphWCache != graphW || lastMaxHistoryCache != maxHistory)
         {
-            var cw = Std.int(Math.max(1, Math.round(graphW / (maxHistory - 1))));
+            var cw = Std.int(Math.max(1, Math.ceil(graphW / (maxHistory - 1))));
             if (cw > graphW) cw = graphW;
             colWidthCache = cw;
             lastGraphWCache = graphW;
@@ -1029,8 +1029,8 @@ class GraphMonitor extends Sprite
 
         tmpMatrix.identity();
         tmpMatrix.tx = graphW - colWidth;
-        graphBitmapData.draw(segFillShape, tmpMatrix, null, null, null, true);
-        graphBitmapData.draw(strokeShape, tmpMatrix, null, null, null, true);
+        graphBitmapData.draw(segFillShape, tmpMatrix, null, null, null, false);
+        graphBitmapData.draw(strokeShape, tmpMatrix, null, null, null, false);
     }
     
     private function rebuildGraphBitmap(m:MonitorItem):Void
@@ -1139,8 +1139,8 @@ class GraphMonitor extends Sprite
             }
             tmpMatrix.identity();
             tmpMatrix.tx = (i - 1) * colWidth;
-            graphBitmapData.draw(segFillShape, tmpMatrix, null, null, null, true);
-            graphBitmapData.draw(strokeShape, tmpMatrix, null, null, null, true);
+            graphBitmapData.draw(segFillShape, tmpMatrix, null, null, null, false);
+            graphBitmapData.draw(strokeShape, tmpMatrix, null, null, null, false);
         }
     }
     
