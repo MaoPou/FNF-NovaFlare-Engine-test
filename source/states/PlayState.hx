@@ -1118,9 +1118,9 @@ class PlayState extends MusicBeatState
 					new FlxTimer().start(0.00001, function(tmr:FlxTimer)
 					{
 						canPause = true;
+						inCutscene = false;
+						startAndEnd();
 					}, 1);
-					inCutscene = false;
-					startAndEnd();
 				}
 				videoCutscene.finishCallback = onVideoEnd;
 				videoCutscene.onSkip = onVideoEnd;

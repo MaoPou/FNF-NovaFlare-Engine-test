@@ -85,15 +85,16 @@ class MouseMove extends FlxBasic
         }
         
         if (checkInput && inputAllow) {
-            // 鼠标滚轮
-            if (enableMouseWheel && mouse.wheel!= 0) {
-                velocity += mouse.wheel * mouseWheelSensitivity;
-                cancelMoveTo();
-            }
-            
             // 鼠标按下
             if (mouse.justPressed) {
                 startDrag(mouse.y);
+                cancelMoveTo();
+            }
+
+            // 鼠标滚轮
+            if (enableMouseWheel && mouse.wheel!= 0) {
+                isDragging = false;
+                velocity += mouse.wheel * mouseWheelSensitivity;
                 cancelMoveTo();
             }
             

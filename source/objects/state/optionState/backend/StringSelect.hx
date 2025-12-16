@@ -11,6 +11,7 @@ class StringSelect extends FlxSpriteGroup
 
     public var options:Array<String>;
     public var optionSprites:Array<ChooseRect>;
+    var mask:PixelMaskCutter;
 
     var mainX:Float = 0;
     var mainY:Float = 0;
@@ -53,6 +54,8 @@ class StringSelect extends FlxSpriteGroup
             optionSprites.push(option);
             option.y = follow.followY + follow.innerY + mainY + i * height / 5; //初始化在state的y
         }
+
+        mask = new PixelMaskCutter(bg);
         
         // 创建滑块
         var calcWidth = width / init;
@@ -72,7 +75,7 @@ class StringSelect extends FlxSpriteGroup
 								]
 								);
 		OptionsState.instance.addMove(optionMove);
-        optionMove.mouseWheelSensitivity = 10;
+        //optionMove.mouseWheelSensitivity = 10;
     }
     
     public var allowUpdate:Bool = true;
@@ -113,6 +116,7 @@ class StringSelect extends FlxSpriteGroup
     }
 
     function changeRect(str:ChooseRect, startY:Float, overY:Float) { //ai真的太好用了喵 --狐月影
+        
         // 获取选项矩形的顶部和底部坐标（相对于父容器）
         var optionTop = str.y;
         var optionBottom = str.y + str.height;
@@ -146,6 +150,10 @@ class StringSelect extends FlxSpriteGroup
         
         // 应用裁剪
         str.clipRect = swagRect;
+        
+        
+        //mask.cutSprite(str.bg);
+        //mask.cutSprite(str.textDis);
     }
     
     public function updateSelection(index:Int):Void

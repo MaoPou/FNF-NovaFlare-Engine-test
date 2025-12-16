@@ -1,4 +1,6 @@
 package shapeEx;
+import openfl.display.Sprite;
+import openfl.display.BlendMode;
 
 class Triangle extends FlxSprite
 {
@@ -6,50 +8,68 @@ class Triangle extends FlxSprite
 	{
 		super(X, Y);
 
-		loadGraphic(drawHollowTriangle(Size, Inner));
+		if (!Cache.checkFrame('triangle-s:'+Std.int(Size)+'-i:'+Std.int(Inner * 100))) addCache(Size, Inner);
+		frames = Cache.getFrame('triangle-s:'+Std.int(Size)+'-i:'+Std.int(Inner * 100));
 		antialiasing = ClientPrefs.data.antialiasing;
 	}
 
-	function drawHollowTriangle(sideLength:Float, innerSide:Float):BitmapData
+	function addCache(sizeLength:Float, innerRatio:Float)
 	{
-		var shape:Shape = new Shape();
+		var newGraphic:FlxGraphic = FlxGraphic.fromBitmapData(drawHollowTriangle(sizeLength, innerRatio));
+		newGraphic.persist = true;
+		newGraphic.destroyOnNoUse = false;
+		Cache.setFrame('triangle-s:'+Std.int(sizeLength)+'-i:'+Std.int(innerRatio * 100), newGraphic.imageFrame);
+	}
 
-		// 图像的宽度和高度，确保三角形在图像中居中
-		var imageSize:Float = sideLength * Math.sqrt(3); // 等边三角形的高为边长的sqrt(3)/2，乘以2得到图像大小
-		// 图像中心点
-		var centerX:Float = imageSize / 2;
-		var centerY:Float = imageSize / 2 + 5; // +5 是修复bug
+	function drawHollowTriangle(sideLength:Float, innerRatio:Float):BitmapData
+	{
+		var container:Sprite = new Sprite();
+		var outer:Shape = new Shape();
+		var inner:Shape = new Shape();
 
-		// 计算等边三角形的三个顶点位置，确保中心位于图像中心
-		var angleStep:Float = Math.PI * 2 / 3; // 顶点之间的角度差为120度，即2π/3
-		var p1:Point = new Point(centerX + sideLength * Math.cos(0), centerY + sideLength * Math.sin(0));
-		var p2:Point = new Point(centerX + sideLength * Math.cos(angleStep), centerY + sideLength * Math.sin(angleStep));
-		var p3:Point = new Point(centerX + sideLength * Math.cos(angleStep * 2), centerY + sideLength * Math.sin(angleStep * 2));
+		var h:Float = sideLength * Math.sqrt(3) / 2;
+		var margin:Int = 4;
+		var bw:Int = Std.int(sideLength + margin * 2);
+		var R:Float = sideLength / Math.sqrt(3);
+		var bh:Int = Std.int(2 * (margin + R));
 
-		// 绘制外部三角形
-		shape.graphics.beginFill(0xFFFFFF);
-		shape.graphics.lineStyle(3, 0xFFFFFF, 1);
-		shape.graphics.moveTo(p1.x, p1.y);
-		shape.graphics.lineTo(p2.x, p2.y);
-		shape.graphics.lineTo(p3.x, p3.y);
-		shape.graphics.lineTo(p1.x, p1.y);
-		shape.graphics.endFill();
+		var cx:Float = bw / 2;
+		var cy:Float = bh / 2;
+		var a1:Float = -Math.PI / 2;
+		var a2:Float = a1 + 2 * Math.PI / 3;
+		var a3:Float = a1 + 4 * Math.PI / 3;
+		var p1:Point = new Point(cx + R * Math.cos(a1), cy + R * Math.sin(a1));
+		var p2:Point = new Point(cx + R * Math.cos(a2), cy + R * Math.sin(a2));
+		var p3:Point = new Point(cx + R * Math.cos(a3), cy + R * Math.sin(a3));
 
-		// 绘制内部三角形
-		var innerSideLength:Float = sideLength * (1 - innerSide);
-		var innerP1:Point = new Point(centerX + innerSideLength * Math.cos(0), centerY + innerSideLength * Math.sin(0));
-		var innerP2:Point = new Point(centerX + innerSideLength * Math.cos(angleStep), centerY + innerSideLength * Math.sin(angleStep));
-		var innerP3:Point = new Point(centerX + innerSideLength * Math.cos(angleStep * 2), centerY + innerSideLength * Math.sin(angleStep * 2));
+		var innerSide:Float = sideLength * (1 - innerRatio);
+		var scale:Float = innerSide / sideLength;
 
-		shape.graphics.beginFill(0x00); // 设置填充颜色为透明
-		shape.graphics.moveTo(innerP1.x, innerP1.y);
-		shape.graphics.lineTo(innerP2.x, innerP2.y);
-		shape.graphics.lineTo(innerP3.x, innerP3.y);
-		shape.graphics.lineTo(innerP1.x, innerP1.y);
-		shape.graphics.endFill();
+		var ip1:Point = new Point(cx + (p1.x - cx) * scale, cy + (p1.y - cy) * scale);
+		var ip2:Point = new Point(cx + (p2.x - cx) * scale, cy + (p2.y - cy) * scale);
+		var ip3:Point = new Point(cx + (p3.x - cx) * scale, cy + (p3.y - cy) * scale);
 
-		var bitmap:BitmapData = new BitmapData(Std.int(imageSize * 1.2), Std.int(imageSize * 1.2), true, 0);
-		bitmap.draw(shape);
+		outer.graphics.beginFill(0xFFFFFF);
+		outer.graphics.lineStyle(2, 0xFFFFFF, 1);
+		outer.graphics.moveTo(p1.x, p1.y);
+		outer.graphics.lineTo(p2.x, p2.y);
+		outer.graphics.lineTo(p3.x, p3.y);
+		outer.graphics.lineTo(p1.x, p1.y);
+		outer.graphics.endFill();
+
+		inner.graphics.beginFill(0xFFFFFF);
+		inner.graphics.moveTo(ip1.x, ip1.y);
+		inner.graphics.lineTo(ip2.x, ip2.y);
+		inner.graphics.lineTo(ip3.x, ip3.y);
+		inner.graphics.lineTo(ip1.x, ip1.y);
+		inner.graphics.endFill();
+		inner.blendMode = BlendMode.ERASE;
+
+		container.addChild(outer);
+		container.addChild(inner);
+
+		var bitmap:BitmapData = new BitmapData(bw, bh, true, 0);
+		bitmap.draw(container);
 		return bitmap;
 	}
 }

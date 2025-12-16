@@ -6,23 +6,22 @@ class SongRect extends FlxSpriteGroup {
 
     static public final fixHeight:Int = #if mobile 80 #else 70 #end;
 
-    static public var focusRect:SongRect;
-    static public var openRect:SongRect;
-    
-
     public var id:Int = 0;
     
     public var onSelectChange:String->Void;
 
     public var bgPath:String;
 
-    public var diffRectGroup:FlxSpriteGroup;
-
     /////////////////////////////////////////////////////////////////////
 
     public var haveDiffDis:Bool = false;
     private var _songCharter:Array<String>;
     private var _songColor:FlxColor;
+
+    public var diffRectGroup:FlxSpriteGroup;
+
+    static public var focusRect:SongRect;
+    static public var openRect:SongRect;
 
     public var light:Rect;
     private var bg:FlxSprite;
@@ -33,7 +32,10 @@ class SongRect extends FlxSpriteGroup {
     public function new(songNameSt:String, songIcon:String, songMusican:String, songCharter:Array<String>, songColor:Array<Int>) {
         super(0, 0);
 
-        light = new Rect(0, 0, 560, fixHeight, fixHeight / 4, fixHeight / 4, FlxColor.WHITE, 1, 0, EngineSet.mainColor);
+        diffRectGroup = new FlxSpriteGroup();
+        add(diffRectGroup);
+
+        light = new Rect(2, 0, 560, fixHeight, fixHeight / 4, fixHeight / 4, FlxColor.WHITE, 1, 0, EngineSet.mainColor);
         light.antialiasing = ClientPrefs.data.antialiasing;
         add(light);
         
@@ -51,9 +53,6 @@ class SongRect extends FlxSpriteGroup {
         _songCharter = songCharter;
         _songColor = FlxColor.fromRGB(songColor[0], songColor[1], songColor[2]);
 
-        diffRectGroup = new FlxSpriteGroup();
-        add(diffRectGroup);
-
         icon = new HealthIcon(songIcon, false, false);
 		icon.setGraphicSize(Std.int(bg.height * 0.8));
 		icon.x += bg.height / 2 - icon.height / 2;
@@ -66,7 +65,6 @@ class SongRect extends FlxSpriteGroup {
         songName.borderStyle = NONE;
 		songName.antialiasing = ClientPrefs.data.antialiasing;
 		songName.x += bg.height / 2 - icon.height / 2 + icon.width * 1.1;
-		//songName.y = light.height * 0.05;
 		add(songName);
 
         musican = new FlxText(0, 0, 0, songMusican, 20);
@@ -111,7 +109,7 @@ class SongRect extends FlxSpriteGroup {
 
         var mouse = FreeplayState.instance.mouseEvent;
 
-		var overlaps = mouse.overlaps(this);
+		var overlaps = mouse.overlaps(this.bg);
 
         if (overlaps) {
             if (mouse.justReleased) {
@@ -143,18 +141,36 @@ class SongRect extends FlxSpriteGroup {
     //////////////////////////////////////////////////////////////////////////////////////////////
 
     public var diffAdded:Bool = false;
-    public function createDiff() {
+    public function createDiff(imme:Bool = false) {
         if (diffAdded) return;
         Difficulty.loadFromWeek();
+
         for (mem in FreeplayState.instance.songGroup) {
             diffAdded = false;
-            if (mem.id > focusRect.id) mem.addInterY(fixHeight * 0.15);
-            else if (mem.id == focusRect.id) mem.addInterY(fixHeight * 0.1);
+            if (mem.id >= focusRect.id) mem.addInterY(fixHeight * 0.1);
             else mem.addInterY(0);
             if (mem.id > focusRect.id) mem.addDiffY();
             else mem.addDiffY(false);
             if (mem != focusRect) mem.destoryDiff();
         }
+
+        for (diff in 0...Difficulty.list.length)
+		{
+			var chart:String = _songCharter[diff];
+			if (_songCharter[diff] == null)
+				chart = _songCharter[0];
+			var rect = new DiffRect(this, Difficulty.list[diff], _songColor, chart);
+			diffRectGroup.add(rect);
+			rect.member = diff;
+			rect.startTarY = bg.height + 10 + diff * DiffRect.fixHeight * 1.05;
+			if (imme)
+				rect.startY = rect.startTarY;
+			if (diff == FreeplayState.curDifficulty)
+				rect.onFocus = true;
+			else
+				rect.onFocus = false;
+		}
+
         diffAdded = true;
         openRect = this;
         FreeplayState.instance.changeSelection();
@@ -163,50 +179,17 @@ class SongRect extends FlxSpriteGroup {
     
     public function destoryDiff() {
         if (!diffAdded && diffRectGroup.length < 1) return;
-        //desDiff();
-        diffAdded = false;
-    }
-
-    //////////////////////////////////////////////////////////////////////////////////////////////
-
-    /*
-    public function createDifftes(color:FlxColor, charter:Array<String>, imme:Bool = false)
-	{
-		desDiff();
-		haveDiffDis = true;
-		for (diff in 0...Difficulty.list.length)
-		{
-			var chart:String = charter[diff];
-			if (charter[diff] == null)
-				chart = charter[0];
-			var rect = new DiffRect(Difficulty.list[diff], color, chart, this);
-			diffRectGroup.add(rect);
-			rect.member = diff;
-			rect.posY = bg.height + 10 + diff * DiffRect.fixHeight;
-			if (imme)
-				rect.lerpPosY = rect.posY;
-			if (diff == FreeplayState.curDifficulty)
-				rect.onFocus = true;
-			else
-				rect.onFocus = false;
-		}
-	}
-
-	public function desDiff()
-	{
-		haveDiffDis = false;
-
-		for (member in diffRectGroup.members)
+        for (member in diffRectGroup.members)
 		{
 			if (member == null)
 				continue;
 			diffRectGroup.remove(member);
 			member.destroy();
 		}
-	}
-        */
+        diffAdded = false;
+    }
 
-    ///////////////////////////////////////////////////////////////////////
+    //////////////////////////////////////////////////////////////////////////////////////////////
 
     public var moveX:Float = 0;
     public var chooseX:Float = 0;
@@ -223,6 +206,17 @@ class SongRect extends FlxSpriteGroup {
         else diffX = diffTar;
         
         this.x = FlxG.width - this.light.width + 80 + moveX + chooseX + diffX;
+        diffCalcX();
+    }
+
+    private function diffCalcX() {
+        if (diffAdded) {
+            for (diff in diffRectGroup.members) {
+                var diffRect = cast(diff, DiffRect);
+                if (diffRect == null) continue;
+                diffRect.calcX();
+            }
+        }
     }
 
     public var interY:Float = 0;
@@ -239,6 +233,17 @@ class SongRect extends FlxSpriteGroup {
             diffY = diffYTar;
 
         this.y = startY + interY + diffY;
+        diffCalcY();
+    }
+
+    private function diffCalcY() {
+        if (diffAdded) {
+            for (diff in diffRectGroup.members) {
+                var diffRect = cast(diff, DiffRect);
+                if (diffRect == null) continue;
+                diffRect.calcY();
+            }
+        }
     }
     
     private var interYTar:Float = 0;
@@ -248,9 +253,29 @@ class SongRect extends FlxSpriteGroup {
     
     private var diffYTar:Float = 0;
     public function addDiffY(isAdd:Bool = true) {
-        diffYTar = isAdd ? Difficulty.list.length * DiffRect.fixHeight * 1.05 : 0;
+        diffYTar = isAdd ? 10 + Difficulty.list.length * DiffRect.fixHeight * 1.05 : 0;
+        //trace(diffYTar);
     }
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 class CurLight extends FlxSprite
 {

@@ -322,7 +322,7 @@ class FreeplayState extends MusicBeatState
 								],
 								songMoveEvent);
 		songsMove.useLerp = true;
-		songsMove.lerpSmooth = 12.5;
+		songsMove.lerpSmooth = 8;
 		add(songsMove);
 
 		////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -399,7 +399,7 @@ class FreeplayState extends MusicBeatState
 	public function songMoveEvent(){
 		if (songGroup.length <= 0) return;
 		for (i in 0...songGroup.length) {
-			songGroup[i].moveY(songPosiData + songGroup[i].diffY + (songGroup[i].id) * SongRect.fixHeight * inter);
+			songGroup[i].moveY(songPosiData + (songGroup[i].id) * SongRect.fixHeight * inter);
 			songGroup[i].calcX();
 		}
 		updateSongVisibility();

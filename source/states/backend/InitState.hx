@@ -237,7 +237,7 @@ class InitState extends MusicBeatState
 	{
 		if (!ClientPrefs.data.skipTitleVideo)
 			#if VIDEOS_ALLOWED
-			changeState(); //startVideo('menuExtend/titleIntro');
+			startVideo('menuExtend/titleIntro');
 			#else
 			changeState();
 			#end

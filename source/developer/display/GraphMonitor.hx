@@ -1062,8 +1062,6 @@ class GraphMonitor extends Sprite
 
         drawAxisLabels(m, graphH, minVal, maxVal);
 
-        var colWidth = getColWidth(graphW);
-
         for (i in 1...maxHistory)
         {
             var idxPrev = (m.historyIndex + i - 1) % maxHistory;
@@ -1084,8 +1082,13 @@ class GraphMonitor extends Sprite
 
             var yPrevPrev:Float = 0;
 
+            var startX = Std.int(Math.floor((i - 1) * graphW / (maxHistory - 1)));
+            var endX = Std.int(Math.floor(i * graphW / (maxHistory - 1)));
+            var segWidth = endX - startX;
+            if (segWidth < 1) segWidth = 1;
+
             segFillShape.graphics.clear();
-            gradientMatrix.createGradientBox(colWidth, graphH, 0, 0, 0);
+            gradientMatrix.createGradientBox(segWidth, graphH, 0, 0, 0);
             var leftColor = getColorForValueCached(m, vPrev, minVal, maxVal);
             var rightColor = getColorForValueCached(m, vCurr, minVal, maxVal);
             gradColors[0] = leftColor;
@@ -1102,43 +1105,43 @@ class GraphMonitor extends Sprite
 
             if (useSmoothCurve)
             {
-                var midX = colWidth * 0.5;
+                var midX = segWidth * 0.5;
                 var midY = (yPrev + yCurr) * 0.5;
                 var rPrevPrev = (vPrevPrev - minVal) / (maxVal - minVal);
                 if (rPrevPrev < 0) rPrevPrev = 0; if (rPrevPrev > 1) rPrevPrev = 1;
                 yPrevPrev = graphH - (rPrevPrev * graphH);
                 var tangentY = yPrev - yPrevPrev;
-                var c0x = colWidth * 0.25;
+                var c0x = segWidth * 0.25;
                 var c0y = yPrev + tangentY * 0.25;
-                var c1x = colWidth * 0.75;
+                var c1x = segWidth * 0.75;
                 var c1y = yCurr - tangentY * 0.25;
                 segFillShape.graphics.moveTo(0, graphH);
                 segFillShape.graphics.lineTo(0, yPrev);
                 segFillShape.graphics.curveTo(c0x, c0y, midX, midY);
-                segFillShape.graphics.curveTo(c1x, c1y, colWidth, yCurr);
-                segFillShape.graphics.lineTo(colWidth, graphH);
+                segFillShape.graphics.curveTo(c1x, c1y, segWidth, yCurr);
+                segFillShape.graphics.lineTo(segWidth, graphH);
                 segFillShape.graphics.lineTo(0, graphH);
 
                 strokeShape.graphics.moveTo(0, yPrev);
                 strokeShape.graphics.curveTo(c0x, c0y, midX, midY);
-                strokeShape.graphics.curveTo(c1x, c1y, colWidth, yCurr);
+                strokeShape.graphics.curveTo(c1x, c1y, segWidth, yCurr);
             }
             else
             {
                 segFillShape.graphics.moveTo(0, graphH);
                 segFillShape.graphics.lineTo(0, yPrev);
-                segFillShape.graphics.lineTo(colWidth, yCurr);
-                segFillShape.graphics.lineTo(colWidth, graphH);
+                segFillShape.graphics.lineTo(segWidth, yCurr);
+                segFillShape.graphics.lineTo(segWidth, graphH);
                 segFillShape.graphics.lineTo(0, graphH);
 
-                var midX = colWidth * 0.5;
+                var midX = segWidth * 0.5;
                 var midY = (yPrev + yCurr) * 0.5;
                 strokeShape.graphics.moveTo(0, yPrev);
                 strokeShape.graphics.lineTo(midX, midY);
-                strokeShape.graphics.lineTo(colWidth, yCurr);
+                strokeShape.graphics.lineTo(segWidth, yCurr);
             }
             tmpMatrix.identity();
-            tmpMatrix.tx = (i - 1) * colWidth;
+            tmpMatrix.tx = startX;
             graphBitmapData.draw(segFillShape, tmpMatrix, null, null, null, false);
             graphBitmapData.draw(strokeShape, tmpMatrix, null, null, null, false);
         }

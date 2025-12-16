@@ -214,6 +214,25 @@ class OptionsState extends MusicBeatState
 		}
 	}
 
+	private function updateCataVisibility():Void
+	{
+		var cam = FlxG.camera;
+		var l = cam.scroll.x;
+		var t = cam.scroll.y;
+		var r = l + cam.width;
+		var b = t + cam.height;
+		for (cata in cataGroup)
+		{
+			var cl = cata.x;
+			var ct = cata.y;
+			var cr = cl + cata.bg.width;
+			var cb = ct + cata.bg.realHeight;
+			var inView = (cr > l && cl < r && cb > t && ct < b);
+			cata.visible = inView;
+			cata.active = inView;
+		}
+	}
+
 	override function closeSubState()
 	{
 		super.closeSubState();
@@ -294,6 +313,7 @@ class OptionsState extends MusicBeatState
 			if (i == 0) cataGroup[i].y = cataPosiData;
 			else cataGroup[i].y = cataGroup[i - 1].y + cataGroup[i - 1].bg.realHeight + FlxG.width * (0.8 / 40);
 		}
+		updateCataVisibility();
 	}
 
 	public function cataMoveChange()

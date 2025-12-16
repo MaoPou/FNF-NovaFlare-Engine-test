@@ -2,7 +2,7 @@ package objects.state.freeplayState.down;
 
 class BackButton extends FlxSpriteGroup {
     var pressRect:Rect;
-    var disRect:Rect;
+    var disRect:SkewRoundRect;
 
     var text:FlxText;
 
@@ -15,7 +15,7 @@ class BackButton extends FlxSpriteGroup {
         add(pressRect);
         pressRect.alpha = 0;
 
-        disRect = new Rect(10, 0, width - 10, height - 10, height / 4, height / 4, EngineSet.mainColor);
+        disRect = new SkewRoundRect(10, 0, width - 10, height - 10, height / 4, height / 4, -15, 0, EngineSet.mainColor);
         add(disRect);
 
         this.event = onClick;
