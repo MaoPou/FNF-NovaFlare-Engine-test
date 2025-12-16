@@ -15,8 +15,17 @@ import objects.state.optionState.controlsSubState.*;
 
 class NewControlsSubState extends MusicBeatSubstate
 {
+	public var allowFade:Bool = false;
+
 	public static var allowControlsMode:Bool = false; // 启用设置按键模式
 	public static var updateNoteModeBool:Bool = false; // 开始设置按键
+	public static var keybootBool:Bool = true; // 是否键盘控制 按键设置时会自动关闭
+
+	// 键盘操控
+
+	public static var curSelected:Int = 0;
+	public static var buttonSelected:Int = 0; // 0 - 3
+	public static var buttonAltBool:Bool = false;
 
 	public static var instance:NewControlsSubState;
 
@@ -121,10 +130,12 @@ class NewControlsSubState extends MusicBeatSubstate
 
 	public var buttonMouseMove:MouseMove;
 
-    private static var position:Float = 100 - 45;
-	private static var lerpPosition:Float = 100 - 45;
+    private static var position:Float = 100 - 30;
+	private static var lerpPosition:Float = 100 - 30;
 
     public static var optionText:FlxText;
+	public static var optionTextStrStatic:String = "";
+
 	public static var setOptionText:FlxText;
 
 	public static var onKeyboardMode:Bool = true;
@@ -158,19 +169,21 @@ class NewControlsSubState extends MusicBeatSubstate
 		bg.scrollFactor.set();
 		bg.alpha = 0;
 		add(bg);
-		FlxTween.tween(bg, {alpha: 0.5}, 0.5, {ease: FlxEase.linear});
 
         background = new ControlsSprite(0, 0, 1025, 600, 16);
         background.screenCenter();
         add(background);
 
-        optionText = new FlxText(background.x, background.y, 600, "");
+        optionText = new FlxText(background.x, background.y, 600, optionTextStrStatic);
         optionText.setFormat(Paths.font(Language.get('fontName', 'ma') + '.ttf'), 25, FlxColor.BLACK, "center");
         add(optionText);
+		optionText.antialiasing = true;
 		optionText.screenCenter(X);
 
-		setOptionText = new FlxText(0, 0, 200, "");
-        setOptionText.setFormat(Paths.font(Language.get('fontName', 'ma') + '.ttf'), 13, FlxColor.WHITE, "left");
+		setOptionText = new FlxText(0, 0, 1000, "");
+        setOptionText.setFormat((Language.get('fontName', 'ma') + '.ttf'), 51, FlxColor.WHITE, "left");
+		setOptionText.scale.x = 0.3;
+		setOptionText.antialiasing = true;
 		add(setOptionText);
 
 		setOptionText.scale.y = 0;
@@ -192,7 +205,7 @@ class NewControlsSubState extends MusicBeatSubstate
 			if (i != opn.length) {
 				if (opn[i][1] != null && opn[i][2] == null)
 				{
-					createOnOptionsText(opn[i][1], xpos, ypos);
+					createOnOptionsText(opn[i][1], xpos, ypos + 20);
 					optionTextStr = opn[i][1];
 				}
 				else if (opn[i][1] != null && opn[i][2] != null)
@@ -213,12 +226,31 @@ class NewControlsSubState extends MusicBeatSubstate
 			}
         }
 
+		songsRectPosUpdate(true);
+
+		var intmove:Int = 500;
+
+		background.y += intmove;
+		camControls.y += intmove;
+		optionText.y += intmove;
+
+		FlxTween.tween(background, {y: background.y - intmove}, 0.5, {ease: FlxEase.circInOut});
+		FlxTween.tween(camControls, {y: camControls.y - intmove}, 0.5, {ease: FlxEase.circInOut});
+		FlxTween.tween(optionText, {y: optionText.y - intmove}, 0.5, {ease: FlxEase.circInOut});
+
+		FlxTween.tween(bg, {alpha: 0.5}, 0.5, {ease: FlxEase.circInOut,
+		onComplete: function(twn:FlxTween)
+		{
+			allowFade = true;
+		}});
+
 		buttonMouseMove = new MouseMove(NewControlsSubState, 'position',
-									   [FlxG.height + 20 - 71 * optionsButtonArray.length, -70],
-									   [
-											[0, FlxG.width],
-											[0, FlxG.height]
-									   ]);
+					[FlxG.height + 20 - 71 * optionsButtonArray.length, -70],
+					[
+						[0, FlxG.width],
+						[0, FlxG.height]
+					]);
+		buttonMouseMove.tweenTime = 0.4;
 		add(buttonMouseMove);
     }
 
@@ -226,13 +258,11 @@ class NewControlsSubState extends MusicBeatSubstate
 	public var curAlt:Int;
 	var holdingEsc:Float = 0;
 
+	public var doneBool:Bool = false;
+
     override function update(elapsed:Float):Void
     {
-		if (!allowControlsMode) {
-			position += FlxG.mouse.wheel * 70;
-			position += moveData;
-			lerpPosition = position;
-
+		if (!updateNoteModeBool) {
 			/*if (position > -70)
 				position = FlxMath.lerp(-70, position, Math.exp(-elapsed * 15));
 			if (position < FlxG.height + 20 - 71 * optionsButtonArray.length)
@@ -243,36 +273,20 @@ class NewControlsSubState extends MusicBeatSubstate
 			else
 				lerpPosition = FlxMath.lerp(position, lerpPosition, Math.exp(-elapsed * 15));*/
 
-			for (i in 0...optionsButtonArray.length)
-			{
-				if (FlxG.mouse.overlaps(optionsButtonArray[i]))
+			if (allowFade) {
+				if (controls.BACK)
 				{
-					position += avgSpeed * 1.5 * (0.0166 / elapsed) * Math.pow(1.1, Math.abs(avgSpeed * 0.8));
+					//FlxTween.tween(bg, {alpha: 0}, 0.35, {ease: FlxEase.linear});
+
+					close();
 				}
-
-				// 以上都是移动控制面板的数值
-
-				// ---------------------------------
-
-				// 识别鼠标是否在控制按键上
-				if (CoolUtil.mouseOverlaps(optionsButtonArray[i], camControls) && optionsButtonArray[i].optionUpdateBool) {
-					optionsButtonArray[i].updateOptionText();
-
-					if (FlxG.mouse.justPressed)
-					{
-						allowControlsMode = true;
-
-						optionsButtonArray[i].moveBG(i, optionsButtonArray);
-					}
+				else if (!FlxG.mouse.overlaps(background) && FlxG.mouse.justPressed)
+				{
+					close();
 				}
 			}
 
-			if (controls.BACK)
-			{
-				//FlxTween.tween(bg, {alpha: 0}, 0.35, {ease: FlxEase.linear});
-
-				close();
-			}
+			songsRectPosUpdate(true, elapsed);
 		}
 		else {
 			if (updateNoteModeBool)
@@ -285,9 +299,101 @@ class NewControlsSubState extends MusicBeatSubstate
 					backAllowControlsMode();
 				}
 			}
+
+			songsRectPosUpdate(true, elapsed);
 		}
 
-		songsRectPosUpdate(true, elapsed);
+		if (!updateNoteModeBool) {
+			position += FlxG.mouse.wheel * 70;
+			position += moveData;
+			lerpPosition = position;
+
+			// 键盘操控
+
+			if (!buttonAltBool) {
+				if (controls.UI_DOWN_P)
+				{
+					selSected(1);
+				}
+				else if (controls.UI_UP_P)
+				{
+					selSected(-1);
+				}
+			}
+			if (controls.ACCEPT)
+			{
+				if (!optionsButtonArray[curSelected].scaleBool && optionsButtonArray[curSelected].optionUpdateBool)
+				{
+					selectNote();
+				}
+			}
+
+			if (optionsButtonArray[curSelected].scaleBool && optionsButtonArray[curSelected].optionUpdateBool)
+			{
+				if (controls.UI_LEFT_P)
+				{
+					selsetButton(-1, 0);
+				}
+				else if (controls.UI_RIGHT_P)
+				{
+					selsetButton(1, 0);
+				}
+				else if (controls.UI_DOWN_P)
+				{
+					selsetButton(-1, 1);
+				}
+				else if (controls.UI_UP_P)
+				{
+					selsetButton(1, 1);
+				}
+			}
+
+			for (i in 0...optionsButtonArray.length)
+			{
+				if (FlxG.mouse.overlaps(optionsButtonArray[i]))
+				{
+					position += avgSpeed * 1.5 * (0.0166 / elapsed) * Math.pow(1.1, Math.abs(avgSpeed * 0.8));
+				}
+
+				if (optionsButtonArray[i].optionUpdateBool)
+				{
+					var background = optionsButtonArray[i].background;
+
+					if (allowFade && CoolUtil.mouseOverlaps(optionsButtonArray[i], camControls) && curSelected != i) {
+						curSelected = i;
+
+						//trace("curSelected:" + curSelected);
+					}
+
+					if (curSelected == i)
+					{
+						if (background.alpha != 1)
+							background.alpha = 1;
+					}
+					else {
+						if (background.alpha != 0.8)
+							background.alpha = 0.8;
+					}
+				}
+
+				if (allowFade && CoolUtil.mouseOverlaps(optionsButtonArray[i], camControls) && optionsButtonArray[i].optionUpdateBool)
+				{
+					optionsButtonArray[i].updateOptionText();
+
+					//trace("overlaps:" + i);
+
+					if (FlxG.mouse.justPressed) {
+						if (buttonNpos == 0 && !optionsButtonArray[buttonNpos].scaleBool || buttonNpos != 0 && !optionsButtonArray[buttonNpos-1].scaleBool || buttonNpos != 0 && i != buttonNpos-1)
+						{
+							selectNote();
+						}
+					}
+				}
+				else {
+					
+				}
+			}
+		}
 
         super.update(elapsed);
     }
@@ -300,8 +406,7 @@ class NewControlsSubState extends MusicBeatSubstate
 			if (holdingEsc > 0.5)
 			{
 				FlxG.sound.play(Paths.sound('cancelMenu'));
-				FlxTween.tween(bindingBlack, {alpha: 0}, 0.35, {ease: FlxEase.linear});
-
+				
 				closeBinding();
 			}
 		}
@@ -380,30 +485,123 @@ class NewControlsSubState extends MusicBeatSubstate
 		}
 	}
 
-	public function backAllowControlsMode()
+	public function selSected(i:Int)
 	{
+		if (!keybootBool) return;
+
+		FlxG.sound.play(Paths.sound('scrollMenu'));
+		curSelected += i;
+
+		curSelected = returnNoteInt(curSelected, i);
+
+		var intvalue:Float = 65;
+
+		buttonMouseMove.tweenData = -intvalue * curSelected;
+	}
+
+	public var acceptBool:Bool = false;
+	public var acceptTimer:FlxTimer;
+
+	public function selectNote()
+	{
+		if (acceptTimer != null)
+		{
+			acceptTimer.cancel();
+		}
+
+		allowControlsMode = true;
+		buttonAltBool = true;
+
+		if (buttonNpos != 0 && curSelected != buttonNpos-1 && doneBool)
+		{
+			backAllowControlsMode(false);
+		}
+
+		optionsButtonArray[curSelected].moveBG(curSelected, optionsButtonArray);
+
+		acceptTimer = new FlxTimer().start(0.1, function(tmr:FlxTimer)
+		{
+			acceptBool = true;
+		});
+
+		doneBool = true;
+	}
+
+	public function selsetButton(i:Int, type:Int = 0)
+	{
+		if (!keybootBool) return;
+
+		FlxG.sound.play(Paths.sound('scrollMenu'));
+		if (type == 0)
+			buttonSelected += i;
+		else if (type == 1)
+			buttonSelected += 2;
+		else if (type == 2)
+			buttonSelected = i;
+
+		if (buttonSelected > 3)
+		{
+			buttonSelected = 0;
+		}
+		else if (buttonSelected < 0)
+		{
+			buttonSelected = 1;
+		}
+
+		//trace(buttonSelected);
+	}
+
+	function returnNoteInt(index:Int, cur:Int):Int
+	{
+		if (optionsButtonArray[index].optionUpdateBool)
+		{
+			return index;
+		}
+		else {
+			index += cur;
+
+			if (index > optionsButtonArray.length - 1)
+			{
+				index = 0;
+				index = returnNoteInt(index, cur);
+			}
+			else if (index <= 0)
+			{
+				index = optionsButtonArray.length - 1;
+				index = returnNoteInt(index, cur);
+			}
+
+			returnNoteInt(index, cur);
+		}
+
+		return index;
+	}
+
+	public function backAllowControlsMode(tweenBool:Bool = true)
+	{
+		buttonAltBool = false;
 		allowControlsMode = false;
 
-		optionsButtonArray[buttonNpos-1].moveBG(buttonNpos-1, optionsButtonArray);
+		optionsButtonArray[buttonNpos-1].moveBG(buttonNpos-1, optionsButtonArray, tweenBool);
+
+		doneBool = false;
+		
+		//trace("doneBool:" + doneBool);
 	}
 
 	function updateCSNote(text:String)
 	{
-		bindingText.text = text;
 		noteParent.noteSprite.updateText(curAlt, text);
-		trace(text);
+		//trace(text);
 	}
 
-	function closeBinding()
+	public function closeBinding()
 	{
 		updateNoteModeBool = false;
+		keybootBool = true;
+
 		setOptionText.text = "Idle...";
-
-		bindingBlack.destroy();
-		remove(bindingBlack);
-
-		bindingText.destroy();
-		remove(bindingText);
+		setOptionText.updateHitbox();
 
 		ClientPrefs.reloadVolumeKeys();
 	}
@@ -415,28 +613,13 @@ class NewControlsSubState extends MusicBeatSubstate
 	public function updateNoteMode(text:String, strArray:Array<String>, alt:Int, parent:ControlsSprite)
 	{
 		updateNoteModeBool = true;
+		keybootBool = false;
+
 		curOption = strArray;
 		curAlt = alt;
 		noteParent = parent;
 		setOptionText.text = returnText(text);
-
-		bindingBlack = new FlxSprite().makeGraphic(1, 1, /*FlxColor.BLACK*/ FlxColor.BLACK);
-		bindingBlack.scale.set(FlxG.width, FlxG.height);
-		bindingBlack.updateHitbox();
-		bindingBlack.alpha = 0;
-		FlxTween.tween(bindingBlack, {alpha: 0.6}, 0.35, {ease: FlxEase.linear});
-		//add(bindingBlack);
-		
-		bindingText = new FlxText(0, 160, 0, "");
-		bindingText.setFormat(Paths.font(Language.get('fontName', 'ma') + '.ttf'), 32, FlxColor.WHITE, "center");
-		bindingText.alpha = 1;
-		//add(bindingText);
-
-		bindingBlack.cameras = [camHUD];
-		bindingText.cameras = [camHUD];
-
-		bindingText.text = returnText(text);
-		bindingText.screenCenter(XY);
+		setOptionText.updateHitbox();
 
 		holdingEsc = 0;
 		ClientPrefs.toggleVolumeKeys(false);
@@ -463,23 +646,25 @@ class NewControlsSubState extends MusicBeatSubstate
 
     public function createOnOptionsText(text:String, x:Float, y:Float):Void
     {
-		var optionsButton = new ControlsSprite(0, y, 100, 2, 1, 0xFF7A75A0, text);
+		var optionsButton = new ControlsSprite(0, y, 150, 2, 1, 0xFF7A75A0, text);
 		optionsButton.screenCenter(X);
         add(optionsButton);
         optionsButtonArray.push(optionsButton);
 		optionsButton.cameras = [camControls];
-		optionsButton.centerTextX();
+		optionsButton.centerTextX(23);
     }
 
 	public static function updateOptionsText(text:String):Void
 	{
-		optionText.text = text;
+		optionTextStrStatic = text;
+
+		optionText.text = optionTextStrStatic;
 		optionText.screenCenter(X);
 	}
 
     public function createOptionsButton(text:String, x:Float, y:Float, array:Array<String>):Void
     {
-        var optionsButton = new ControlsSprite(0, y, 1000, 50, 16, 0xFF7A75A0, text);
+        var optionsButton = new ControlsSprite(0, y, 1000, 50, 15, 0xFF7A75A0, text);
 		optionsButton.screenCenter(X);
         add(optionsButton);
         optionsButtonArray.push(optionsButton);
@@ -495,7 +680,7 @@ class NewControlsSubState extends MusicBeatSubstate
 
 	public function createOptionsResetButton(text:String, x:Float, y:Float):Void
 	{
-		var optionsButton = new ControlsSprite(0, y, 100, 50, 16, 0xFF7A75A0, "");
+		var optionsButton = new ControlsSprite(0, y, 100, 2, 16, 0xFF7A75A0, "");
 		optionsButton.funReNote(text);
 		optionsButton.text.screenCenter(X);
 		add(optionsButton);
@@ -536,32 +721,28 @@ class NewControlsSubState extends MusicBeatSubstate
 
 	public var buttonYpos:Float = 0;
 	public var buttonNpos:Int = 0;
+	
+	var odButtonNpos:Int = 0;
+	var odButtonBool:Bool = false;
 
-    function songsRectPosUpdate(forceUpdate:Bool = false, elapsed:Float)
+    function songsRectPosUpdate(forceUpdate:Bool = false, elapsed:Float = 0)
     {
         if (!forceUpdate && lerpPosition == position)
             return; // 优化
 
-		/*if (FlxG.mouse.wheel != 0)
-		{
-			pos = FlxMath.lerp(4, pos, Math.exp(-elapsed * 15));
-		}
-		else {
-			pos = 0;
-		}*/
+		//trace(buttonYpos, buttonNpos);
 
 		pos = 1;
 
-		//pos = 2;
-
         for (i in 0...optionsButtonArray.length)
         {
-            optionsButtonArray[i].y = lerpPosition + i * pos;
+			if (i >= buttonNpos)
+			{
+				optionsButtonArray[i].y = lerpPosition + i * pos + buttonYpos;
+			}
+			else {
+				optionsButtonArray[i].y = lerpPosition + i * pos;
+			}
         }
-
-		for (i in buttonNpos...optionsButtonArray.length)
-		{
-			optionsButtonArray[i].y = lerpPosition + i * pos + buttonYpos;
-		}
     }
 }
