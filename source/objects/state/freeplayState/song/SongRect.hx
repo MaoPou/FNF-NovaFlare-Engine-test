@@ -162,7 +162,7 @@ class SongRect extends FlxSpriteGroup {
 			var rect = new DiffRect(this, Difficulty.list[diff], _songColor, chart);
 			diffRectGroup.add(rect);
 			rect.member = diff;
-			rect.startTarY = bg.height + 10 + diff * DiffRect.fixHeight * 1.05;
+			rect.startTarY = bg.height + fixHeight / 10 + diff * DiffRect.fixHeight * 1.05;
 			if (imme)
 				rect.startY = rect.startTarY;
 			if (diff == FreeplayState.curDifficulty)
@@ -253,8 +253,7 @@ class SongRect extends FlxSpriteGroup {
     
     private var diffYTar:Float = 0;
     public function addDiffY(isAdd:Bool = true) {
-        diffYTar = isAdd ? 10 + Difficulty.list.length * DiffRect.fixHeight * 1.05 : 0;
-        //trace(diffYTar);
+        diffYTar = isAdd ? fixHeight / 10 * 2 + Difficulty.list.length * DiffRect.fixHeight * 1.05 : 0;
     }
 }
 

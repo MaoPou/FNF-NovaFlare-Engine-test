@@ -23,7 +23,7 @@ class DiffRect extends FlxSpriteGroup {
         var h:Float = fixHeight;
         var r:Float = h / 4;
 
-        background = new Rect(0, 0, w, h, r, r, color, 1, 1, color);
+        background = new Rect(0, 0, w, h, r, r, color, 1, 0, color);
         add(background);
 
         overlay = new Rect(0, 0.5, w, h - 1, r, r, FlxColor.fromRGB(90, 100, 110), 1, 0, FlxColor.TRANSPARENT);

@@ -22,6 +22,8 @@ import mobile.states.CopyState;
 #end
 import lime.app.Application;
 import lime.system.System as LimeSystem;
+import lime.graphics.opengl.GL;
+import lime.graphics.Image;
 #if hxvlc
 import hxvlc.flixel.FlxVideoSprite;
 #end
@@ -106,6 +108,12 @@ class InitState extends MusicBeatState
 			if (FlxG.game != null)
 				Main.resetSpriteCache(FlxG.game);
 		});
+
+		
+
+		var maxTextureSize:Int = GL.getParameter(GL.MAX_TEXTURE_SIZE);
+		trace('maxTextureSize: ' + maxTextureSize);
+		Image.setMaxTextureSize(maxTextureSize);
 
 		Language.resetData();
 
