@@ -27,7 +27,7 @@ class ControlsSprite extends FlxSpriteGroup
 
     private var CORNER_RADIUS:Float;
     
-    private var background:FlxSprite;
+    public var background:RoundRect;
     public var text:FlxText;
     public var noteSprite:ControlsNoteSprite;
     public var moveBGArray:Array<RabSprite> = [];
@@ -54,22 +54,29 @@ class ControlsSprite extends FlxSpriteGroup
 
         currentColor = DEFAULT_COLOR;
         targetColor = DEFAULT_COLOR;
-        mainX = X;
-		mainY = Y;
+        mainX = x;
+		mainY = y;
         heightset = height;
 
-        background = new FlxSprite(x, y);
-        background.makeGraphic(Std.int(width), Std.int(height), FlxColor.TRANSPARENT, true);
-        FlxSpriteUtil.drawRoundRect(background, 0, 0, width, height, CORNER_RADIUS, CORNER_RADIUS, currentColor);
-        add(background);
+        if (heightset != 2) {
+            background = new RoundRect(x, y, width, height, CORNER_RADIUS, LEFT_UP, currentColor);
+            background.mainY = y;
+            add(background);
+        }
+        else {
+            background = new RoundRect(x, y, width, height, CORNER_RADIUS, CENTER_CENTER, currentColor);
+        }
         
         if (label != "")
         {
             text = new FlxText(PADDING + x, PADDING + y - 5, width, label);
             text.autoSize = true;
-            text.setFormat(Paths.font(Language.get('fontName', 'ma') + '.ttf'), 16, FlxColor.WHITE, LEFT);
+            text.setFormat(Paths.font(Language.get('fontName', 'ma') + '.ttf'), 17, FlxColor.WHITE, LEFT);
             text.fieldHeight = height;
+            text.antialiasing = true;
             add(text);
+
+            text.y = background.y + (background.height / 2) - (text.height / 2);
         }
     }
 
@@ -81,56 +88,17 @@ class ControlsSprite extends FlxSpriteGroup
         text = new FlxText(PADDING + background.x, PADDING + background.y - 5, 300, labels);
         text.setFormat(Paths.font(Language.get('fontName', 'ma') + '.ttf'), 32, FlxColor.WHITE, CENTER);
         text.screenCenter(X);
+        text.antialiasing = true;
         add(text);
-    }
-
-    public function centerTextX()
-    {
-        text.setFormat(Paths.font(Language.get('fontName', 'ma') + '.ttf'), 16, FlxColor.WHITE, CENTER);
-        text.screenCenter(X);
-        centerSpriteX();
-        background.y += text.height;
-    }
-    public function centerSpriteX()
-    {
-        background.screenCenter(X);
-    }
-
-    public var wwidth:Float = 0;
-    var hheight = 0;
-    
-    public function createNoteArray(array:Array<String>)
-    {
-        wwidth = 120;
-        hheight = 50;
-
-        noteSprite = new ControlsNoteSprite(background.x, background.y + (background.height / 2 - hheight / 2), wwidth, background.height, array, 16);
-        noteSprite.updateBackground(background.x, background.y, 1800, background.height);
-        noteSprite.updateParent(this);
-        add(noteSprite);
-
-        var resetSprite:RabSprite = new RabSprite(background.x + (background.width / 2 + wwidth) - 1, background.y + hheight, wwidth, hheight, 0x8E00D9E0, "Reset");
-        add(resetSprite);
-
-        var backSprite:RabSprite = new RabSprite(background.x + (background.width / 2 + (wwidth * 2)) + 5 - 1, background.y + hheight, wwidth, hheight, 0x8A42FF8A, "Done");
-        add(backSprite);
-
-        resetSprite.sprite.alpha = 0.8;
-        backSprite.sprite.alpha = 0.8;
-
-        resetSprite.setScale("y", 0);
-        backSprite.setScale("y", 0);
-
-        moveBGArray.push(resetSprite);
-        moveBGArray.push(backSprite);
-
-        // 不知道为什么另一个class的图片偏移这么多 chh
     }
 
     public var scaleBool:Bool = false;
 
     override public function update(elapsed:Float):Void
     {
+		mainY = background.y;
+		background.mainY = mainY;
+
         super.update(elapsed);
 
         if (reNote)
@@ -140,19 +108,77 @@ class ControlsSprite extends FlxSpriteGroup
 
         if (reNote || label == "") return;
 
-        if (!NewControlsSubState.allowControlsMode) {
-            if (CoolUtil.mouseOverlaps(background, NewControlsSubState.instance.camControls)) 
+        if (!NewControlsSubState.updateNoteModeBool && heightset != 2) {
+            if (CoolUtil.mouseOverlaps(background, NewControlsSubState.instance.camControls) && !scaleBool) 
             {
-                if (background.alpha != 1)
-                    background.alpha = 1;
+
             }
-            else {
-                if (background.alpha != 0.8)
-                    background.alpha = 0.8;
+
+            if (scaleBool)
+            {
+                var setOptionText = NewControlsSubState.setOptionText;
+
+                setOptionText.y = background.y + hheight - 12;
+
+                background.alpha = 1;
+
+                // 键盘控制
+                if (NewControlsSubState.buttonSelected >= 2)
+                {
+                    var acceptBool = NewControlsSubState.instance.acceptBool;
+
+                    if (Controls.instance.justPressed('accept') && acceptBool)
+                    {
+                        var i:Int = NewControlsSubState.buttonSelected - 2;
+                        
+                        keyPress(i);
+                    }
+                }
+
+                for (i in 0...2)
+                {
+                    var moveBG:FlxSprite = moveBGArray[i].sprite;
+                    var noteSel:Int = NewControlsSubState.buttonSelected;
+
+                    var e = i + 2;
+
+                    if (noteSel == e)
+                    {
+                        if (moveBG.alpha != 1)
+                            moveBG.alpha = 1;
+                    }
+                    else {
+                        if (moveBG.alpha != 0.8)
+                            moveBG.alpha = 0.8;
+                    }
+
+                    if (CoolUtil.mouseOverlaps(moveBG, NewControlsSubState.instance.camControls)) 
+                    {
+                        var acceptBool = NewControlsSubState.instance.acceptBool;
+
+                        if (NewControlsSubState.buttonSelected != e)
+                        {
+                            NewControlsSubState.instance.selsetButton(e, 2);
+                        }
+
+                        if (FlxG.mouse.justPressed && acceptBool)
+                        {
+                            keyPress(i);
+                        }
+                    }
+                }
             }
         }
-        else {
-            if (scaleBool) {
+        else if (NewControlsSubState.updateNoteModeBool && heightset != 2)
+        {
+            if (scaleBool)
+            {
+                var setOptionText = NewControlsSubState.setOptionText;
+
+                setOptionText.y = background.y + hheight - 12;
+
+                background.alpha = 1;
+
                 for (i in 0...2)
                 {
                     var moveBG:FlxSprite = moveBGArray[i].sprite;
@@ -164,11 +190,17 @@ class ControlsSprite extends FlxSpriteGroup
 
                         if (FlxG.mouse.justPressed)
                         {
+                            FlxG.sound.play(Paths.sound('cancelMenu'));
+
                             switch (i)
                             {
                                 case 0:
                                     resetindieNote(NewControlsSubState.instance.buttonNpos-1);
+
+				                    NewControlsSubState.instance.closeBinding();
                                 case 1:
+                                    NewControlsSubState.instance.closeBinding();
+
                                     NewControlsSubState.instance.backAllowControlsMode();
                             }
                         }
@@ -182,16 +214,38 @@ class ControlsSprite extends FlxSpriteGroup
         }
     }
 
+    public function keyPress(i:Int)
+    {
+        switch (i)
+        {
+            case 0:
+                resetindieNote(NewControlsSubState.instance.buttonNpos-1);
+            case 1:
+                NewControlsSubState.instance.acceptBool = false;
+
+                NewControlsSubState.instance.backAllowControlsMode();
+        }
+    }
+
     public var changeHeighting:Bool = false;
     public var bgheight:Float = 30;
 
     var tween:FlxTween;
     var tweenY:FlxTween;
+    var tweenTime:Float = 0.2;
 
-    public function moveBG(i:Int, optionsButtonArray:Array<ControlsSprite>)
+    public function moveBG(i:Int, optionsButtonArray:Array<ControlsSprite>, tweenBool:Bool = true)
     {
+        tweenTime = 0.2;
+
+        if (!tweenBool)
+            tweenTime = 0;
+
         var optionsButtonArray = NewControlsSubState.instance.optionsButtonArray;
+        var noteButton = optionsButtonArray[i].noteSprite.backgroundArray;
         var setOptionText = NewControlsSubState.setOptionText;
+
+        setOptionText.visible = true;
         
         setOptionText.text = "Idle...";
         setOptionText.updateHitbox();
@@ -209,57 +263,75 @@ class ControlsSprite extends FlxSpriteGroup
             changeHeighting = true;
             scaleBool = true;
 
-            tween = FlxTween.tween(background.scale, { y: 2 }, 0.2, {
-                onUpdate: function(tween:FlxTween)
-                {
-                    tweenUpdate();
-                },
-                onComplete: function(twn:FlxTween)
-                {
-                    tweenUpdate();
-                }
-            });
+            background.changeHeight(100, tweenTime);
+
+            for (i in 0...2)
+            {
+                var note = noteButton[i];
+                
+                note.makeGraphic(Std.int(note.width), Std.int(note.height), FlxColor.TRANSPARENT, true);
+                FlxSpriteUtil.drawRoundRectComplex(note, 0, 0, note.width, note.height, 8, 8, 0, 0, 0xFF908BB0);
+            }
+
+            if (!tweenBool)
+                tweenUpdate(2);
+            else
+                tween = FlxTween.num(1, 2, tweenTime, tweenUpdate);
+
+            NewControlsSubState.instance.buttonYpos = 0;
         }
         else {
             changeHeighting = false;
             scaleBool = false;
 
-            tween = FlxTween.tween(background.scale, { y: 1 }, 0.2, {
-                onUpdate: function(tween:FlxTween)
-                {
-                    tweenUpdate();
-                },
-                onComplete: function(twn:FlxTween)
-                {
-                    tweenUpdate();
-                }
-            });
+            background.changeHeight(50, tweenTime);
+
+            for (i in 0...2)
+            {
+                var note = noteButton[i];
+
+                note.makeGraphic(Std.int(note.width), Std.int(note.height), FlxColor.TRANSPARENT, true);
+                FlxSpriteUtil.drawRoundRectComplex(note, 0, 0, note.width, note.height, 8, 8, 8, 8, 0xFF908BB0);
+            }
+
+            if (!tweenBool)
+                tweenUpdate(1);
+            else
+                tween = FlxTween.num(2, 1, tweenTime, tweenUpdate);
+            
             bgheight = 0;
+            NewControlsSubState.instance.buttonYpos = 50;
+
+            setOptionText.visible = false;
         }
 
-        tweenY = FlxTween.num(NewControlsSubState.instance.buttonYpos, bgheight, 0.2, tweenFunction.bind(NewControlsSubState.instance.buttonYpos));
-
+        tweenY = FlxTween.num(NewControlsSubState.instance.buttonYpos, bgheight, tweenTime, tweenFunction.bind(NewControlsSubState.instance.buttonYpos));
+        
         i++;
 
         NewControlsSubState.instance.buttonNpos = i;
-        trace(i, NewControlsSubState.instance.buttonNpos);
     }
 
-    function tweenUpdate(i:Bool = false)
+    function tweenUpdate(e:Float)
     {
         var setOptionText = NewControlsSubState.setOptionText;
 
         setOptionText.x = background.x + 5;
-        setOptionText.y = background.y + hheight - 5;
+        setOptionText.y = background.y + hheight - 12;
 
         for (i in 0...2){
-            moveBGArray[i].setScale("y", background.scale.y - 1);
+            moveBGArray[i].setScale("y", e - 1);
         }
 
-        setOptionText.scale.y = background.scale.y - 1;
+        setOptionText.scale.y = e - 1 - 0.7;
+
+        if (setOptionText.scale.y < 0)
+        {
+            setOptionText.scale.y = 0;
+        }
 
         setOptionText.updateHitbox();
-        background.updateHitbox();
+        //background.updateHitbox();
     }
 
     function tweenFunction(s:Float, v:Float)
@@ -341,10 +413,52 @@ class ControlsSprite extends FlxSpriteGroup
             NewControlsSubState.updateOptionsText(optiontext);
         }
     }
-    
-    private function applyColor():Void
+
+    public function centerTextX(size:Int = 16)
     {
-        FlxSpriteUtil.drawRoundRect(background, 0, 0, background.width, background.height, CORNER_RADIUS, CORNER_RADIUS, currentColor);
+        text.setFormat(Paths.font(Language.get('fontName', 'ma') + '.ttf'), size, FlxColor.WHITE, CENTER);
+        text.screenCenter(X);
+        text.updateHitbox();
+
+        background.y += text.height - 10;
+        centerSpriteX();
+    }
+    public function centerSpriteX()
+    {
+        background.screenCenter(X);
+    }
+
+    public var wwidth:Float = 0;
+    var hheight = 0;
+    
+    public function createNoteArray(array:Array<String>)
+    {
+        background.alpha = 0.8;
+
+        wwidth = 120;
+        hheight = 50;
+
+        noteSprite = new ControlsNoteSprite(background.x, background.y + (background.height / 2 - hheight / 2), wwidth, background.height, array, 15);
+        noteSprite.updateBackground(background.x, background.y, 1800, background.height);
+        noteSprite.updateParent(this);
+        add(noteSprite);
+
+        var resetSprite:RabSprite = new RabSprite(background.x + (background.width / 2 + wwidth) - 1, background.y + hheight, wwidth, hheight, 0x8E00D9E0, "Reset");
+        add(resetSprite);
+
+        var backSprite:RabSprite = new RabSprite(background.x + (background.width / 2 + (wwidth * 2)) + 5 - 1, background.y + hheight, wwidth, hheight, 0x8A42FF8A, "Done");
+        add(backSprite);
+
+        resetSprite.sprite.alpha = 0.8;
+        backSprite.sprite.alpha = 0.8;
+
+        resetSprite.setScale("y", 0);
+        backSprite.setScale("y", 0);
+
+        moveBGArray.push(resetSprite);
+        moveBGArray.push(backSprite);
+
+        // 不知道为什么另一个class的图片偏移这么多 chh
     }
     
     public function setColor(color:FlxColor):Void
@@ -375,6 +489,7 @@ class ControlsNoteSprite extends FlxSpriteGroup
     public var backgroundArray:Array<FlxSprite> = [];
 
     public var parent:ControlsSprite;
+    public var mainY:Float;
 
     public function new(x:Float, y:Float, width:Float, height:Float, array:Array<String>, CORNER_RADIUS:Float, DEFAULT_COLOR:FlxColor = 0xFF908BB0, label:String = "111")
     {
@@ -402,6 +517,7 @@ class ControlsNoteSprite extends FlxSpriteGroup
             //text.autoSize = true;
             text.setFormat(Paths.font(Language.get('fontName', 'ma') + '.ttf'), 16, FlxColor.WHITE, CENTER);
             //text.fieldHeight = height;
+            text.antialiasing = true;
             text.updateHitbox();
 
             //trace(text.width);
@@ -415,11 +531,10 @@ class ControlsNoteSprite extends FlxSpriteGroup
 
             bgWidth = width;
 
-            var background:FlxSprite = new FlxSprite(x - xPos + bgWidth + 5, y);
-            background.makeGraphic(Std.int(bgWidth), Std.int(height), FlxColor.TRANSPARENT, true);
-            FlxSpriteUtil.drawRoundRectComplex(background, 0, 0, bgWidth, height, CORNER_RADIUS, CORNER_RADIUS, 0, 0, DEFAULT_COLOR); // 同步宽度 -- chh
-            background.alpha = 0.8;
-            background.updateHitbox();
+            var background:FlxSprite = new FlxSprite(x, y);
+            background.makeGraphic(Std.int(width), Std.int(height), FlxColor.TRANSPARENT, true);
+            FlxSpriteUtil.drawRoundRectComplex(background, 0, 0, width, height, 8, 8, 8, 8, DEFAULT_COLOR);
+            //background.mainY = y;
 
             add(background);
             add(text);
@@ -433,13 +548,55 @@ class ControlsNoteSprite extends FlxSpriteGroup
 
     override function update(elapsed:Float):Void
     {
+        /*for (i in 0...2)
+        {
+            mainY = backgroundArray[i].y;
+		    backgroundArray[i].mainY = mainY;
+        }*/
+
         super.update(elapsed);
 
         if (!NewControlsSubState.allowControlsMode || NewControlsSubState.allowControlsMode && parent.scaleBool) {
+            // 键盘控制
+            if (NewControlsSubState.buttonSelected <= 1 && parent.scaleBool)
+            {
+                var acceptBool = NewControlsSubState.instance.acceptBool;
+
+                if (Controls.instance.justPressed('accept') && acceptBool)
+                {
+                    var i:Int = NewControlsSubState.buttonSelected;
+
+                    var key:String = returnKey(i);
+
+                    NewControlsSubState.instance.updateNoteMode(key, strArray, i, parent);
+                }
+            }
+
             for (i in 0...2) {
-                if (CoolUtil.mouseOverlaps(backgroundArray[i], NewControlsSubState.instance.camControls)) {
-                    if (backgroundArray[i].alpha != 1) {
-                        backgroundArray[i].alpha = 1;
+                var moveBG:FlxSprite = backgroundArray[i];
+                var noteSel:Int = NewControlsSubState.buttonSelected;
+
+                var e = i;
+
+                if (parent.scaleBool) {
+                    if (noteSel == e)
+                    {
+                        if (moveBG.alpha != 1)
+                            moveBG.alpha = 1;
+                    }
+                    else {
+                        if (moveBG.alpha != 0.8)
+                            moveBG.alpha = 0.8;
+                    }
+                }
+
+                if (CoolUtil.mouseOverlaps(moveBG, NewControlsSubState.instance.camControls)) 
+                {
+                    var acceptBool = NewControlsSubState.instance.acceptBool;
+
+                    if (NewControlsSubState.buttonSelected != e && parent.scaleBool)
+                    {
+                        NewControlsSubState.instance.selsetButton(e, 2);
                     }
 
                     if (FlxG.mouse.justPressed)
@@ -447,11 +604,8 @@ class ControlsNoteSprite extends FlxSpriteGroup
                         var key:String = returnKey(i);
 
                         NewControlsSubState.instance.updateNoteMode(key, strArray, i, parent);
-                    }
-                }
-                else {
-                    if (backgroundArray[i].alpha != 0.8) {
-                        backgroundArray[i].alpha = 0.8;
+
+                        trace("press" + NewControlsSubState.instance.buttonNpos);
                     }
                 }
             }
