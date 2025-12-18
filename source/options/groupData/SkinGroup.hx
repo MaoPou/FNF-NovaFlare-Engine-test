@@ -32,7 +32,7 @@ class SkinGroup extends OptionCata
 
 
 		var option:Option = new Option(this, 'NotesSubState', STATE);
-		option.onChange = () -> changeState(2);
+		option.onChange = function() { changeState(2); };
 		addOption(option);
 		
 		var option:Option = new Option(this, 'noteColorSwap', BOOL);
@@ -44,7 +44,7 @@ class SkinGroup extends OptionCata
 		}
 
 		var option:Option = new Option(this, 'NotesSubStateLegacy', STATE);
-		option.onChange = () -> changeState(7);
+		option.onChange = function() { changeState(7); };
 		addOption(option);
 		
 		/////--Splash--\\\\\

@@ -93,7 +93,7 @@ class NaviMember extends FlxSpriteGroup
 
     public function changeLanguage() {
         textDis.text = Language.get(name, 'op');
-        textDis.setFormat(Paths.font(Language.get('fontName', 'ma') + '.ttf'), Std.int(mainHeight * 0.25), EngineSet.mainColor, LEFT, FlxTextBorderStyle.OUTLINE, 0xFFFFFFFF);
+        textDis.setFormat(Paths.font(Language.get('fontName', 'ma') + '.ttf'), Std.int(mainHeight * 0.35), EngineSet.mainColor, LEFT, FlxTextBorderStyle.OUTLINE, 0xFFFFFFFF);
         textDis.borderStyle = NONE;
     }
 }

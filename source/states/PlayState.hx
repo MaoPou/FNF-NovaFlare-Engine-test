@@ -348,6 +348,7 @@ class PlayState extends MusicBeatState
 	override public function create()
 	{
 		Paths.clearStoredMemory();
+		GCManager.enable(false);
 		Note.init();
 		
 		startCallback = startCountdown;
@@ -861,6 +862,7 @@ class PlayState extends MusicBeatState
 
 		callOnScripts('onCreateFinal');
 
+		GCManager.enable(true);
 		Paths.clearUnusedMemory();
 
 		if (eventNotes.length < 1)

@@ -24,7 +24,7 @@ enum OptionType
 class Option extends FlxSpriteGroup
 {
 	public var onChange:Void->Void = null;
-	public var experMode(default, set):Bool = false; //实验性设置
+	public var experMode(default, set):Bool; //实验性设置
 
 	//STRING
 	public var strGroup:Array<String> = null;
@@ -317,6 +317,7 @@ class Option extends FlxSpriteGroup
 		tipsText.setFormat(Paths.font(Language.get('fontName', 'ma') + '.ttf'), Std.int(follow.bg.realWidth / 45), 0xffffff, LEFT, FlxTextBorderStyle.OUTLINE, 0xFFFFFFFF);
         tipsText.antialiasing = ClientPrefs.data.antialiasing;
 		tipsText.borderStyle = NONE;
+		tipsText.color = EngineSet.minorColor;
 		tipsText.active = false;
 		add(tipsText);
 
@@ -345,6 +346,7 @@ class Option extends FlxSpriteGroup
         title.antialiasing = ClientPrefs.data.antialiasing;
 		title.borderStyle = NONE;
 		title.x += follow.bg.mainRound;
+		title.color = EngineSet.minorColor;
 		title.active = false;
 		add(title);
 
@@ -396,7 +398,6 @@ class Option extends FlxSpriteGroup
 	var mult:Float = 1; //一些数据需要保持一致
 	function baseBGAdd(double:Bool = false)
 	{
-		
 		if (double) mult = 2;
 		else mult = 1;
 
@@ -461,12 +462,13 @@ class Option extends FlxSpriteGroup
 				baseChangeLanguage();
 			case TITLE:
 				title.text = description;
-				title.setFormat(Paths.font(Language.get('fontName', 'ma') + '.ttf'), Std.int(follow.bg.realWidth / 30), 0xffffff, LEFT, FlxTextBorderStyle.OUTLINE, 0xFFFFFFFF);
+				title.setFormat(Paths.font(Language.get('fontName', 'ma') + '.ttf'), Std.int(follow.bg.realWidth / 30), EngineSet.minorColor, LEFT, FlxTextBorderStyle.OUTLINE, 0xFFFFFFFF);
 				title.borderStyle = NONE;
 			case TEXT:
 				tipsText.text = description;
-				tipsText.setFormat(Paths.font(Language.get('fontName', 'ma') + '.ttf'), Std.int(follow.bg.realWidth / 45), 0xffffff, LEFT, FlxTextBorderStyle.OUTLINE, 0xFFFFFFFF);
+				tipsText.setFormat(Paths.font(Language.get('fontName', 'ma') + '.ttf'), Std.int(follow.bg.realWidth / 45), EngineSet.minorColor, LEFT, FlxTextBorderStyle.OUTLINE, 0xFFFFFFFF);
 				tipsText.borderStyle = NONE;
+				
 			case STATE:
 				stateButton.stateName.text = description;
 				stateButton.stateName.setFormat(Paths.font(Language.get('fontName', 'ma') + '.ttf'), Std.int(stateButton.bg.width / 20), 0xffffff, CENTER, FlxTextBorderStyle.OUTLINE, 0xFFFFFFFF);

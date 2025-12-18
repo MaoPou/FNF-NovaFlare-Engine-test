@@ -32,6 +32,7 @@ import states.PlayState;
 import states.LoadingState;
 import states.editors.ChartingState;
 import options.OptionsState;
+import shaders.states.freeplayState.BlurFilter;
 
 import sys.thread.Thread;
 import sys.thread.Mutex;
@@ -177,6 +178,8 @@ class FreeplayState extends MusicBeatState
 		background.antialiasing = ClientPrefs.data.antialiasing;
 		background.camera = camBG;
 		add(background);
+		var bgBlur = new BlurFilter(15.0);
+		bgBlur.apply(camBG);
 
 		detailRect = new DetailRect(0, 0);
 		detailRect.camera = camAfter;
@@ -290,7 +293,7 @@ class FreeplayState extends MusicBeatState
 		/*
 		var songRectload:Array<DataPrepare> = [];
 
-		for (time in 0...Math.ceil((Math.ceil(FlxG.height / SongRect.fixHeight * inter) + 2) / songsData.length)){
+		for (time in 0...Math.ceil((Math.ceil(FlxG.height / SongRect.fixHeight * rectInter) + 2) / songsData.length)){
 			for (i in 0...songsData.length)
 			{
 				var data = songsData[i];
@@ -311,13 +314,13 @@ class FreeplayState extends MusicBeatState
 			rect.id = i;
 			add(rect);
 			songGroup.push(rect);
-			rect.cameras = [camSongs];
+			rect.camera = camSongs;
 		}
 
 		songsMove = new MouseMove(FreeplayState, 'songPosiData', 
-								[songPosiData - (songGroup.length + 1) * SongRect.fixHeight, songPosiData],
+								[songPosiData - (songGroup.length + 1) * SongRect.fixHeight, FlxG.height * 0.5 - SongRect.fixHeight * 0.5],
 								[	
-									[FlxG.width * 0.5, FlxG.width], 
+									[FlxG.width * 0.6, FlxG.width], 
 									[0, FlxG.height]
 								],
 								songMoveEvent);
@@ -393,13 +396,13 @@ class FreeplayState extends MusicBeatState
 			&& (!StoryMenuState.weekCompleted.exists(leWeek.weekBefore) || !StoryMenuState.weekCompleted.get(leWeek.weekBefore)));
 	}
 
-	public var songPosiStart:Float = 720 * 0.42;
-	public static final songPosiData:Float = 720 * 0.42; //神人haxe不能用FlxG.height
-	public var inter:Float = 0.97;
+	public final songPosiStart:Float = 720 * 0.3;
+	public static var songPosiData:Float = 720 * 0.3; //神人haxe不能用FlxG.height
+	public var rectInter:Float = 0.97;
 	public function songMoveEvent(){
 		if (songGroup.length <= 0) return;
 		for (i in 0...songGroup.length) {
-			songGroup[i].moveY(songPosiData + (songGroup[i].id) * SongRect.fixHeight * inter);
+			songGroup[i].moveY(songPosiData + (songGroup[i].id) * SongRect.fixHeight * rectInter);
 			songGroup[i].calcX();
 		}
 		updateSongVisibility();
@@ -410,6 +413,8 @@ class FreeplayState extends MusicBeatState
 	public var allowUpdate:Bool = false;
 	override function update(elapsed:Float)
 	{
+		if (FlxG.sound.music != null)
+			Conductor.songPosition = FlxG.sound.music.time;
 		super.update(elapsed);
 
 		var shiftMult:Int = 1;
@@ -452,28 +457,28 @@ class FreeplayState extends MusicBeatState
 			}
 			
 			if (controls.ACCEPT) 			
-			{			
-			   songGroup[curSelected].createDiff();
+			{
+			   songGroup[curSelected].changeSelectAll();
 			}
 		}
-
 		updateSongVisibility();
 	}
 
 	public function changeSelection(change:Int = 0, playSound:Bool = true)
 	{
 		curSelected = FlxMath.wrap(curSelected + change, 0, songGroup.length - 1);
-		SongRect.updateFocus();
+		SongRect.updateFocusRect();
 		if (SongRect.openRect == null) SongRect.openRect = SongRect.focusRect;
-		songsMove.tweenData = songPosiStart - curSelected * SongRect.fixHeight * inter - (curSelected <= SongRect.openRect.id ? 0 : Difficulty.list.length * DiffRect.fixHeight * 1.05 + SongRect.fixHeight * (0.15 + 1));
+
+		songsMove.tweenData = FlxG.height * 0.5 - SongRect.fixHeight * 0.5 - curSelected * SongRect.fixHeight * rectInter - (curSelected <= SongRect.openRect.id ? 0 : Difficulty.list.length * DiffRect.fixHeight * 1.05 + SongRect.fixHeight * (0.1 * 2));
 		
 		if (playSound)
 			FlxG.sound.play(Paths.sound('scrollMenu'), 0.4);
 
 		background.changeSprite(Cache.getFrame('freePlayBG-' + songGroup[curSelected].bgPath));
-
+		
 		var colors:Array<Int> = songsData[curSelected].color;
-		var newColor:Int = FlxColor.fromRGB(colors[0], colors[1], colors[2]);
+		var newColor:Int = FlxColor.fromRGB(Std.int(colors[0] * 1.0), Std.int(colors[1] * 1.0), Std.int(colors[2] * 1.0));
 		if (newColor != intendedColor)
 		{
 			intendedColor = newColor;
@@ -507,7 +512,11 @@ class FreeplayState extends MusicBeatState
 		var cy:Float = camSongs.scroll.y;
 		var ch:Float = camSongs.height;
 		var ry:Float = r.y;
-		var rh:Float = r.light.height;
+		var rh:Float = r.selectShow.height;
+
+		if (r == SongRect.openRect) {
+			rh = r.selectShow.height + Difficulty.list.length * DiffRect.fixHeight * 1.05 + SongRect.fixHeight * (0.1 * 2);
+		}
 		return ry + rh > cy && ry < cy + ch;
 	}
 
@@ -523,6 +532,12 @@ class FreeplayState extends MusicBeatState
 	function changeDiff(change:Int = 0)
 	{
 		curDifficulty = FlxMath.wrap(curDifficulty + change, 0, Difficulty.list.length - 1);
+	}
+
+	override function beatHit()
+	{
+		super.beatHit();
+		SongRect.openRect.beatHit();
 	}
 	
 	public static function destroyFreeplayVocals() {

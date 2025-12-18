@@ -49,7 +49,7 @@ class ExtraCounter extends Sprite
         graphMonitor.addMonitor("Update Frame", "FPS", function() return DataCalc.updateFPS, 0, function() return ClientPrefs.data.framerate, 0xFFFF005D, 0xFF00FF91);
         graphMonitor.addMonitor("Draw Frame", "FPS", function() return DataCalc.drawFPS, 0, function() return (ClientPrefs.data.splitUpdate ? ClientPrefs.data.drawFramerate : ClientPrefs.data.framerate), 0xFFFF005D, 0xFF00FF91);
 		graphMonitor.addMonitor("App Mem", "MB", function() return DataCalc.getAppMem(), 0, 4096, 0xFF00FF91, 0xFFFF005D);
-		graphMonitor.addMonitor("GC Mem", "MB", function() return DataCalc.getGcMem(), 0, 100, 0xFF00FF91, 0xFFFF005D);
+		graphMonitor.addMonitor("GC Mem", "MB", function() return DataCalc.getGcMem(), 0, 10, 0xFF00FF91, 0xFFFF005D);
 		addChild(graphMonitor);
 
 		typeName.x -= 10;

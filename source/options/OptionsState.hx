@@ -120,6 +120,8 @@ class OptionsState extends MusicBeatState
 
 		/////////////////////////////////////////////////////////////////
 
+		//trace('work');
+
 		for (data in 0...naviArray.length) {
 			var naviData:NaviData = naviArray[data];
 			for (mem in 0...naviData.group.length) {
@@ -127,6 +129,8 @@ class OptionsState extends MusicBeatState
 				else addCata(naviData.group[mem], naviGroup[data], naviGroup[data].parent[mem]);
 			}
 		}
+
+		//trace('work');
 
 		var moveHeight:Float = 100;
 		for (num in cataGroup) {
