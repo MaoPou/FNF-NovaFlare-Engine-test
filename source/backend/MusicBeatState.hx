@@ -154,6 +154,7 @@ class MusicBeatState extends FlxUIState
 	}
 
 	public static var timePassedOnState:Float = 0;
+	public var allowMinorGc:Bool = true;
 
 	override function update(elapsed:Float)
 	{
@@ -187,7 +188,8 @@ class MusicBeatState extends FlxUIState
 		});
 
 		super.update(elapsed);
-		GCManager.gc_update();
+		if (allowMinorGc)
+			GCManager.gc_update();
 	}
 
 	private function updateSection():Void

@@ -21,7 +21,6 @@ class SongRect extends FlxSpriteGroup {
 
     public var diffRectGroup:FlxSpriteGroup;
 
-    static public var focusRect:SongRect;
     static public var openRect:SongRect;
 
     public var selectShow:Rect;
@@ -116,7 +115,14 @@ class SongRect extends FlxSpriteGroup {
     override function update(elapsed:Float)
 	{
         if (FreeplayState.curSelected != this.id) onFocus = false;
-        else onFocus = true;
+        else {
+            if (diffAdded) {
+                if (FreeplayState.curDifficulty == -1) onFocus = true;
+                else onFocus = false;
+            } else {
+                onFocus = true;
+            }
+        }
 
         var mouse = FreeplayState.instance.mouseEvent;
 
@@ -135,22 +141,23 @@ class SongRect extends FlxSpriteGroup {
         }
 	}
 
-    public static function updateFocusRect() {
-        focusRect = FreeplayState.instance.songGroup[FreeplayState.curSelected];
-    }
-
     public function beatHit() {
         light.alpha = 1;
+        if (diffRectGroup.members[FreeplayState.curDifficulty] != null) {
+            var diffRect = cast(diffRectGroup.members[FreeplayState.curDifficulty], DiffRect);
+            diffRect.beatHit();
+        }
     }
-	
-    //////////////////////////////////////////////////////////////////////////////////////////////
-	
-	public function changeSelectAll() {
+
+    public function changeSelectAll(imme:Bool = false) {
+        openRect = this;
 	    FreeplayState.curSelected = this.id;
         FreeplayState.instance.changeSelection();
         FreeplayState.instance.songsMove.tweenData = FlxG.height * 0.35 - SongRect.fixHeight * 0.5 - FreeplayState.curSelected * SongRect.fixHeight * FreeplayState.instance.rectInter;
-        createDiff();
+        createDiff(imme);
 	}
+	
+    //////////////////////////////////////////////////////////////////////////////////////////////
 
     private function set_onFocus(value:Bool):Bool
 	{
@@ -167,12 +174,14 @@ class SongRect extends FlxSpriteGroup {
         if (diffAdded) return;
         Difficulty.loadFromWeek();
 
+        FreeplayState.curDifficulty = 0;
+
         for (mem in FreeplayState.instance.songGroup) {
-            if (mem.id >= focusRect.id) mem.addInterY(fixHeight * 0.1);
+            if (mem.id >= openRect.id) mem.addInterY(fixHeight * 0.1);
             else mem.addInterY(0);
-            if (mem.id > focusRect.id) mem.addDiffY();
+            if (mem.id > openRect.id) mem.addDiffY();
             else mem.addDiffY(false);
-            if (mem != focusRect) mem.signDesDiff();
+            if (mem != openRect) mem.signDesDiff();
             mem.diffAdded = false;
         }
 
@@ -189,12 +198,9 @@ class SongRect extends FlxSpriteGroup {
                 diffRectGroup.add(rect);
                 rect.id = diff;
                 rect.startTarY = bg.height + fixHeight / 10 + diff * DiffRect.fixHeight * 1.05;
-                if (imme)
-                    rect.startY = rect.startTarY;
-                if (diff == FreeplayState.curDifficulty)
-                    rect.onFocus = true;
-                else
-                    rect.onFocus = false;
+                if (imme) rect.startY = rect.startTarY;
+
+                diffFouceUpdate();
             }
         } else {
             for (member in diffRectGroup.members)
@@ -202,15 +208,15 @@ class SongRect extends FlxSpriteGroup {
                 var rect = cast(member, DiffRect);
                 rect.allowDestroy = false;
                 rect.startTarY = bg.height + fixHeight / 10 + rect.id * DiffRect.fixHeight * 1.05;
+
+                diffFouceUpdate();
             }
         }
 
         diffAdded = true;
-        openRect = this;
         FlxTimer.wait(0.001, () -> {
             FreeplayState.instance.updateSongLayerOrder();
         });
-        
     }
     
     private function signDesDiff() {
@@ -236,6 +242,16 @@ class SongRect extends FlxSpriteGroup {
                 continue;
             diffRectGroup.remove(member, true);
             member.destroy();
+        }
+    }
+
+    public function diffFouceUpdate() {
+        if (diffRectGroup.members.length > 0) {
+            for (diff in diffRectGroup.members) {
+                var diffRect = cast(diff, DiffRect);
+                if (diffRect == null) continue;
+                diffRect.onFocus = diffRect.id == FreeplayState.curDifficulty;
+            }
         }
     }
 

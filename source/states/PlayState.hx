@@ -350,6 +350,8 @@ class PlayState extends MusicBeatState
 		Paths.clearStoredMemory();
 		GCManager.enable(false);
 		Note.init();
+
+		allowMinorGc = false;
 		
 		startCallback = startCountdown;
 		endCallback = endSong;
@@ -867,6 +869,9 @@ class PlayState extends MusicBeatState
 
 		if (eventNotes.length < 1)
 			checkEventNote();
+
+		var timeCalc:Float = (unspawnNotes.length) / 1000 * 0.7;
+		FlxTimer.wait(timeCalc, function() allowMinorGc = true);
 	}
 
 	function set_songSpeed(value:Float):Float

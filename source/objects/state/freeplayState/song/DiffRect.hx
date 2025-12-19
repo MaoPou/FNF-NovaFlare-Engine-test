@@ -6,19 +6,22 @@ class DiffRect extends FlxSpriteGroup {
     static public final fixWidth:Int = SongRect.fixWidth - 50;
     static public final fixHeight:Int = #if mobile 50 #else 45 #end;
 
-    var background:Rect;
-    var overlay:Rect;
-    var triangles:FlxSpriteGroup;
-
-    var diffName:FlxText;
-    var charterName:FlxText;
-
-    var follow:SongRect;
-
     public var id:Int = 0;
 
     public var onFocus(default, set):Bool = true;
     public var allowDestroy:Bool = false;
+
+    /////////////////////////////////////////////////
+
+    public var background:Rect;
+    private var overlay:Rect;
+    private var triangles:FlxSpriteGroup;
+    private var light:SegmentGradientRoundRect;
+
+    private var diffName:FlxText;
+    private var charterName:FlxText;
+
+    var follow:SongRect;
 
     public function new(follow:SongRect, name:String, color:FlxColor, charter:String) {
         super();
@@ -45,6 +48,12 @@ class DiffRect extends FlxSpriteGroup {
             updateRect(tri);
             triangles.add(tri);
         }
+
+        light = new SegmentGradientRoundRect(0, 0, Std.int(w), Std.int(h), Std.int(r), FlxColor.WHITE, [[0.3, 0.5, 0], [1, 0.5, 0.3]], 1);
+        light.antialiasing = ClientPrefs.data.antialiasing;
+        light.blend = ADD;
+        light.alpha = 0;
+        add(light);
 
         diffName = new FlxText(20 + 7, 0, 0, name, Std.int(fixHeight * 0.35));
         diffName.setFormat(Paths.font(Language.get('fontName', 'ma') + '.ttf'), Std.int(fixHeight * 0.35), FlxColor.WHITE, LEFT, FlxTextBorderStyle.OUTLINE, 0xA1393939);
@@ -83,6 +92,10 @@ class DiffRect extends FlxSpriteGroup {
 
         super.update(elapsed);
 
+        if (light.alpha > 0) {
+            light.alpha -= elapsed / (Conductor.crochet / 1000);
+        }
+
         if (allowDestroy && startY == 0) {
             follow.destroyDiff();
         }
@@ -119,7 +132,12 @@ class DiffRect extends FlxSpriteGroup {
         return value;
     }
 
-    //////////////////////////////////////////
+    public function beatHit() {
+        if (!onFocus) return;
+        light.alpha = 1;
+    }
+
+    ////////////////////////////////////////////////////////////////////////////////////
 
     
     public var startX:Float = 0;

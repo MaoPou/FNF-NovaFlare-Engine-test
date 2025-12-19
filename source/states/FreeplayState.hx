@@ -383,9 +383,7 @@ class FreeplayState extends MusicBeatState
 		//////////////////////////////////////////////////////////////////////////////////////////
 
 		WeekData.setDirectoryFromWeek();
-
-		changeSelection();
-		SongRect.focusRect.createDiff();
+		songGroup[curSelected].changeSelectAll(true);
 	}
 
 	function weekIsLocked(name:String):Bool
@@ -437,13 +435,49 @@ class FreeplayState extends MusicBeatState
 			}
 			if (controls.UI_UP_P)
 			{
-				changeSelection(-shiftMult);
 				holdTime = 0;
+				if (curSelected != SongRect.openRect.id) {
+					var newCurSelected:Int = FlxMath.wrap(curSelected - shiftMult, 0, songGroup.length - 1);
+					if (newCurSelected == SongRect.openRect.id) {
+						curDifficulty = Difficulty.list.length - 1;
+						songGroup[newCurSelected].diffFouceUpdate();
+						curSelected = newCurSelected;
+						songsMove.tweenData = FlxG.height * 0.35 - SongRect.fixHeight * 0.5 - curSelected * SongRect.fixHeight * rectInter - (curDifficulty+1) * DiffRect.fixHeight * 1.05;
+					} else {
+						curDifficulty = -1;
+						songGroup[curSelected].diffFouceUpdate();
+						changeSelection(-shiftMult);
+					}
+				} else {
+					if (curDifficulty >= 0) {
+						curDifficulty--;
+						songGroup[curSelected].diffFouceUpdate();
+						if (curDifficulty >= 0) songsMove.tweenData = FlxG.height * 0.35 - SongRect.fixHeight * 0.5 - curSelected * SongRect.fixHeight * rectInter - (curDifficulty+1) * DiffRect.fixHeight * 1.05;
+						else songsMove.tweenData = FlxG.height * 0.35 - SongRect.fixHeight * 0.5 - curSelected * SongRect.fixHeight * rectInter;
+					} else {
+						curDifficulty = -1;
+						songGroup[curSelected].diffFouceUpdate();
+						changeSelection(-shiftMult);
+					}
+				}
 			}
 			if (controls.UI_DOWN_P)
 			{
-				changeSelection(shiftMult);
 				holdTime = 0;
+				if (curSelected != SongRect.openRect.id)
+					changeSelection(shiftMult);
+				else {
+					if (curDifficulty < Difficulty.list.length - 1) {
+						curDifficulty++;
+						songGroup[curSelected].diffFouceUpdate();
+						songsMove.tweenData = FlxG.height * 0.35 - SongRect.fixHeight * 0.5 - curSelected * SongRect.fixHeight * rectInter - (curDifficulty+1) * DiffRect.fixHeight * 1.05;
+					} else {
+						curDifficulty = -1;
+						songGroup[curSelected].diffFouceUpdate();
+						changeSelection(shiftMult);
+					}
+				}
+				
 			}
 
 			if (controls.UI_DOWN || controls.UI_UP)
@@ -452,13 +486,58 @@ class FreeplayState extends MusicBeatState
 				holdTime += elapsed;
 				var checkNewHold:Int = Math.floor((holdTime - 0.5) * 30);
 
-				if (holdTime > 0.5 && checkNewHold - checkLastHold > 0)
+				if (holdTime > 0.5 && checkNewHold - checkLastHold > 0) {
+					curDifficulty = -1;
+					SongRect.openRect.diffFouceUpdate();
 					changeSelection((checkNewHold - checkLastHold) * (controls.UI_UP ? -shiftMult : shiftMult));
+				}
 			}
 			
 			if (controls.ACCEPT) 			
 			{
-			   songGroup[curSelected].changeSelectAll();
+				if (curSelected != SongRect.openRect.id) {
+			   		songGroup[curSelected].changeSelectAll();
+				} else {
+					if (curDifficulty >= 0 && curDifficulty < Difficulty.list.length) {
+						var songLowercase:String = Paths.formatToSongPath(songsData[curSelected].songName);
+						var poop:String = Highscore.formatSong(songLowercase, curDifficulty);
+
+						try
+						{
+							PlayState.SONG = Song.loadFromJson(poop, songLowercase);
+							PlayState.isStoryMode = false;
+							PlayState.storyDifficulty = curDifficulty;
+
+							trace('CURRENT WEEK: ' + WeekData.getWeekFileName());
+						}
+						catch (e:Dynamic)
+						{
+							trace('ERROR! $e');
+
+							var errorStr:String = e.toString();
+							if (errorStr.startsWith('[lime.utils.Assets] ERROR:'))
+								errorStr = 'Missing file: ' + errorStr.substring(errorStr.indexOf(songLowercase), errorStr.length - 1); // Missing chart
+
+							trace(errorStr);
+							FlxG.sound.play(Paths.sound('cancelMenu'));
+							super.update(elapsed);
+							updateSongVisibility();
+							return;
+						}
+
+						LoadingState.prepareToSong();
+						if (ClientPrefs.data.loadingScreen)
+						{
+							FlxTransitionableState.skipNextTransIn = true;
+							FlxTransitionableState.skipNextTransOut = true;
+						}
+						LoadingState.loadAndSwitchState(new PlayState());
+						destroyFreeplayVocals();
+						#if (MODS_ALLOWED && DISCORD_ALLOWED)
+						DiscordClient.loadModRPC();
+						#end
+					}
+				}
 			}
 		}
 		updateSongVisibility();
@@ -467,8 +546,6 @@ class FreeplayState extends MusicBeatState
 	public function changeSelection(change:Int = 0, playSound:Bool = true)
 	{
 		curSelected = FlxMath.wrap(curSelected + change, 0, songGroup.length - 1);
-		SongRect.updateFocusRect();
-		if (SongRect.openRect == null) SongRect.openRect = SongRect.focusRect;
 
 		songsMove.tweenData = FlxG.height * 0.5 - SongRect.fixHeight * 0.5 - curSelected * SongRect.fixHeight * rectInter - (curSelected <= SongRect.openRect.id ? 0 : Difficulty.list.length * DiffRect.fixHeight * 1.05 + SongRect.fixHeight * (0.1 * 2));
 		
