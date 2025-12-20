@@ -118,7 +118,7 @@ class MouseMove extends FlxBasic
         }
 
         if (tweenData != 0 && allowLerp) {
-            if (Math.abs(target - tweenData) < 0.5) {
+            if (Math.abs(target - tweenData) < 1) {
                 target = tweenData;
                 tweenData = 0;
                 allowLerp = false;

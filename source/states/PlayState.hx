@@ -870,7 +870,7 @@ class PlayState extends MusicBeatState
 		if (eventNotes.length < 1)
 			checkEventNote();
 
-		var timeCalc:Float = (unspawnNotes.length) / 1000 * 0.7;
+		var timeCalc:Float = (unspawnNotes.length) / 1000 * 0.7 + 1;
 		FlxTimer.wait(timeCalc, function() allowMinorGc = true);
 	}
 

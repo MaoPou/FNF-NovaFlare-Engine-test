@@ -36,7 +36,7 @@ class MouseEvent extends FlxBasic
         }
         else pressed = false;
 
-        if (mouse.justReleased && calcPosX < 20 && calcPosY < 20) justReleased = true;
+        if (mouse.justReleased && calcPosX < FlxG.width * 0.1 && calcPosY < FlxG.height * 0.1) justReleased = true;
         else justReleased = false;
     
         super.update(elapsed);

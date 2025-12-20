@@ -30,6 +30,7 @@ class SongRect extends FlxSpriteGroup {
     private var icon:HealthIcon;
     private var songName:FlxText;
     private var musican:FlxText;
+    private var selectLight:Rect;
 
     public function new(songNameSt:String, songIcon:String, songMusican:String, songCharter:Array<String>, songColor:Array<Int>) {
         super(0, 0);
@@ -86,6 +87,12 @@ class SongRect extends FlxSpriteGroup {
 		musican.x += bg.height / 2 - icon.height / 2 + icon.width * 1.1;
 		musican.y += songName.textField.textHeight;
 		add(musican);
+
+        selectLight = new Rect(0, 0, Std.int(selectShow.width + 50), Std.int(selectShow.height), fixHeight / 4, fixHeight / 4, 0xFFFFFF, 0);
+        selectLight.antialiasing = ClientPrefs.data.antialiasing;
+        selectLight.blend = ADD;
+        selectLight.alpha = 0;
+        add(selectLight);
     }
 
     function addBGCache(filesLoad:String) {
@@ -128,16 +135,21 @@ class SongRect extends FlxSpriteGroup {
 
 		var overlaps = mouse.overlaps(this.black);
 
+        selectLight.alpha -= elapsed;
+
         if (overlaps) {
+            if (FreeplayState.curSelected != this.id) selectLight.alpha = 0.1;
             if (mouse.justReleased) {
                 changeSelectAll();
             }
         }
 
+        if (onFocus) selectLight.alpha = 0.1;
+
         super.update(elapsed);
 
         if (light.alpha > 0) {
-            light.alpha -= elapsed / (Conductor.crochet / 1000);
+            light.alpha -= elapsed / (Conductor.crochet * 2 / 1000);
         }
 	}
 
@@ -151,9 +163,10 @@ class SongRect extends FlxSpriteGroup {
 
     public function changeSelectAll(imme:Bool = false) {
         openRect = this;
+        selectLight.alpha = 0.6;
 	    FreeplayState.curSelected = this.id;
         FreeplayState.instance.changeSelection();
-        FreeplayState.instance.songsMove.tweenData = FlxG.height * 0.35 - SongRect.fixHeight * 0.5 - FreeplayState.curSelected * SongRect.fixHeight * FreeplayState.instance.rectInter;
+        FreeplayState.instance.songsMove.tweenData = FlxG.height * 0.5 - SongRect.fixHeight * 0.5 - FreeplayState.curSelected * SongRect.fixHeight * FreeplayState.instance.rectInter;
         createDiff(imme);
 	}
 	
@@ -198,19 +211,29 @@ class SongRect extends FlxSpriteGroup {
                 diffRectGroup.add(rect);
                 rect.id = diff;
                 rect.startTarY = bg.height + fixHeight / 10 + diff * DiffRect.fixHeight * 1.05;
-                if (imme) rect.startY = rect.startTarY;
-
-                diffFouceUpdate();
+                if (imme) {
+                    rect.startY = rect.startTarY;
+                    rect.allowSelect = true;
+                } else {
+                    FlxTimer.wait(0.1, () -> {
+                        rect.allowSelect = true;
+                    });
+                }
             }
+            diffFouceUpdate();
+            FreeplayState.instance.songsMove.tweenData = FlxG.height * 0.5 - SongRect.fixHeight * 0.5 - FreeplayState.curSelected * SongRect.fixHeight * FreeplayState.instance.rectInter - (FreeplayState.curDifficulty+1) * DiffRect.fixHeight * 1.05;
         } else {
             for (member in diffRectGroup.members)
             {
                 var rect = cast(member, DiffRect);
                 rect.allowDestroy = false;
+                FlxTimer.wait(0.1, () -> {
+                    rect.allowSelect = true;
+                });
                 rect.startTarY = bg.height + fixHeight / 10 + rect.id * DiffRect.fixHeight * 1.05;
-
-                diffFouceUpdate();
             }
+            diffFouceUpdate();
+            FreeplayState.instance.songsMove.tweenData = FlxG.height * 0.5 - SongRect.fixHeight * 0.5 - FreeplayState.curSelected * SongRect.fixHeight * FreeplayState.instance.rectInter - (FreeplayState.curDifficulty+1) * DiffRect.fixHeight * 1.05;
         }
 
         diffAdded = true;
@@ -230,6 +253,7 @@ class SongRect extends FlxSpriteGroup {
                 if (diffRect == null) continue;
                 diffRect.startTarY = 0;
                 diffRect.allowDestroy = true;
+                diffRect.allowSelect = false;
                 diffRect.onFocus = false;
             }
         }
@@ -264,11 +288,11 @@ class SongRect extends FlxSpriteGroup {
         moveX = Math.pow(Math.abs(this.y + this.selectShow.height / 2 - FlxG.height / 2) / (FlxG.height / 2) * 10, 1.8);
 
         var chooseTar = onFocus ? -20 : 0;
-        if (Math.abs(chooseX - chooseTar) > 0.5) chooseX = FlxMath.lerp(chooseTar, chooseX, Math.exp(-FreeplayState.instance.songsMove.saveElapsed * FreeplayState.instance.songsMove.lerpSmooth));
+        if (Math.abs(chooseX - chooseTar) > 1) chooseX = FlxMath.lerp(chooseTar, chooseX, Math.exp(-FreeplayState.instance.songsMove.saveElapsed * FreeplayState.instance.songsMove.lerpSmooth));
         else chooseX = chooseTar;
 
         var diffTar = diffAdded ? -50 : 0;
-        if (Math.abs(diffX - diffTar) > 0.5) diffX = FlxMath.lerp(diffTar, diffX, Math.exp(-FreeplayState.instance.songsMove.saveElapsed * FreeplayState.instance.songsMove.lerpSmooth));
+        if (Math.abs(diffX - diffTar) > 1) diffX = FlxMath.lerp(diffTar, diffX, Math.exp(-FreeplayState.instance.songsMove.saveElapsed * FreeplayState.instance.songsMove.lerpSmooth));
         else diffX = diffTar;
         
         this.x = FlxG.width - this.selectShow.width + 80 + moveX + chooseX + diffX;
@@ -288,12 +312,12 @@ class SongRect extends FlxSpriteGroup {
     public var interY:Float = 0;
     public var diffY:Float = 0;    
     public function moveY(startY:Float) {        
-        if (Math.abs(interY - interYTar) > 0.5)
+        if (Math.abs(interY - interYTar) > 1)
             interY = FlxMath.lerp(interYTar, interY, Math.exp(-FreeplayState.instance.songsMove.saveElapsed * FreeplayState.instance.songsMove.lerpSmooth));
         else 
             interY = interYTar;
         
-        if (Math.abs(diffY - diffYTar) > 0.5)
+        if (Math.abs(diffY - diffYTar) > 1)
             diffY = FlxMath.lerp(diffYTar, diffY, Math.exp(-FreeplayState.instance.songsMove.saveElapsed * FreeplayState.instance.songsMove.lerpSmooth));
         else 
             diffY = diffYTar;

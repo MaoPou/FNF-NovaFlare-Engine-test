@@ -259,32 +259,34 @@ class FreeplayState extends MusicBeatState
 		detailBpmText.camera = camAfter;
 		add(detailBpmText);
 
-		detailStar = new StarRect(detailSongName.x, detailRect.bg2.y + (detailRect.bg2.height - detailRect.bg3.height) * 0.15, 60, (detailRect.bg2.height - detailRect.bg3.height) * 0.7);
+		detailStar = new StarRect(detailSongName.x, detailRect.bg2.y, 80, (detailRect.bg2.height - detailRect.bg3.height) * 0.7);
+		detailStar.y += (detailRect.bg2.height - detailRect.bg3.height) * 0.5 - detailStar.height * 0.5;
 		add(detailStar);
 
-		detailMapper = new FlxText(0, 0, 0, 'eazy mapped by test', Std.int(detailRect.bg1.height * 0.25));
-		detailMapper.setFormat(Paths.font(Language.get('fontName', 'ma') + '.ttf'), Std.int(detailRect.bg1.height * 0.09), 0xFFFFFFFF, LEFT, FlxTextBorderStyle.OUTLINE, 0xFFFFFFFF);
+		detailMapper = new FlxText(0, 0, 0, '0.99 eazy mapped by test', Std.int(detailRect.bg1.height * 0.25));
+		detailMapper.setFormat(Paths.font(Language.get('fontName', 'ma') + '.ttf'), Std.int((detailRect.bg2.height - detailRect.bg3.height) * 0.7 * 0.6), 0xFFFFFFFF, LEFT, FlxTextBorderStyle.OUTLINE, 0xFFFFFFFF);
         detailMapper.borderStyle = NONE;
 		detailMapper.antialiasing = ClientPrefs.data.antialiasing;
 		detailMapper.x = detailStar.x + detailStar.width + 10;
-		detailMapper.y = detailRect.bg2.y;
+		detailMapper.y = detailRect.bg2.y + (detailRect.bg2.height - detailRect.bg3.height) * 0.5 - detailMapper.height * 0.5;
 		detailMapper.camera = camAfter;
+		detailMapper.color = 0x9bff7a;
 		add(detailMapper);
 
 
-		noteData = new DataDis(10, detailRect.bg3.y + 10, 120, 5, 'Notes');
+		noteData = new DataDis(10, detailRect.bg3.y + 5, 120, 5, 'Notes');
 		noteData.camera = camAfter;
 		add(noteData);
 
-		holdNoteData = new DataDis(noteData.x + noteData.lineDis.width * 1.2, detailRect.bg3.y + 10, 120, 5, 'Hold Notes');
+		holdNoteData = new DataDis(noteData.x + noteData.lineDis.width * 1.2, detailRect.bg3.y + 8, 120, 5, 'Hold Notes');
 		holdNoteData.camera = camAfter;
 		add(holdNoteData);
 
-		speedData = new DataDis(holdNoteData.x + holdNoteData.lineDis.width * 1.2, detailRect.bg3.y + 10, 120, 5, 'Speed');
+		speedData = new DataDis(holdNoteData.x + holdNoteData.lineDis.width * 1.2, detailRect.bg3.y + 8, 120, 5, 'Speed');
 		speedData.camera = camAfter;
 		add(speedData);
 
-		keyCountData = new DataDis(speedData.x + speedData.lineDis.width * 1.2, detailRect.bg3.y + 10, 120, 5, 'Key count');
+		keyCountData = new DataDis(speedData.x + speedData.lineDis.width * 1.2, detailRect.bg3.y + 8, 120, 5, 'Key count');
 		keyCountData.camera = camAfter;
 		add(keyCountData);
 
@@ -442,7 +444,8 @@ class FreeplayState extends MusicBeatState
 						curDifficulty = Difficulty.list.length - 1;
 						songGroup[newCurSelected].diffFouceUpdate();
 						curSelected = newCurSelected;
-						songsMove.tweenData = FlxG.height * 0.35 - SongRect.fixHeight * 0.5 - curSelected * SongRect.fixHeight * rectInter - (curDifficulty+1) * DiffRect.fixHeight * 1.05;
+						FlxG.sound.play(Paths.sound('scrollMenu'), 0.4);
+						songsMove.tweenData = FlxG.height * 0.5 - SongRect.fixHeight * 0.5 - curSelected * SongRect.fixHeight * rectInter - (curDifficulty+1) * DiffRect.fixHeight * 1.05;
 					} else {
 						curDifficulty = -1;
 						songGroup[curSelected].diffFouceUpdate();
@@ -452,8 +455,9 @@ class FreeplayState extends MusicBeatState
 					if (curDifficulty >= 0) {
 						curDifficulty--;
 						songGroup[curSelected].diffFouceUpdate();
-						if (curDifficulty >= 0) songsMove.tweenData = FlxG.height * 0.35 - SongRect.fixHeight * 0.5 - curSelected * SongRect.fixHeight * rectInter - (curDifficulty+1) * DiffRect.fixHeight * 1.05;
-						else songsMove.tweenData = FlxG.height * 0.35 - SongRect.fixHeight * 0.5 - curSelected * SongRect.fixHeight * rectInter;
+						FlxG.sound.play(Paths.sound('scrollMenu'), 0.4);
+						if (curDifficulty >= 0) songsMove.tweenData = FlxG.height * 0.5 - SongRect.fixHeight * 0.5 - curSelected * SongRect.fixHeight * rectInter - (curDifficulty+1) * DiffRect.fixHeight * 1.05;
+						else songsMove.tweenData = FlxG.height * 0.5 - SongRect.fixHeight * 0.5 - curSelected * SongRect.fixHeight * rectInter;
 					} else {
 						curDifficulty = -1;
 						songGroup[curSelected].diffFouceUpdate();
@@ -470,7 +474,8 @@ class FreeplayState extends MusicBeatState
 					if (curDifficulty < Difficulty.list.length - 1) {
 						curDifficulty++;
 						songGroup[curSelected].diffFouceUpdate();
-						songsMove.tweenData = FlxG.height * 0.35 - SongRect.fixHeight * 0.5 - curSelected * SongRect.fixHeight * rectInter - (curDifficulty+1) * DiffRect.fixHeight * 1.05;
+						FlxG.sound.play(Paths.sound('scrollMenu'), 0.4);
+						songsMove.tweenData = FlxG.height * 0.5 - SongRect.fixHeight * 0.5 - curSelected * SongRect.fixHeight * rectInter - (curDifficulty+1) * DiffRect.fixHeight * 1.05;
 					} else {
 						curDifficulty = -1;
 						songGroup[curSelected].diffFouceUpdate();
@@ -498,49 +503,51 @@ class FreeplayState extends MusicBeatState
 				if (curSelected != SongRect.openRect.id) {
 			   		songGroup[curSelected].changeSelectAll();
 				} else {
-					if (curDifficulty >= 0 && curDifficulty < Difficulty.list.length) {
-						var songLowercase:String = Paths.formatToSongPath(songsData[curSelected].songName);
-						var poop:String = Highscore.formatSong(songLowercase, curDifficulty);
-
-						try
-						{
-							PlayState.SONG = Song.loadFromJson(poop, songLowercase);
-							PlayState.isStoryMode = false;
-							PlayState.storyDifficulty = curDifficulty;
-
-							trace('CURRENT WEEK: ' + WeekData.getWeekFileName());
-						}
-						catch (e:Dynamic)
-						{
-							trace('ERROR! $e');
-
-							var errorStr:String = e.toString();
-							if (errorStr.startsWith('[lime.utils.Assets] ERROR:'))
-								errorStr = 'Missing file: ' + errorStr.substring(errorStr.indexOf(songLowercase), errorStr.length - 1); // Missing chart
-
-							trace(errorStr);
-							FlxG.sound.play(Paths.sound('cancelMenu'));
-							super.update(elapsed);
-							updateSongVisibility();
-							return;
-						}
-
-						LoadingState.prepareToSong();
-						if (ClientPrefs.data.loadingScreen)
-						{
-							FlxTransitionableState.skipNextTransIn = true;
-							FlxTransitionableState.skipNextTransOut = true;
-						}
-						LoadingState.loadAndSwitchState(new PlayState());
-						destroyFreeplayVocals();
-						#if (MODS_ALLOWED && DISCORD_ALLOWED)
-						DiscordClient.loadModRPC();
-						#end
-					}
+					startGame();
 				}
 			}
 		}
 		updateSongVisibility();
+	}
+
+	public function startGame() {
+		if (curDifficulty >= 0 && curDifficulty < Difficulty.list.length) {
+			var songLowercase:String = Paths.formatToSongPath(songsData[curSelected].songName);
+			var poop:String = Highscore.formatSong(songLowercase, curDifficulty);
+
+			try
+			{
+				PlayState.SONG = Song.loadFromJson(poop, songLowercase);
+				PlayState.isStoryMode = false;
+				PlayState.storyDifficulty = curDifficulty;
+
+				trace('CURRENT WEEK: ' + WeekData.getWeekFileName());
+			}
+			catch (e:Dynamic)
+			{
+				trace('ERROR! $e');
+
+				var errorStr:String = e.toString();
+				if (errorStr.startsWith('[lime.utils.Assets] ERROR:'))
+					errorStr = 'Missing file: ' + errorStr.substring(errorStr.indexOf(songLowercase), errorStr.length - 1); // Missing chart
+
+				trace(errorStr);
+				FlxG.sound.play(Paths.sound('cancelMenu'));
+				return;
+			}
+
+			LoadingState.prepareToSong();
+			if (ClientPrefs.data.loadingScreen)
+			{
+				FlxTransitionableState.skipNextTransIn = true;
+				FlxTransitionableState.skipNextTransOut = true;
+			}
+			LoadingState.loadAndSwitchState(new PlayState());
+			destroyFreeplayVocals();
+			#if (MODS_ALLOWED && DISCORD_ALLOWED)
+			DiscordClient.loadModRPC();
+			#end
+		}
 	}
 
 	public function changeSelection(change:Int = 0, playSound:Bool = true)
@@ -614,7 +621,7 @@ class FreeplayState extends MusicBeatState
 	override function beatHit()
 	{
 		super.beatHit();
-		SongRect.openRect.beatHit();
+		if (Std.int(Conductor.getBeat(Conductor.songPosition)) % 2 == 0) SongRect.openRect.beatHit();
 	}
 	
 	public static function destroyFreeplayVocals() {

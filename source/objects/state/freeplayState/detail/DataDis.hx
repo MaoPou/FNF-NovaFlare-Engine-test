@@ -18,17 +18,17 @@ class DataDis extends FlxSpriteGroup{
 		add(lineDis);
 
         text = new FlxText(0, 0, 0, dataName, 20);
-		text.setFormat(Paths.font(Language.get('fontName', 'ma') + '.ttf'), 16, 0xffffff, LEFT, FlxTextBorderStyle.OUTLINE, 0xFFFFFFFF);
+		text.setFormat(Paths.font(Language.get('fontName', 'ma') + '.ttf'), 14, 0xffffff, LEFT, FlxTextBorderStyle.OUTLINE, 0xFFFFFFFF);
         text.borderStyle = NONE;
 		text.antialiasing = ClientPrefs.data.antialiasing;
         text.y += height * 1.5;
 		add(text);
 
         data = new FlxText(0, 0, 0, dataName, 20);
-		data.setFormat(Paths.font(Language.get('fontName', 'ma') + '.ttf'), 16, 0xffffff, LEFT, FlxTextBorderStyle.OUTLINE, 0xFFFFFFFF);
+		data.setFormat(Paths.font(Language.get('fontName', 'ma') + '.ttf'), 14, 0xffffff, LEFT, FlxTextBorderStyle.OUTLINE, 0xFFFFFFFF);
         data.borderStyle = NONE;
 		data.antialiasing = ClientPrefs.data.antialiasing;
-        data.y += lineDis.height + text.height;
+        data.y += lineDis.height + text.textField.height;
 		add(data);
     }
 
