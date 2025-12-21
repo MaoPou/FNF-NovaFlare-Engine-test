@@ -188,8 +188,12 @@ class MusicBeatState extends FlxUIState
 		});
 
 		super.update(elapsed);
-		if (allowMinorGc)
-			GCManager.gc_update();
+	}
+
+	override function draw()
+	{
+		super.draw();
+		if (allowMinorGc) GCManager.gc_update();
 	}
 
 	private function updateSection():Void

@@ -520,15 +520,15 @@ class LoadingState extends MusicBeatState
 	static function luaFilesCheck(path:String)
 	{
 		var input:String = File.getContent(path);	
-		//trace('LUA: load Path: ' + path);
 
 		if (StringTools.fastCodeAt(input, 0) == 0xFEFF) {
 			input = input.substr(1);
 		} //防止BOM字符 <UTF-8 with BOM> <\65279>
 
+		if(input.contains("\r\n")) input.replace("\r\n", "\n");
+
 		var parser = new LuaParser();
 		var e:LuaExpr = parser.parseFromString(input);
-		//trace('work');
 	
 		ScriptExprTools.lua_searchCallback(e, function(e:LuaExpr, params:Array<LuaExpr>) {
 			switch(e.expr) {
@@ -634,6 +634,8 @@ class LoadingState extends MusicBeatState
 		if (StringTools.fastCodeAt(input, 0) == 0xFEFF) {
 			input = input.substr(1);
 		} //防止BOM字符 <UTF-8 with BOM> <\65279>
+
+		if(input.contains("\r\n")) input.replace("\r\n", "\n");
 
 		var parser = new Parser();
 		parser.allowTypes = parser.allowMetadata = parser.allowJSON = true;

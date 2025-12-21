@@ -40,8 +40,6 @@ class NotesSubStateLegacy extends MusicBeatSubstate
 	var posX = 230;
 	public function new() {
         
-		controls.isInSubstate = true;
-
 		super();
 
         #if DISCORD_ALLOWED

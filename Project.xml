@@ -161,8 +161,6 @@
 	<haxedef name="HXCPP_ALIGN_ALLOC"/>
 	<haxedef name="HXCPP_GC_GENERATIONAL" />
 
-	<haxedef name="LIME_MT_RENDER" />
-
 	<!-- _______________________________ TRACY ______________________________ -->
 
 	<haxedef name="HXCPP_TRACY" if="TRACY_ALLOWED"/>

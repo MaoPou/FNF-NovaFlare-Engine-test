@@ -71,8 +71,6 @@ class NotesSubState extends MusicBeatSubstate
 			stage: 'stage'
 		};
 
-		controls.isInSubstate = true;
-
 		super();
 
 		#if DISCORD_ALLOWED
