@@ -133,6 +133,7 @@ class MainMenuState extends MusicBeatState
 		logoBl.animation.play('bump');
 		logoBl.offset.x = 0;
 		logoBl.offset.y = 0;
+		trace(logoBl.frameWidth);
 		logoBl.scale.x = (640 / logoBl.frameWidth);
 		logoBl.scale.y = logoBl.scale.x;
 		logoBl.updateHitbox();

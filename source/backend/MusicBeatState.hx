@@ -54,6 +54,7 @@ class MusicBeatState extends FlxUIState
 
 	public function addMobileControls(DefaultDrawTarget:Bool = true):Void
 	{
+		controls.isInSubstate = false;
 		mobileControls = new MobileControls();
 
 		var stage = Lib.current.stage;
@@ -154,7 +155,7 @@ class MusicBeatState extends FlxUIState
 	}
 
 	public static var timePassedOnState:Float = 0;
-	public var allowMinorGc:Bool = true;
+	public var allowMinorGc:Bool = false;
 
 	override function update(elapsed:Float)
 	{
@@ -193,7 +194,7 @@ class MusicBeatState extends FlxUIState
 	override function draw()
 	{
 		super.draw();
-		if (allowMinorGc) GCManager.gc_update();
+		//if (allowMinorGc) GCManager.incCollect(1);
 	}
 
 	private function updateSection():Void

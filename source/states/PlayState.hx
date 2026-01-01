@@ -114,7 +114,6 @@ class PlayState extends MusicBeatState
 	#if LUA_ALLOWED
 	public var modchartTweens:Map<String, FlxTween> = new Map<String, FlxTween>();
 	public var modchartSprites:Map<String, ModchartSprite> = new Map<String, ModchartSprite>();
-	public var checkSprites:Map<String, String> = new Map<String, String>();
 	public var modchartTimers:Map<String, FlxTimer> = new Map<String, FlxTimer>();
 	public var modchartSounds:Map<String, FlxSound> = new Map<String, FlxSound>();
 	public var modchartTexts:Map<String, FlxText> = new Map<String, FlxText>();
@@ -3238,8 +3237,8 @@ function musicCheck(music:FlxSound, getTime:Float, deviation:Float):Bool
 		if (gf != null && SONG.notes[sec].gfSection)
 		{
 			camFollow.setPosition(gf.getMidpoint().x, gf.getMidpoint().y);
-			camFollow.x += gf.cameraPosition[0] + girlfriendCameraOffset[0];
-			camFollow.y += gf.cameraPosition[1] + girlfriendCameraOffset[1];
+			camFollow.x += gf.cameraPosition[0] + girlfriendCameraOffset[0] + gf.additionalX;
+			camFollow.y += gf.cameraPosition[1] + girlfriendCameraOffset[1] + gf.additionalY;
 			tweenCamIn();
 			callOnScripts('onMoveCamera', ['gf']);
 			return;
@@ -3257,15 +3256,15 @@ function musicCheck(music:FlxSound, getTime:Float, deviation:Float):Bool
 		if (isDad)
 		{
 			camFollow.setPosition(dad.getMidpoint().x + 150, dad.getMidpoint().y - 100);
-			camFollow.x += dad.cameraPosition[0] + opponentCameraOffset[0];
-			camFollow.y += dad.cameraPosition[1] + opponentCameraOffset[1];
+			camFollow.x += dad.cameraPosition[0] + opponentCameraOffset[0] + dad.additionalX;
+			camFollow.y += dad.cameraPosition[1] + opponentCameraOffset[1] + dad.additionalY;
 			tweenCamIn();
 		}
 		else
 		{
 			camFollow.setPosition(boyfriend.getMidpoint().x - 100, boyfriend.getMidpoint().y - 100);
-			camFollow.x -= boyfriend.cameraPosition[0] - boyfriendCameraOffset[0];
-			camFollow.y += boyfriend.cameraPosition[1] + boyfriendCameraOffset[1];
+			camFollow.x -= boyfriend.cameraPosition[0] - boyfriendCameraOffset[0] - boyfriend.additionalX;
+			camFollow.y += boyfriend.cameraPosition[1] + boyfriendCameraOffset[1] + boyfriend.additionalY;
 
 			if (songName == 'tutorial' && cameraTwn == null && FlxG.camera.zoom != 1)
 			{

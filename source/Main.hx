@@ -83,7 +83,7 @@ class Main extends Sprite
 		#if cpp
 
 		GCManager.enable(true);
-		GCManager.run(true);  
+		//GCManager.run(true);  
 		#end
 	}
 	

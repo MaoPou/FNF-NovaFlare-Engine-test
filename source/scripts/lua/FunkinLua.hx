@@ -1291,7 +1291,7 @@ class FunkinLua
 			if (mySprite == null)
 				return false;
 
-			if (game.checkSprites.get(tag) != null && game.checkSprites.get(tag) == mySprite.imageName) {
+			if (mySprite.alreadyAdded) {
 				//trace('already added: ' + tag);
 				return false;
 			}
@@ -1305,7 +1305,7 @@ class FunkinLua
 				else
 					GameOverSubstate.instance.insert(GameOverSubstate.instance.members.indexOf(GameOverSubstate.instance.boyfriend), mySprite);
 			}
-			game.checkSprites.set(tag, mySprite.imageName);
+			mySprite.alreadyAdded = true;
 			return true;
 		});
 		set("setGraphicSize", function(obj:String, x:Int, y:Int = 0, updateHitbox:Bool = true)
@@ -1399,7 +1399,7 @@ class FunkinLua
 			var pee:ModchartSprite = game.modchartSprites.get(tag);
 			FlxTween.cancelTweensOf(pee);
 			LuaUtils.getTargetInstance().remove(pee, true);
-			game.checkSprites.remove(tag);
+			pee.alreadyAdded = false;
 			if (destroy)
 			{
 				pee.kill();

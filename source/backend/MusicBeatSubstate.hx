@@ -11,9 +11,14 @@ class MusicBeatSubstate extends FlxSubState
 	public function new()
 	{
 		instance = this;
+		super();
+	}
+
+	override function create()
+	{
+		super.create();
 		controls.isInSubstate = true;
 		ColorblindFilter.UpdateColors();
-		super();
 	}
 
 	private var curSection:Int = 0;
@@ -37,6 +42,7 @@ class MusicBeatSubstate extends FlxSubState
 
 	public function addMobileControls(DefaultDrawTarget:Bool = true):Void
 	{
+		controls.isInSubstate = true;
 		mobileControls = new MobileControls();
 
 		var stage = Lib.current.stage;
@@ -148,7 +154,7 @@ class MusicBeatSubstate extends FlxSubState
 
 		super.update(elapsed);
 
-		GCManager.gc_update();
+		//GCManager.gc_update();
 	}
 
 	private function updateSection():Void

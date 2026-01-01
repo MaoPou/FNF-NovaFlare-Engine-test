@@ -23,21 +23,27 @@ class ThreadEvent {
     public static function create(job:()->Void, event:Void->Void):ThreadEvent
     {
         var thread = new ThreadEvent(event);
-		thread.__create(job);
         thread.id = IDcount;
         IDcount++;
+		thread.__create(job);
         return thread;
     }
 
     @:noCompletion private function __create(job:()->Void):Void
 	{
 		workThread = Thread.create(function() {
-            job();
+            try {
+                job();
+            } catch (e:Dynamic) {
+                trace("Thread Error: " + e);
+            }
             
-            mainThread.sendMessage({
-                type: "complete",
-                data: {id: this.id}
-            });
+            if (mainThread != null) {
+                mainThread.sendMessage({
+                    type: "complete",
+                    data: {id: this.id}
+                });
+            }
         });
 	}
 
@@ -63,25 +69,29 @@ class ThreadEvent {
             return;
         }
 
-        var msg = Thread.readMessage(blocking);
-        if (msg != null && Reflect.hasField(msg, "type") && Std.string(msg.type).toLowerCase() == "complete" && Reflect.hasField(msg, "data") && Reflect.hasField(msg.data, "id")) {
-            var mid:Int = msg.data.id;
-            if (mid == id) {
-                if (event != null) {
-                    event();
+        var msg:Dynamic = null;
+        do {
+            msg = Thread.readMessage(blocking);
+            if (msg != null && Reflect.hasField(msg, "type") && Std.string(msg.type).toLowerCase() == "complete" && Reflect.hasField(msg, "data") && Reflect.hasField(msg.data, "id")) {
+                var mid:Int = msg.data.id;
+                if (mid == id) {
+                    if (event != null) {
+                        event();
+                    }
+                    if (updateListener != null) {
+                        removeIndividualListener();
+                    }
+                    return;
+                } else {
+                    var other = pendingMessages.get(mid);
+                    if (other == null) {
+                        other = [];
+                        pendingMessages.set(mid, other);
+                    }
+                    other.push(msg);
                 }
-                if (updateListener != null) {
-                    removeIndividualListener();
-                }
-            } else {
-                var other = pendingMessages.get(mid);
-                if (other == null) {
-                    other = [];
-                    pendingMessages.set(mid, other);
-                }
-                other.push(msg);
             }
-        }
+        } while (!blocking && msg != null);
     }
     
     function addIndividualListener():Void {

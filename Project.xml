@@ -114,6 +114,7 @@
     <haxelib name="crypto" />
     <haxelib name="trandom" unless="android" />
 	<haxelib name="spine-haxe" />
+	<haxelib name="hxmaker" />
 
 	<!--Psych stuff needed-->
 	<haxelib name="linc_luajit" if="LUA_ALLOWED"/>
@@ -157,8 +158,7 @@
 	<haxedef name="lime_threads" if="cpp || hl || neko || java || cs || nodejs" />
 	<!--haxedef name="openfl_enable_experimental_update_queue"/-->
 
-	<!--haxedef name="HXCPP_GC_DYNAMIC_SIZE" /-->
-	<haxedef name="HXCPP_ALIGN_ALLOC"/>
+	<!--haxedef name="HXCPP_ALIGN_ALLOC"/-->
 	<haxedef name="HXCPP_GC_GENERATIONAL" />
 
 	<!-- _______________________________ TRACY ______________________________ -->

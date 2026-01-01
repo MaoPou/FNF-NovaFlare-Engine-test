@@ -124,6 +124,20 @@ extern class GCManager {
 	*/
 	@:native("__hxcpp_set_minimum_working_memory") extern static function setMinimumWorkingMemory(inBytes:Int):Void;
 
+       /**
+       获取当前估计的垃圾字节数。
+       @return 字节数
+      */
+      @:native("__hxcpp_gc_garbage_estimate") extern static function gcGarbageEstimate():Int;
+
+      /**
+       * 执行增量 GC。
+       * @param timeBudgetMs 本次执行的标记工作量时长（毫秒）。
+       */
+      //@:native("__hxcpp_inc_collect") extern static function incCollect(timeBudgetMs:Int):Void;
+}
+
+class LegacyGCManager {
       /**
        触发一次 Minor GC（增量回收）。
       */
@@ -236,11 +250,4 @@ extern class GCManager {
        @return 0 未启用，1 已启用
       */
       @:native("__hxcpp_gc_get_parallel_ref_proc_enabled") extern static function gcGetParallelRefProcEnabled():Int;
-
-
-      /**
-       获取当前估计的垃圾字节数。
-       @return 字节数
-      */
-      @:native("__hxcpp_gc_garbage_estimate") extern static function gcGarbageEstimate():Int;
 }

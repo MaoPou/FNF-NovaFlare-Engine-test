@@ -621,7 +621,7 @@ class FreeplayState extends MusicBeatState
 	override function beatHit()
 	{
 		super.beatHit();
-		if (Std.int(Conductor.getBeat(Conductor.songPosition)) % 2 == 0) SongRect.openRect.beatHit();
+		if (Std.int(Conductor.getBeat(Conductor.songPosition)) % 2 == 0 && SongRect.openRect != null) SongRect.openRect.beatHit();
 	}
 	
 	public static function destroyFreeplayVocals() {
