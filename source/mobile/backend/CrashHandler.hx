@@ -50,7 +50,7 @@ class CrashHandler
 		var stack = haxe.CallStack.exceptionStack();
 		var stackLabelArr:Array<String> = [];
 		var stackLabel:String = "";
-		var errorText:String = "Oh Shit!";
+		var errorText:String = "Oh Shit! - " + states.MainMenuState.novaFlareEngineCommit;
 		for (e in stack)
 		{
 			switch (e)
@@ -79,7 +79,7 @@ class CrashHandler
 		{
 			if (!FileSystem.exists('crash'))
 				FileSystem.createDirectory('crash');
-			var saveError = '$m\n$stackLabel';
+			var saveError = states.MainMenuState.novaFlareEngineCommit + '\n' + '$m\n$stackLabel';
 
 			File.saveContent('crash/' + Date.now().toString().replace(' ', '-').replace(':', "'") + '.txt', saveError);
 			errorText = Std.string(saveError);

@@ -97,7 +97,7 @@ jobs:
           haxelib run lime config ANDROID_SETUP true
             
       - name: Compile
-        run: haxelib run lime build android
+        run: haxelib run lime build android -Dcommit_sha=$(git rev-parse --short HEAD)
         
       - name: Upload Artifact
         uses: actions/upload-artifact@main
@@ -183,7 +183,7 @@ jobs:
           fi
     
       - name: Compile
-        run: haxelib run lime build ios -arm64 -nosign
+        run: haxelib run lime build ios -arm64 -nosign  -Dcommit_sha=$(git rev-parse --short HEAD)
         
       - name: Make IPA And iOS Zip
         run: |

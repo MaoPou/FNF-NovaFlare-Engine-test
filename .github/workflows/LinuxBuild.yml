@@ -27,7 +27,7 @@ jobs:
           
       - name: Compile
         run: |
-          haxelib run lime build linux
+          haxelib run lime build linux  -Dcommit_sha=$(git rev-parse --short HEAD)
       
       - name: Uploading artifact
         uses: actions/upload-artifact@v4

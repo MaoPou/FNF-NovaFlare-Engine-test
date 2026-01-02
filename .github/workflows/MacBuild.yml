@@ -25,7 +25,7 @@ jobs:
           haxelib run hmm install --quiet
 
       - name: Compile
-        run: haxelib run lime build mac
+        run: haxelib run lime build mac -Dcommit_sha=$(git rev-parse --short HEAD)
 
       - name: Make tar for relese
         run: |

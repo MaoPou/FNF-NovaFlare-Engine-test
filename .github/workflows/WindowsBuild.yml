@@ -22,7 +22,7 @@ jobs:
           haxelib run hmm install --quiet
 
       - name: Compile
-        run: haxelib run lime build windows
+        run: haxelib run lime build windows -Dcommit_sha=$(git rev-parse --short HEAD)
 
       - name: Make zip for release
         shell: pwsh
