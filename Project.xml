@@ -114,7 +114,6 @@
     <haxelib name="crypto" />
     <haxelib name="trandom" unless="android" />
 	<haxelib name="spine-haxe" />
-	<haxelib name="hxmaker" />
 
 	<!--Psych stuff needed-->
 	<haxelib name="linc_luajit" if="LUA_ALLOWED"/>
