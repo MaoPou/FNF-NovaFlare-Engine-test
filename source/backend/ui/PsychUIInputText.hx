@@ -525,15 +525,26 @@ class PsychUIInputText extends FlxSpriteGroup
 	public var unfocus:Void->Void;
 
 	public static function set_focusOn(v:PsychUIInputText)
-	{
-		if (focusOn != null && focusOn != v && focusOn.exists)
-		{
-			if (focusOn.unfocus != null)
-				focusOn.unfocus();
-			focusOn.resetCaret();
-		}
-		return (focusOn = v);
-	}
+    {
+        if (focusOn != null && focusOn != v && focusOn.exists)
+        {
+            focusOn._safeDisableTextInput();
+            if (focusOn.unfocus != null)
+                focusOn.unfocus();
+            focusOn.resetCaret();
+        }
+        
+        focusOn = v;
+        
+        if (v != null && v.exists)
+        {
+            v._safeEnableTextInput();
+            v._updateTextInputRect();
+            v.updateCaret();
+        }
+        
+        return v;
+    }
 
 	public var ignoreCheck = false;
 
