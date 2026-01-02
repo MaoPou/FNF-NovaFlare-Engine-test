@@ -27,7 +27,7 @@ class MainMenuState extends MusicBeatState
             haxe.macro.Compiler.getDefine("commit_sha");
         #else
             "dev";
-        #end;
+        #end
 
 	public static var NovaFlareGithubAction:String = '????';
 	public static var createTime:String = 'Time: ????';
