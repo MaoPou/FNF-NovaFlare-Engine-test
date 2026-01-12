@@ -312,6 +312,7 @@ class Paths
 		newGraphic.destroyOnNoUse = false;
 		if (thread) bitmapMutex.acquire();
 			Cache.currentTrackedAssets.set(file, newGraphic);
+			newGraphic.bitmap.getTexture(FlxG.stage.context3D);
 		if (thread) bitmapMutex.release();
 		
 		return newGraphic;

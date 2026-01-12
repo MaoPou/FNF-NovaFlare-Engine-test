@@ -59,6 +59,7 @@ class InitState extends MusicBeatState
 		super.create();
 
 		FlxG.save.bind('funkin', CoolUtil.getSavePath());
+		trace('save path: ' + CoolUtil.getSavePath());
 
 		ClientPrefs.loadPrefs();
 

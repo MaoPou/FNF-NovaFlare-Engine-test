@@ -194,7 +194,7 @@ class LoadingState extends MusicBeatState
 
 		GCManager.enable(false);
 
-		new FlxTimer().start(0.0001, function(tmr:FlxTimer)
+		FlxG.signals.postUpdate.addOnce(function()
 		{
 			ThreadEvent.create(function() {
 				prepareMutex.acquire();
@@ -525,10 +525,11 @@ class LoadingState extends MusicBeatState
 			input = input.substr(1);
 		} //防止BOM字符 <UTF-8 with BOM> <\65279>
 
-		if(input.contains("\r\n")) input.replace("\r\n", "\n");
-
 		var parser = new LuaParser();
 		var e:LuaExpr = parser.parseFromString(input);
+
+		if (e == null)
+			return;
 	
 		ScriptExprTools.lua_searchCallback(e, function(e:LuaExpr, params:Array<LuaExpr>) {
 			switch(e.expr) {
@@ -634,8 +635,6 @@ class LoadingState extends MusicBeatState
 		if (StringTools.fastCodeAt(input, 0) == 0xFEFF) {
 			input = input.substr(1);
 		} //防止BOM字符 <UTF-8 with BOM> <\65279>
-
-		if(input.contains("\r\n")) input.replace("\r\n", "\n");
 
 		var parser = new Parser();
 		parser.allowTypes = parser.allowMetadata = parser.allowJSON = true;
@@ -743,7 +742,6 @@ class LoadingState extends MusicBeatState
 		for (key => bitmap in requestedBitmaps)
 		{
 			if (bitmap != null && Paths.cacheBitmap(key, bitmap, false) != null) {
-				FlxG.bitmap.add(bitmap, false, key);
 				trace('IMAGE: finished preloading image $key');
 			} else
 				trace('IMAGE: failed to cache image $key');

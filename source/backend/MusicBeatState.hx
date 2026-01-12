@@ -155,7 +155,7 @@ class MusicBeatState extends FlxUIState
 	}
 
 	public static var timePassedOnState:Float = 0;
-	public var allowMinorGc:Bool = false;
+	public var allowMinorGc:Bool = true;
 
 	override function update(elapsed:Float)
 	{
@@ -194,7 +194,23 @@ class MusicBeatState extends FlxUIState
 	override function draw()
 	{
 		super.draw();
-		//if (allowMinorGc) GCManager.incCollect(1);
+		/*
+		if (allowMinorGc) {
+			if (GCManager.incMark(0.001)) {
+				// 返回 true 表示标记完成
+				GCManager.finishMark();
+				
+				// 2. 标记完成后，立即开始清理
+				GCManager.startSweep();
+			}
+
+			// 3. 执行增量清理
+			// incSweep 返回 true 表示清理全部完成
+			if (GCManager.incSweep(0.001)) {
+				GCManager.finishSweep();
+			}
+		}
+		*/
 	}
 
 	private function updateSection():Void

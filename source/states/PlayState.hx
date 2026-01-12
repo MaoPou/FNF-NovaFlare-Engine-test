@@ -2617,28 +2617,6 @@ function musicCheck(music:FlxSound, getTime:Float, deviation:Float):Bool
 			checkEventNote();
 		}
 
-	#if debug
-    // 性能测试：合成基准，验证 addNoteInternal 的吞吐效率与事件兼容性
-    // 说明：生成轻量的临时 Note，执行 add/remove 流程并销毁，不影响实际游戏状态
-    public function runAddBenchmarkSynthetic(count:Int = 2000):Void
-    {
-        var t0:Float = Sys.time();
-        var i:Int = 0;
-        while (i < count)
-        {
-            var fake:Note = new Note(Conductor.songPosition, 0, null, (i & 1) == 1);
-            addNoteInternal(fake);
-            notes.remove(fake, false);
-            if (fake.isSustainNote) sustainLayer.remove(fake, false); else tapLayer.remove(fake, false);
-            fake.destroy();
-            i++;
-        }
-        var t1:Float = Sys.time();
-        var ms:Int = Std.int((t1 - t0) * 1000);
-        trace('AddBenchmarkSynthetic: ' + count + ' notes in ' + ms + ' ms');
-    }
-	#end
-
 		destroyNotes();
 
 		#if debug
@@ -2696,6 +2674,28 @@ function musicCheck(music:FlxSound, getTime:Float, deviation:Float):Bool
 		onUpdatePostArgs[0] = elapsed;
 		callOnScripts('onUpdatePost', onUpdatePostArgs);
 	}
+
+	#if debug
+    // 性能测试：合成基准，验证 addNoteInternal 的吞吐效率与事件兼容性
+    // 说明：生成轻量的临时 Note，执行 add/remove 流程并销毁，不影响实际游戏状态
+    public function runAddBenchmarkSynthetic(count:Int = 2000):Void
+    {
+        var t0:Float = Sys.time();
+        var i:Int = 0;
+        while (i < count)
+        {
+            var fake:Note = new Note(Conductor.songPosition, 0, null, (i & 1) == 1);
+            addNoteInternal(fake);
+            notes.remove(fake, false);
+            if (fake.isSustainNote) sustainLayer.remove(fake, false); else tapLayer.remove(fake, false);
+            fake.destroy();
+            i++;
+        }
+        var t1:Float = Sys.time();
+        var ms:Int = Std.int((t1 - t0) * 1000);
+        trace('AddBenchmarkSynthetic: ' + count + ' notes in ' + ms + ' ms');
+    }
+	#end
 
 	public function scoreTxtUpdate()
 	{

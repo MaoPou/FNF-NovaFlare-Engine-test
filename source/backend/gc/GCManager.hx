@@ -130,11 +130,20 @@ extern class GCManager {
       */
       @:native("__hxcpp_gc_garbage_estimate") extern static function gcGarbageEstimate():Int;
 
-      /**
-       * 执行增量 GC。
-       * @param timeBudgetMs 本次执行的标记工作量时长（毫秒）。
-       */
-      //@:native("__hxcpp_inc_collect") extern static function incCollect(timeBudgetMs:Int):Void;
+      /*
+
+      @:native("__hxcpp_gc_start_inc_mark") extern static function startMark():Void;
+
+      @:native("__hxcpp_gc_inc_mark") extern static function incMark(timeoutSeconds:Float):Bool;
+
+      @:native("__hxcpp_gc_finish_inc_mark") extern static function finishMark():Void;
+
+      @:native("__hxcpp_gc_start_inc_sweep") extern static function startSweep():Void;
+
+      @:native("__hxcpp_gc_inc_sweep") extern static function incSweep(timeoutSeconds:Float):Bool;
+
+      @:native("__hxcpp_gc_finish_inc_sweep") extern static function finishSweep():Void;
+      */
 }
 
 class LegacyGCManager {

@@ -12,8 +12,8 @@ import states.TitleState;
 	// General
 	public var framerate:Int = 60;
 	public var drawFramerate:Int = 60;
-	public var newFrameGeneration:Bool = false;
-	public var splitUpdate:Bool = #if desktop false #else true #end;
+	public var newFrameGeneration:Bool = true;
+	public var splitUpdate:Bool = true;
 	public var colorblindMode:String = 'None';
 	public var lowQuality:Bool = false;
 	public var gameQuality:Int = #if mobile 0 #else 1 #end;
@@ -143,7 +143,7 @@ import states.TitleState;
 
 	// Watermark
 	public var showFPS:Bool = true;
-	public var rainbowFPS:Bool = false;
+	public var rainbowFPS:Bool = true;
 	public var memoryType:String = 'Usage';
 	public var FPSScale:Float = 1;
 	public var WatermarkScale:Float = 1;

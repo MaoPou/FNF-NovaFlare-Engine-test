@@ -17,6 +17,10 @@ import sys.thread.Mutex;
 import flixel.ui.FlxButton;
 import flixel.addons.transition.FlxTransitionableState;
 
+import funkin.vis.dsp.MusicBPMDetector;
+
+@:access(flixel.sound.FlxSound._sound)
+@:access(openfl.media.Sound.__buffer)
 class MainMenuState extends MusicBeatState
 {
 	public static var psychEngineVersion:String = '0.7.3'; // This is also used for Discord RPC
@@ -326,6 +330,14 @@ class MainMenuState extends MusicBeatState
 		var buttonX = FlxG.width - 100 - 10;
 		var substate = new flixel.addons.ui.FlxUIButton(buttonX,10,"hello",openSub);
 		add(substate);
+
+		var soundBuffer = FlxG.sound.music;
+
+		// 实例化并检测
+		var detector = new MusicBPMDetector();
+		var result = detector.detect(soundBuffer._sound.__buffer);
+
+		trace("BPM Result: " + result.bpm);
 		
 		super.create();
 	}

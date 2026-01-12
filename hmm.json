@@ -137,6 +137,13 @@
       "url": "https://github.com/EsotericSoftware/spine-runtimes/"
     },
     {
+      "name": "hxmaker",
+      "type": "git",
+      "dir": null,
+      "ref": "main",
+      "url": "https://github.com/rainyt/hxmaker"
+    },
+    {
       "name": "flxanimate",
       "type": "git",
       "dir": null,

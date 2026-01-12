@@ -2,7 +2,7 @@
 <project>
 	<!-- _________________________ Application Settings _________________________ -->
 
-	<app title="NovaFlare Engine" file="NovaFlare Engine" packageName="com.NovaFlareEngine" package="com.NovaFlareEngine" main="Main" version="1.2.0" company="beihu" />
+	<app title="NovaFlareEngine" file="NovaFlareEngine" packageName="com.NovaFlareEngine" package="com.NovaFlareEngine" main="Main" version="1.2.0" company="beihu" />
 	<!--Switch Export with Unique ApplicationID and Icon-->
 	<set name="APP_ID" value="0x0100f6c013bbc000" />
 
@@ -119,6 +119,7 @@
     <haxelib name="crypto" />
     <haxelib name="trandom" unless="android" />
 	<haxelib name="spine-haxe" />
+	<haxelib name="hxmaker" />
 
 	<!--Psych stuff needed-->
 	<haxelib name="linc_luajit" if="LUA_ALLOWED"/>
@@ -162,8 +163,9 @@
 	<haxedef name="lime_threads" if="cpp || hl || neko || java || cs || nodejs" />
 	<!--haxedef name="openfl_enable_experimental_update_queue"/-->
 
-	<!--haxedef name="HXCPP_ALIGN_ALLOC"/-->
+	<haxedef name="HXCPP_ALIGN_ALLOC"/>
 	<haxedef name="HXCPP_GC_GENERATIONAL" />
+	<haxedef name="HXCPP_GC_INCREMENTAL" />
 
 	<!-- _______________________________ TRACY ______________________________ -->
 
