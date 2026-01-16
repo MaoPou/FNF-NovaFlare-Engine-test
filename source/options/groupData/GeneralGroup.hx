@@ -11,7 +11,7 @@ class GeneralGroup extends OptionCata
 		var option:Option = new Option(this, 'General', TITLE);
 		addOption(option);
 
-		var option:Option = new Option(this, 'framerate', INT, [24, 1000, 'FPS']);
+		var option:Option = new Option(this, 'framerate', INT, [24, 10000, 'FPS']);
 		addOption(option);
 		option.onChange = onChangeFramerate;
 

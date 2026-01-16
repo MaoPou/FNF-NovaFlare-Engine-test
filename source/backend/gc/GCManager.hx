@@ -128,11 +128,17 @@ extern class GCManager {
        获取当前估计的垃圾字节数。
        @return 字节数
       */
-      @:native("__hxcpp_gc_garbage_estimate") extern static function gcGarbageEstimate():Int;
+      //@:native("__hxcpp_gc_garbage_estimate") extern static function gcGarbageEstimate():Int;
+
+      @:native("__hxcpp_gc_start_concurrent_mark") extern static function startMarking():Void;
+
+      @:native("__hxcpp_gc_is_concurrent_marking") extern static function isMarking():Bool;
+
+      @:native("__hxcpp_gc_finish_concurrent_mark") extern static function finishMarking():Void;
 
       /*
 
-      @:native("__hxcpp_gc_start_inc_mark") extern static function startMark():Void;
+      
 
       @:native("__hxcpp_gc_inc_mark") extern static function incMark(timeoutSeconds:Float):Bool;
 

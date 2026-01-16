@@ -19,6 +19,7 @@ import backend.Song;
 import backend.StageData;
 import backend.Rating;
 import backend.state.loadingState.*;
+import backend.AsyncTextureUploader;
 
 import sys.thread.Thread;
 import sys.thread.Mutex;
@@ -40,6 +41,8 @@ class LoadingState extends MusicBeatState
 {
 	public static var loaded:Int = 0; //已经加载的数量
 	public static var loadMax:Int = 0; //总体需要加载的数量
+	static var pendingUploads:Int = 0;
+	static var useAsyncUpload:Bool = false;
 
 	static var requestedBitmaps:Map<String, BitmapData> = []; //储存下加载的纹理，再最后进入playstate的时候输出总结
 
@@ -193,6 +196,9 @@ class LoadingState extends MusicBeatState
 		}
 
 		GCManager.enable(false);
+		useAsyncUpload = true;
+
+		super.create();
 
 		FlxG.signals.postUpdate.addOnce(function()
 		{
@@ -203,7 +209,6 @@ class LoadingState extends MusicBeatState
 			}, startThreads);
 		});
 		
-		super.create();
 	}
 
 	public static var imagesToPrepare:Array<String> = [];
@@ -709,6 +714,7 @@ class LoadingState extends MusicBeatState
 
 	function onLoad() //加载完毕进行跳转
 	{
+		useAsyncUpload = false;
 		checkLoaded();
 
 		if (stopMusic && FlxG.sound.music != null)
@@ -739,6 +745,29 @@ class LoadingState extends MusicBeatState
 
 	static function checkLoaded():Bool
 	{
+		if (useAsyncUpload) {
+			var keys = [for (k in requestedBitmaps.keys()) k];
+			for (key in keys) {
+				var bitmap = requestedBitmaps.get(key);
+				requestedBitmaps.remove(key);
+				if (bitmap != null) {
+					pendingUploads++;
+					AsyncTextureUploader.uploadFromBitmap(key, bitmap, function() {
+						pendingUploads--;
+					}, function(err:String) {
+						trace('IMAGE: failed to async upload image $key: $err');
+						// 如果异步失败，尝试回退到同步缓存（或者直接报错）
+						// 这里我们保守处理，直接用原始bitmap缓存
+						if (Paths.cacheBitmap(key, bitmap, false) != null) {
+							trace('IMAGE: fallback synchronous caching for $key');
+						}
+						pendingUploads--;
+					});
+				}
+			}
+			return (loaded == loadMax && pendingUploads == 0 && !requestedBitmaps.iterator().hasNext());
+		}
+
 		for (key => bitmap in requestedBitmaps)
 		{
 			if (bitmap != null && Paths.cacheBitmap(key, bitmap, false) != null) {

@@ -96,7 +96,8 @@ class DataCalc
 
 	static public function getGcMem():Float
 	{
-		return FlxMath.roundDecimal(GCManager.gcGarbageEstimate() / 1024 / 1024, 2); //转化为MB
+		return 0;
+		//FlxMath.roundDecimal(GCManager.gcGarbageEstimate() / 1024 / 1024, 2); //转化为MB
 	}
 }
 

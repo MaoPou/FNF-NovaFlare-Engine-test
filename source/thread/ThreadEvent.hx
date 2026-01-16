@@ -57,7 +57,10 @@ class ThreadEvent {
         var list = pendingMessages.get(id);
         if (list != null && list.length > 0) {
             if (event != null) {
-                event();
+                FlxG.signals.postUpdate.addOnce(function()
+                {
+                    event();
+                });
             }
             if (updateListener != null) {
                 removeIndividualListener();
