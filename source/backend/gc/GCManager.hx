@@ -124,22 +124,11 @@ extern class GCManager {
 	*/
 	@:native("__hxcpp_set_minimum_working_memory") extern static function setMinimumWorkingMemory(inBytes:Int):Void;
 
-       /**
-       获取当前估计的垃圾字节数。
-       @return 字节数
-      */
-      //@:native("__hxcpp_gc_garbage_estimate") extern static function gcGarbageEstimate():Int;
-
-      @:native("__hxcpp_gc_start_concurrent_mark") extern static function startMarking():Void;
-
-      @:native("__hxcpp_gc_is_concurrent_marking") extern static function isMarking():Bool;
-
-      @:native("__hxcpp_gc_finish_concurrent_mark") extern static function finishMarking():Void;
-
-      /*
+      
+      //@:native("__hxcpp_gc_start_concurrent_mark") extern static function concurrentGC():Void;
 
       
-
+      /*
       @:native("__hxcpp_gc_inc_mark") extern static function incMark(timeoutSeconds:Float):Bool;
 
       @:native("__hxcpp_gc_finish_inc_mark") extern static function finishMark():Void;

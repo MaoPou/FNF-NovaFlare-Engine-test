@@ -106,7 +106,7 @@ class ThreadEvent {
     }
     
     function removeIndividualListener():Void {
-        FlxTimer.wait(0.001, () -> {
+        FlxTimer.wait(0.1, () -> {
             if (updateListener != null) {
                 FlxG.signals.preUpdate.remove(updateListener);
                 updateListener = null;

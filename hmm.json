@@ -39,6 +39,11 @@
       "url": "https://github.com/NovaFlare-Engine-haxelib/haxeui-flixel.git"
     },
     {
+      "name": "actuate",
+      "type": "haxelib",
+      "version": "1.9.0"
+    },
+    {
       "name": "flixel-ui",
       "type": "git",
       "dir": null,

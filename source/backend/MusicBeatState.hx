@@ -160,9 +160,7 @@ class MusicBeatState extends FlxUIState
 	override function update(elapsed:Float)
 	{
 		if (allowMinorGc) {
-			if (!GCManager.isMarking()) {
-				GCManager.startMarking();
-			}
+			//GCManager.concurrentGC();
 		}
 
 		// everyStep();
@@ -202,8 +200,7 @@ class MusicBeatState extends FlxUIState
 		super.draw();
 		
 		if (allowMinorGc) {
-			//GCManager.finishMarking();
-			//cpp.vm.Gc.run(false);
+			//GCManager.concurrentGC();
 		}
 	}
 

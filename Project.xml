@@ -2,7 +2,7 @@
 <project>
 	<!-- _________________________ Application Settings _________________________ -->
 
-	<app title="NovaFlareEngine" file="NovaFlareEngine" packageName="com.NovaFlareEngine" package="com.NovaFlareEngine" main="Main" version="1.2.0" company="beihu" />
+	<app title="NovaFlare Engine" file="NovaFlare Engine" packageName="com.NovaFlareEngine" package="com.NovaFlareEngine" main="Main" version="1.2.0" company="NF crew" />
 	<!--Switch Export with Unique ApplicationID and Icon-->
 	<set name="APP_ID" value="0x0100f6c013bbc000" />
 
@@ -164,8 +164,7 @@
 	<!--haxedef name="openfl_enable_experimental_update_queue"/-->
 
 	<haxedef name="HXCPP_ALIGN_ALLOC"/>
-	<haxedef name="HXCPP_GC_GENERATIONAL" />
-	<haxedef name="HXCPP_GC_CONCURRENT" />
+	<!--haxedef name="HXCPP_GC_GENERATIONAL" /-->
 
 	<!-- _______________________________ TRACY ______________________________ -->
 
