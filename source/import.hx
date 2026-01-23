@@ -55,7 +55,7 @@ import backend.Mods;
 import backend.ui.*; // Psych-UI
 import backend.data.*;
 import backend.mouse.*;
-import backend.gc.GCManager;
+import backend.gc.*;
 import backend.extraKeys.ExtraKeysHandler;
 
 import objects.Alphabet;
@@ -75,6 +75,8 @@ import states.LoadingState;
 import flxanimate.*;
 import flxanimate.PsychFlxAnimate as FlxAnimate;
 #end
+
+import sound.FlxStreamSound;
 
 //Spine
 import spine.animation.AnimationStateData;

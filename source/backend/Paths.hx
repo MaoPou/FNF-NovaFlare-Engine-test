@@ -217,6 +217,37 @@ class Paths
 		return file;
 	}
 
+	inline static public function streamMusic(key:String, ?library:String, looped:Bool = false, autoDestroy:Bool = false):FlxSound
+	{
+		var sound:FlxStreamSound = new FlxStreamSound();
+		sound.persist = true; 
+
+		var modLibPath:String = '';
+		if (library != null && library.length > 0)
+			modLibPath = '$library/';
+
+		var file:String = modsSounds(modLibPath, key);
+		trace('file: $file');
+
+		if (FileSystem.exists(file))
+		{
+			sound.loadStream(file, looped, autoDestroy);
+			trace('loaded stream: $file finnish');
+			return sound;
+		}
+
+		var gottenPath:String = getPath('$key.$SOUND_EXT', SOUND, library);
+		gottenPath = gottenPath.substring(gottenPath.indexOf(':') + 1, gottenPath.length);
+		trace('gottenPath: $gottenPath');
+		if (FileSystem.exists(gottenPath))
+		{
+			sound.loadStream(gottenPath, looped, autoDestroy);
+			return sound;
+		}
+
+		return sound;
+	}
+
 	inline static public function voices(song:String, postfix:String = null):Any
 	{
 		var songKey:String = '${formatToSongPath(song)}/Voices';

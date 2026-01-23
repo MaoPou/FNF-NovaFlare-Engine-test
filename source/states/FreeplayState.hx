@@ -203,13 +203,13 @@ class FreeplayState extends MusicBeatState
 		add(detailMusican);
 
 		detailPlaySign = new FlxSprite(0).loadGraphic(Paths.image(filePath + 'playedCount'));
-		detailPlaySign.setGraphicSize(Std.int(50));
+		detailPlaySign.setGraphicSize(25, 25);
 		detailPlaySign.updateHitbox();
 		detailPlaySign.antialiasing = ClientPrefs.data.antialiasing;
 		detailPlaySign.x = detailSongName.x;
 		detailPlaySign.y = detailMusican.y + detailMusican.height + 5;
 		detailPlaySign.camera = camAfter;
-		detailPlaySign.offset.set(0,0);
+		//detailPlaySign.offset.set(0,0);
 		add(detailPlaySign);
 
 		detailPlayText = new FlxText(0, 0, 0, '0', Std.int(detailRect.bg1.height * 0.25));
@@ -222,13 +222,13 @@ class FreeplayState extends MusicBeatState
 		add(detailPlayText);
 
 		detailTimeSign = new FlxSprite(0).loadGraphic(Paths.image(filePath + 'songTime'));
-		detailTimeSign.setGraphicSize(Std.int(50));
+		detailTimeSign.setGraphicSize(25, 25);
 		detailTimeSign.updateHitbox();
 		detailTimeSign.antialiasing = ClientPrefs.data.antialiasing;
 		detailTimeSign.x = detailSongName.x + 150;
 		detailTimeSign.camera = camAfter;
 		detailTimeSign.y = detailPlaySign.y;
-		detailTimeSign.offset.set(0,0);
+		//detailTimeSign.offset.set(0,0);
 		add(detailTimeSign);
 
 		detailTimeText = new FlxText(0, 0, 0, '1:00', Std.int(detailRect.bg1.height * 0.25));
@@ -241,13 +241,13 @@ class FreeplayState extends MusicBeatState
 		add(detailTimeText);
 
 		detailBpmSign = new FlxSprite(0).loadGraphic(Paths.image(filePath + 'bpmCount'));
-		detailBpmSign.setGraphicSize(Std.int(50));
+		detailBpmSign.setGraphicSize(25, 25);
 		detailBpmSign.updateHitbox();
 		detailBpmSign.antialiasing = ClientPrefs.data.antialiasing;
 		detailBpmSign.x = detailSongName.x + 300;
 		detailBpmSign.camera = camAfter;
 		detailBpmSign.y = detailPlaySign.y;
-		detailBpmSign.offset.set(0,0);
+		//detailBpmSign.offset.set(0,0);
 		add(detailBpmSign);
 
 		detailBpmText = new FlxText(0, 0, 0, '300', Std.int(detailRect.bg1.height * 0.25));
@@ -554,13 +554,14 @@ class FreeplayState extends MusicBeatState
 	{
 		curSelected = FlxMath.wrap(curSelected + change, 0, songGroup.length - 1);
 
+		Mods.currentModDirectory = songsData[curSelected].folder;
+		PlayState.storyWeek = songsData[curSelected].week;
+
 		songsMove.tweenData = FlxG.height * 0.5 - SongRect.fixHeight * 0.5 - curSelected * SongRect.fixHeight * rectInter - (curSelected <= SongRect.openRect.id ? 0 : Difficulty.list.length * DiffRect.fixHeight * 1.05 + SongRect.fixHeight * (0.1 * 2));
 		
-		if (playSound)
-			FlxG.sound.play(Paths.sound('scrollMenu'), 0.4);
+		if (playSound) FlxG.sound.play(Paths.sound('scrollMenu'), 0.4);
 
 		background.changeSprite(Cache.getFrame('freePlayBG-' + songGroup[curSelected].bgPath));
-		
 		var colors:Array<Int> = songsData[curSelected].color;
 		var newColor:Int = FlxColor.fromRGB(Std.int(colors[0] * 1.0), Std.int(colors[1] * 1.0), Std.int(colors[2] * 1.0));
 		if (newColor != intendedColor)
@@ -569,8 +570,11 @@ class FreeplayState extends MusicBeatState
 			background.changeColor(intendedColor);
 		}
 
-		Mods.currentModDirectory = songsData[curSelected].folder;
-		PlayState.storyWeek = songsData[curSelected].week;
+		////////////////////////////////////////////////////////////
+
+		if (FlxG.sound.music != null) FlxG.sound.music.stop();
+		FlxG.sound.music = Paths.streamMusic('${Paths.formatToSongPath(songsData[curSelected].songName)}/Inst', 'songs', true);
+		FlxG.sound.music.play();
 	}
 
 	public function updateSongLayerOrder():Void

@@ -159,10 +159,6 @@ class MusicBeatState extends FlxUIState
 
 	override function update(elapsed:Float)
 	{
-		if (allowMinorGc) {
-			//GCManager.concurrentGC();
-		}
-
 		// everyStep();
 		var oldStep:Int = curStep;
 		timePassedOnState += elapsed;
@@ -200,7 +196,7 @@ class MusicBeatState extends FlxUIState
 		super.draw();
 		
 		if (allowMinorGc) {
-			//GCManager.concurrentGC();
+			IncrementalGC.run(1);
 		}
 	}
 

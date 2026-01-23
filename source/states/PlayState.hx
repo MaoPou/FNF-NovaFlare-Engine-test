@@ -866,6 +866,8 @@ class PlayState extends MusicBeatState
 
 		if (eventNotes.length < 1)
 			checkEventNote();
+
+		allowMinorGc = true;
 	}
 
 	function set_songSpeed(value:Float):Float

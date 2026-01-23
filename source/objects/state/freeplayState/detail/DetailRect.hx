@@ -11,7 +11,7 @@ class DetailRect extends FlxSpriteGroup{
 		bg1.antialiasing = ClientPrefs.data.antialiasing;
 		add(bg1);
 
-        bg2 = new SkewSegmentGradientRoundRect(-117, 0, bg1.width, 105, 15, 15, -10, 0, FlxColor.BLACK, [[0, 0.5, 0.4], [1, 0.5, 0.2]]);
+        bg2 = new SkewSegmentGradientRoundRect(-117, 0, bg1.width, 100, 15, 15, -10, 0, FlxColor.BLACK, [[0, 0.5, 0.4], [1, 0.5, 0.2]]);
         bg2.y += bg1.y + bg1.height - bg2.height;
 		bg2.antialiasing = ClientPrefs.data.antialiasing;
 		add(bg2);
