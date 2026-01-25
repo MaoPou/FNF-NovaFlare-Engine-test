@@ -43,7 +43,7 @@ class SongRect extends FlxSpriteGroup {
         add(selectShow);
         
         var path:String = PreThreadLoad.bgPathCheck(Mods.currentModDirectory, 'data/${songNameSt}/bg');
-        if (Cache.getFrame(path) == null) addBGCache(path);
+        if (!Cache.checkFrame(path)) addBGCache(path);
         bgPath = path;
 
         bg = new FlxSprite();

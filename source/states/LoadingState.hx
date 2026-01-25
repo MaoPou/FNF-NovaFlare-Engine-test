@@ -222,11 +222,11 @@ class LoadingState extends MusicBeatState
 	public static function prepare(images:Array<String> = null, sounds:Array<String> = null, music:Array<String> = null)
 	{
 		if (images != null)
-			imagesToPrepare = imagesToPrepare.concat(images);
+			for (file in images) putPreload(imagesToPrepare, file);
 		if (sounds != null)
-			soundsToPrepare = soundsToPrepare.concat(sounds);
+			for (file in sounds) putPreload(soundsToPrepare, file);
 		if (music != null)
-			musicToPrepare = musicToPrepare.concat(music);
+			for (file in music) putPreload(musicToPrepare, file);
 	}
 
 	public static function prepareToSong()
@@ -347,10 +347,6 @@ class LoadingState extends MusicBeatState
 		preloadScript();
 
 		waitPrepare = false;
-		haxe.MainLoop.runInMainThread(function() {
-			loadMax = imagesToPrepare.length + soundsToPrepare.length + musicToPrepare.length + songsToPrepare.length;
-			loaded = 0;
-		});
 	}
 	
 
@@ -707,7 +703,10 @@ class LoadingState extends MusicBeatState
 				precentText.text = precent + '%'; // 修复显示问题
 		};
 
-		intendedPercent = loaded / loadMax;
+		if (loadMax > 0)
+			intendedPercent = loaded / loadMax;
+		else
+			intendedPercent = 1;
 
 		if (curPercent == 1)
 		{
@@ -784,8 +783,11 @@ class LoadingState extends MusicBeatState
 
 	public static function startThreads()
 	{
-		//Sys.sleep(0.01);
+		clearInvalids();
+		loaded = 0;
+		loadMax = imagesToPrepare.length + soundsToPrepare.length + musicToPrepare.length + songsToPrepare.length;
 
+		//trace('LoadingState: startThreads, loadMax: $loadMax');
 		loadThread = new ThreadPool(ClientPrefs.data.loadThreads, ClientPrefs.data.loadThreads, MULTI_THREADED);
 		threadInit();
 
@@ -808,6 +810,7 @@ class LoadingState extends MusicBeatState
 
 		
 		for (image in imagesToPrepare) {
+			//trace('LoadingState: startThreads, image: $image');
 			threadWork(() -> 
 			{
 				var bitmap:BitmapData = null;
@@ -921,7 +924,7 @@ class LoadingState extends MusicBeatState
 	{
 		clearInvalidFrom(imagesToPrepare, 'images', '.png', IMAGE);
 		clearInvalidFrom(soundsToPrepare, 'sounds', '.${Paths.SOUND_EXT}', SOUND);
-		clearInvalidFrom(musicToPrepare, 'music', ' .${Paths.SOUND_EXT}', SOUND);
+		clearInvalidFrom(musicToPrepare, 'music', '.${Paths.SOUND_EXT}', SOUND);
 		clearInvalidFrom(songsToPrepare, 'songs', '.${Paths.SOUND_EXT}', SOUND);
 
 		for (arr in [imagesToPrepare, soundsToPrepare, musicToPrepare, songsToPrepare])

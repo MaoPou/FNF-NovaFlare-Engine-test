@@ -23,7 +23,7 @@ class Triangle extends FlxSprite
 	{
 		var newGraphic:FlxGraphic = FlxGraphic.fromBitmapData(drawHollowTriangle(sizeLength, innerPixels));
 		newGraphic.persist = true;
-		newGraphic.destroyOnNoUse = false;
+		newGraphic.destroyOnNoUse = true;
 		Cache.setFrame('triangle-v2-s:'+Std.int(sizeLength)+'-i:'+Std.int(innerPixels), {graphic:newGraphic, frame:null});
 	}
 

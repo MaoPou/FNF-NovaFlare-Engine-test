@@ -42,7 +42,7 @@ class SkewRoundRect extends FlxSprite
 		var bitmap:BitmapData = drawSkewRoundRect(width, height, roundWidth, roundHeight, skewXDeg, skewYDeg, lineStyle, lineColor);
 		var graphic:FlxGraphic = FlxGraphic.fromBitmapData(bitmap);
 		graphic.persist = true;
-		graphic.destroyOnNoUse = false;
+		graphic.destroyOnNoUse = true;
 
 		var key = 'skewRoundRect-w' + Std.int(width) + '-h:' + Std.int(height)
 			+ '-rw:' + Std.int(roundWidth) + '-rh:' + Std.int(roundHeight)

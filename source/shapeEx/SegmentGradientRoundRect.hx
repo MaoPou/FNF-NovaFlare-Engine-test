@@ -42,7 +42,7 @@ class SegmentGradientRoundRect extends FlxSprite
 		var bmp = drawSegmentGradientRoundRect(width, height, round, s, e, alphaMul);
 		var newGraphic:FlxGraphic = FlxGraphic.fromBitmapData(bmp);
 		newGraphic.persist = true;
-		newGraphic.destroyOnNoUse = false;
+		newGraphic.destroyOnNoUse = true;
 		Cache.setFrame(getKey(width, height, round, s, e, alphaMul), {graphic:newGraphic, frame:null});
 	}
 

@@ -34,10 +34,14 @@ class FlxStreamSound extends FlxSound
 			
 			// 绑定事件
 			_vlcPlayer.onEndReached.add(function() {
-				if (_onVLC) stopped();
+				FlxG.signals.postUpdate.addOnce(function() {
+					if (_onVLC) stopped();
+				});
 			});
 			_vlcPlayer.onEncounteredError.add(function(_) {
-				if (_onVLC) cleanup(true);
+				FlxG.signals.postUpdate.addOnce(function() {
+					if (_onVLC) cleanup(true);
+				});
 			});
 			_vlcPlayer.onOpening.add(function() {
 				if (_vlcPlayer.videoTrack != -1) _vlcPlayer.videoTrack = -1;
@@ -170,8 +174,8 @@ class FlxStreamSound extends FlxSound
 			if (_channel == null) 
 				_channel = @:privateAccess new SoundChannel(null, null, null);
 			
-			_time = cast _vlcPlayer.time;
-			_length = cast _vlcPlayer.length;
+			_time = haxe.Int64.toInt(_vlcPlayer.time);
+			_length = haxe.Int64.toInt(_vlcPlayer.length);
 		}
 		
 		if (endTime != null && _time >= endTime)

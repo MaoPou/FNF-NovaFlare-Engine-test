@@ -59,7 +59,7 @@ class SkewSegmentGradientRoundRect extends FlxSprite
 		var bitmap:BitmapData = drawSkewSegmentGradientRoundRect(width, height, roundWidth, roundHeight, skewXDeg, skewYDeg, pairs, alphaMul);
 		var graphic:FlxGraphic = FlxGraphic.fromBitmapData(bitmap);
 		graphic.persist = true;
-		graphic.destroyOnNoUse = false;
+		graphic.destroyOnNoUse = true;
 		var key = getKey(width, height, roundWidth, roundHeight, skewXDeg, skewYDeg, pairs, alphaMul);
 		Cache.setFrame(key, {graphic:graphic, frame:null});
 	}

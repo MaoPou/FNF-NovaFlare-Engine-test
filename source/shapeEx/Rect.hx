@@ -20,7 +20,7 @@ class Rect extends FlxSprite
 	function addCache(width:Float = 0, height:Float = 0, roundWidth:Float = 0, roundHeight:Float = 0, lineStyle:Int, lineColor:FlxColor) {
 		var newGraphic:FlxGraphic = FlxGraphic.fromBitmapData(drawRect(width, height, roundWidth, roundHeight, lineStyle, lineColor));
 		newGraphic.persist = true;
-		newGraphic.destroyOnNoUse = false;
+		newGraphic.destroyOnNoUse = true;
 
 		Cache.setFrame('rect-w'+Std.int(width)+'-h:'+Std.int(height)+'-rw:'+Std.int(roundWidth)+'-rh:'+Std.int(roundHeight), {graphic:newGraphic, frame:null});
 	}

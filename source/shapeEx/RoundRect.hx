@@ -354,7 +354,7 @@ class RoundRect extends FlxSpriteGroup
 
 		var newGraphic:FlxGraphic = FlxGraphic.fromBitmapData(bitmap);
 		newGraphic.persist = true;
-		newGraphic.destroyOnNoUse = false;
+		newGraphic.destroyOnNoUse = true;
 		Cache.setFrame('roundRect-round' +type+'-w'+width+'-h:'+height, {graphic:newGraphic, frame:null});
 	}
 
@@ -377,7 +377,7 @@ class RoundRect extends FlxSpriteGroup
 
 		var newGraphic:FlxGraphic = FlxGraphic.fromBitmapData(bitmap);
 		newGraphic.persist = true;
-		newGraphic.destroyOnNoUse = false;
+		newGraphic.destroyOnNoUse = true;
 		Cache.setFrame('roundRect-rect-w'+width+'-h:'+height, {graphic:newGraphic, frame:null});
 	}
 }
