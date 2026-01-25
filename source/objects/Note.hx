@@ -454,7 +454,7 @@ class Note extends FlxSprite
 		}
 		else
 		{
-			if (Cache.checkFrame(skin) == false) addSkinCache(skin);
+			if (!Cache.checkFrame(skin)) addSkinCache(skin);
 				
 			frames = Cache.getFrame(skin);
 
@@ -793,7 +793,7 @@ class Note extends FlxSprite
 			spr.animation.addByPrefix(Note.colArray[data] + 'hold', Note.colArray[data] + ' hold piece');
 			spr.animation.addByPrefix(Note.colArray[data] + 'Scroll', Note.colArray[data] + '0');
 		}
-		Cache.setFrame(skin, spr.frames);
+		Cache.setFrame(skin, {graphic:null, frame:spr.frames});
 		Cache.currentTrackedAnims.set(skin, spr.animation);
 	}
 }

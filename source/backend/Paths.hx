@@ -1,6 +1,7 @@
 package backend;
 
 import flixel.graphics.frames.FlxFrame.FlxFrameAngle;
+import flixel.graphics.frames.FlxFramesCollection;
 import flixel.graphics.frames.FlxAtlasFrames;
 import flixel.graphics.FlxGraphic;
 import flixel.math.FlxRect;
@@ -49,6 +50,36 @@ class Paths
 			}
 		}
 
+		// clear all frames that are cached
+		for (key in Cache.currentTrackedFrames.keys())
+		{
+			if (key == null) continue;
+			var obj = Cache.getFrame(key);
+			if (obj != null)
+			{
+				if (obj is FlxGraphic)
+				{
+					var graphic = cast(obj, FlxGraphic);
+						graphic.persist = false; // make sure the garbage collector actually clears it up
+						graphic.destroyOnNoUse = true;
+						graphic.destroy();
+				} else {
+					var frames = cast(obj, FlxFramesCollection);
+						frames.destroy();
+				}
+			}
+		}
+
+		for (key in Cache.currentTrackedAnims.keys())
+		{
+			if (key == null) continue;
+			var obj = Cache.currentTrackedAnims.get(key);
+			if (obj != null)
+			{
+				obj.destroy();
+			}
+		}
+
 		// clear all sounds that are cached
 		for (key in Cache.currentTrackedSounds.keys())
 		{
@@ -64,6 +95,7 @@ class Paths
 					Cache.currentTrackedSounds.remove(key);
 			}
 		}
+
 		// flags everything to be cleared out next unused memory clear
 		Cache.localTrackedAssets = [];
 		Cache.currentTrackedFrames = [];

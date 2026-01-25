@@ -43,7 +43,7 @@ class HealthIcon extends FlxSprite
 				var delimiter:Int = (Math.floor(graphic.width / 3) >= graphic.height) ? 3 : 2;
 				spr.loadGraphic(graphic, true, Math.floor(graphic.width / delimiter), graphic.height);
 				updateHitbox();
-				Cache.setFrame('icon-' + Mods.currentModDirectory + '-' + char, spr.frames);
+				Cache.setFrame('icon-' + Mods.currentModDirectory + '-' + char, {graphic:null, frame:spr.frames});
 			}
 
 			frames = Cache.getFrame('icon-' + Mods.currentModDirectory + '-' + char);

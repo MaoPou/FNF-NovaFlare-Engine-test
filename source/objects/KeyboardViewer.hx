@@ -429,6 +429,6 @@ class DisBitmap extends Bitmap
 		var newGraphic:FlxGraphic = FlxGraphic.fromBitmapData(BitmapData);
 		spr.loadGraphic(newGraphic);
 
-		Cache.currentTrackedFrames.set('keyboardViewer', spr.frames);
+		Cache.setFrame('keyboardViewer', {graphic:null, frame:spr.frames});
 	}
 }

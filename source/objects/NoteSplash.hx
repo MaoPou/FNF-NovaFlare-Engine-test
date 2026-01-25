@@ -180,19 +180,19 @@ class NoteSplash extends FlxSprite
 	{
 		maxAnims = 0;
 
-		if (Cache.checkFrame(skin) == false) addSkinCache(skin);	
+		if (!Cache.checkFrame(skin)) addSkinCache(skin);	
 		frames = Cache.getFrame(skin);
 
 		var config:NoteSplashConfig = null;
 		if (frames == null)
 		{
 			skin = defaultNoteSplash + getSplashSkinPostfix();
-			if (Cache.checkFrame(skin) == false) addSkinCache(skin);	
+			if (!Cache.checkFrame(skin)) addSkinCache(skin);	
 			frames = Cache.getFrame(skin);
 			if (frames == null) // if you really need this, you really fucked something up
 			{
 				skin = defaultNoteSplash;
-				if (Cache.checkFrame(skin) == false) addSkinCache(skin);	
+				if (!Cache.checkFrame(skin)) addSkinCache(skin);	
 				frames = Cache.getFrame(skin);
 			}
 		}
@@ -284,7 +284,7 @@ class NoteSplash extends FlxSprite
 
 	static function addSkinCache(skin:String)
 	{
-		Cache.setFrame(skin, Paths.getSparrowAtlas(skin, null, false));
+		Cache.setFrame(skin, {graphic:null, frame:Paths.getSparrowAtlas(skin, null, false)});
 	}
 }
 

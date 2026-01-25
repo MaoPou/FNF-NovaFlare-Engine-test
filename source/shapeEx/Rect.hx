@@ -10,7 +10,7 @@ class Rect extends FlxSprite
 
 		this.mainRound = roundWidth;
 
-		if (Cache.getFrame('rect-w'+Std.int(width)+'-h:'+Std.int(height)+'-rw:'+Std.int(roundWidth)+'-rh:'+Std.int(roundHeight)) == null) addCache(width, height, roundWidth, roundHeight, lineStyle, lineColor);
+		if (!Cache.checkFrame('rect-w'+Std.int(width)+'-h:'+Std.int(height)+'-rw:'+Std.int(roundWidth)+'-rh:'+Std.int(roundHeight))) addCache(width, height, roundWidth, roundHeight, lineStyle, lineColor);
 		frames = Cache.getFrame('rect-w'+Std.int(width)+'-h:'+Std.int(height)+'-rw:'+Std.int(roundWidth)+'-rh:'+Std.int(roundHeight));
 		antialiasing = ClientPrefs.data.antialiasing;
 		color = Color;
@@ -22,7 +22,7 @@ class Rect extends FlxSprite
 		newGraphic.persist = true;
 		newGraphic.destroyOnNoUse = false;
 
-		Cache.setFrame('rect-w'+Std.int(width)+'-h:'+Std.int(height)+'-rw:'+Std.int(roundWidth)+'-rh:'+Std.int(roundHeight), newGraphic.imageFrame);
+		Cache.setFrame('rect-w'+Std.int(width)+'-h:'+Std.int(height)+'-rw:'+Std.int(roundWidth)+'-rh:'+Std.int(roundHeight), {graphic:newGraphic, frame:null});
 	}
 
 	function drawRect(width:Float, height:Float, roundWidth:Float, roundHeight:Float, lineStyle:Int, lineColor:FlxColor):BitmapData

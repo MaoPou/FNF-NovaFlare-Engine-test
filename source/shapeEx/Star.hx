@@ -28,7 +28,7 @@ class Star extends FlxSprite
 		graphic.persist = true;
 		graphic.destroyOnNoUse = false;
 		var key = 'star5-s:' + Std.int(size) + '-ir:' + Std.int(innerRatio * 100) + '-ls:' + lineStyle + '-lc:' + lineColor;
-		Cache.setFrame(key, graphic.imageFrame);
+		Cache.setFrame(key, {graphic:graphic, frame:null});
 	}
 
 	function drawStar5(size:Float, innerRatio:Float, lineStyle:Int, lineColor:FlxColor):BitmapData

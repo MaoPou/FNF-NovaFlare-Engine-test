@@ -43,7 +43,7 @@ class SegmentGradientRoundRect extends FlxSprite
 		var newGraphic:FlxGraphic = FlxGraphic.fromBitmapData(bmp);
 		newGraphic.persist = true;
 		newGraphic.destroyOnNoUse = false;
-		Cache.setFrame(getKey(width, height, round, s, e, alphaMul), newGraphic.imageFrame);
+		Cache.setFrame(getKey(width, height, round, s, e, alphaMul), {graphic:newGraphic, frame:null});
 	}
 
 	inline function normalizePoint(w:Int, h:Int, p:Array<Float>):Array<Float>

@@ -347,6 +347,10 @@ class LoadingState extends MusicBeatState
 		preloadScript();
 
 		waitPrepare = false;
+		haxe.MainLoop.runInMainThread(function() {
+			loadMax = imagesToPrepare.length + soundsToPrepare.length + musicToPrepare.length + songsToPrepare.length;
+			loaded = 0;
+		});
 	}
 	
 
@@ -781,9 +785,6 @@ class LoadingState extends MusicBeatState
 	public static function startThreads()
 	{
 		//Sys.sleep(0.01);
-
-		loadMax = imagesToPrepare.length + soundsToPrepare.length + musicToPrepare.length + songsToPrepare.length;
-		loaded = 0;
 
 		loadThread = new ThreadPool(ClientPrefs.data.loadThreads, ClientPrefs.data.loadThreads, MULTI_THREADED);
 		threadInit();

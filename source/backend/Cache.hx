@@ -1,21 +1,11 @@
 package backend;
 
-import flixel.graphics.frames.FlxFrame.FlxFrameAngle;
 import flixel.graphics.frames.FlxFramesCollection;
-import flixel.graphics.frames.FlxAtlasFrames;
 import flixel.graphics.frames.FlxFrame;
 import flixel.graphics.FlxGraphic;
 import flixel.animation.FlxAnimationController;
-import flixel.math.FlxRect;
 
-import openfl.display.BitmapData;
-import openfl.display3D.textures.RectangleTexture;
-import openfl.utils.AssetType;
-import openfl.utils.Assets;
-import openfl.system.System;
-import openfl.geom.Rectangle;
 import openfl.media.Sound;
-import haxe.Json;
 
 class Cache {
     // define the locally tracked assets
@@ -25,7 +15,7 @@ class Cache {
 
     public static var currentTrackedSounds:Map<String, Sound> = []; //用于列举当前状态的所有声音资源
 
-	public static var currentTrackedFrames:Map<String, FlxFramesCollection> = []; //用于列举当前状态的所有动画帧资源
+	public static var currentTrackedFrames:Map<String, {graphic:FlxGraphic, frame:FlxFramesCollection}> = []; //用于列举当前状态的所有图形资源
 
 	public static var currentTrackedAnims:Map<String, FlxAnimationController> = []; //用于列举当前状态的所有动画资源
 
@@ -41,24 +31,39 @@ class Cache {
 		'assets/shared/music/tea-time.$Paths.SOUND_EXT',
 	];
 
-	public static function setFrame(key:String, frame:FlxFramesCollection)
+	public static function setFrame(key:String, data:{graphic:FlxGraphic, frame:FlxFramesCollection})
 	{
-		Cache.currentTrackedFrames.set(key, frame);
-		Cache.localTrackedAssets.push(key);
+		Cache.currentTrackedFrames.set(key, data);
 	}
 
 	public static function checkFrame(key:String):Bool
 	{
 		if (currentTrackedFrames.get(key) == null) return false;
-		if (currentTrackedFrames.get(key).frames == null || currentTrackedFrames.get(key).frames.length == 0) {
-			currentTrackedFrames.remove(key);
-			return false;
+
+		if (currentTrackedFrames.get(key).graphic != null
+			&& currentTrackedFrames.get(key).graphic.imageFrame != null 
+			&& currentTrackedFrames.get(key).graphic.imageFrame.frames != null 
+			&& currentTrackedFrames.get(key).graphic.imageFrame.frames.length > 0) {
+			return true;
 		}
-		return true;
+
+		if (currentTrackedFrames.get(key).frame != null 
+			&& currentTrackedFrames.get(key).frame.frames != null 
+			&& currentTrackedFrames.get(key).frame.frames.length > 0) {
+			return true;
+		}
+
+		currentTrackedFrames.remove(key);
+		return false;
 	}
 
 	public static function getFrame(key:String):FlxFramesCollection
 	{
-		return currentTrackedFrames.get(key);
+		if (currentTrackedFrames.get(key).frame != null) {
+			return currentTrackedFrames.get(key).frame;
+		} else if (currentTrackedFrames.get(key).graphic != null) {
+			return currentTrackedFrames.get(key).graphic.imageFrame;
+		}
+		return null;
 	}
 }

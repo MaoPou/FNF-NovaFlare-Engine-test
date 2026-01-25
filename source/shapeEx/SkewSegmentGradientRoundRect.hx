@@ -61,7 +61,7 @@ class SkewSegmentGradientRoundRect extends FlxSprite
 		graphic.persist = true;
 		graphic.destroyOnNoUse = false;
 		var key = getKey(width, height, roundWidth, roundHeight, skewXDeg, skewYDeg, pairs, alphaMul);
-		Cache.setFrame(key, graphic.imageFrame);
+		Cache.setFrame(key, {graphic:graphic, frame:null});
 	}
 
 	inline function normalizePoint(w:Int, h:Int, p:Array<Float>):Array<Float>

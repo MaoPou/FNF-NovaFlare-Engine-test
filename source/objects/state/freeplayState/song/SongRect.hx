@@ -112,10 +112,10 @@ class SongRect extends FlxSpriteGroup {
 
         newGraphic = FlxGraphic.fromBitmapData(resizedBitmapData);
 
-        Cache.setFrame(filesLoad, newGraphic.imageFrame);
+        Cache.setFrame(filesLoad, {graphic:newGraphic, frame:null});
 
         var mainBGcache:FlxGraphic = Paths.cacheBitmap(filesLoad, null, false);
-        Cache.setFrame('freePlayBG-' + filesLoad, mainBGcache.imageFrame); //预加载大界面的图像
+        Cache.setFrame('freePlayBG-' + filesLoad, {graphic:mainBGcache, frame:null}); //预加载大界面的图像
 	}
 
     public var onFocus(default, set):Bool = true; //是当前这个歌曲被选择

@@ -335,7 +335,7 @@ class RoundRect extends FlxSpriteGroup
 	function drawRoundRect(x:Float, y:Float, width:Float = 0, height:Float = 0, round:Float = 0, type:Int):BaseSprite
 	{
 		var sprite:BaseSprite = new BaseSprite(x, y);
-		if (Cache.getFrame('roundRect-round' +type+'-w'+width+'-h:'+height) == null) addRoundCache(width, height, round, type);
+		if (!Cache.checkFrame('roundRect-round' +type+'-w'+width+'-h:'+height)) addRoundCache(width, height, round, type);
 		sprite.frames = Cache.getFrame('roundRect-round' +type+'-w'+width+'-h:'+height);
 		return sprite;
 	}
@@ -355,13 +355,13 @@ class RoundRect extends FlxSpriteGroup
 		var newGraphic:FlxGraphic = FlxGraphic.fromBitmapData(bitmap);
 		newGraphic.persist = true;
 		newGraphic.destroyOnNoUse = false;
-		Cache.setFrame('roundRect-round' +type+'-w'+width+'-h:'+height, newGraphic.imageFrame);
+		Cache.setFrame('roundRect-round' +type+'-w'+width+'-h:'+height, {graphic:newGraphic, frame:null});
 	}
 
 	function drawRect(x:Float, y:Float, width:Float = 0, height:Float = 0):BaseSprite
 	{
 		var sprite:BaseSprite = new BaseSprite(x, y);
-		if (Cache.getFrame('roundRect-rect-w'+width+'-h:'+height) == null) addRectCache(width, height);
+		if (!Cache.checkFrame('roundRect-rect-w'+width+'-h:'+height)) addRectCache(width, height);
 		sprite.frames = Cache.getFrame('roundRect-rect-w'+width+'-h:'+height);
 		return sprite;
 	}
@@ -378,7 +378,7 @@ class RoundRect extends FlxSpriteGroup
 		var newGraphic:FlxGraphic = FlxGraphic.fromBitmapData(bitmap);
 		newGraphic.persist = true;
 		newGraphic.destroyOnNoUse = false;
-		Cache.setFrame('roundRect-rect-w'+width+'-h:'+height, newGraphic.imageFrame);
+		Cache.setFrame('roundRect-rect-w'+width+'-h:'+height, {graphic:newGraphic, frame:null});
 	}
 }
 

@@ -166,7 +166,7 @@ class PreThreadLoad {
                             iconPool = null;
                         }
                         
-                        Cache.currentTrackedFrames.set(file + ' r:' + memData.color[0] + ' g:' + memData.color[1] + ' b:' + memData.color[2], newGraphic.imageFrame);
+                        Cache.setFrame(file + ' r:' + memData.color[0] + ' g:' + memData.color[1] + ' b:' + memData.color[2], {graphic:newGraphic, frame:null});
                     countMutex.release();
                     if (devTrace) trace('RECT: load ' + file + ' color r:' + memData.color[0] + ' g:' + memData.color[1] + ' b:' + memData.color[2] + ' finish');
                 }
@@ -221,7 +221,7 @@ class PreThreadLoad {
                             iconPool = null;
                         }
                         
-                        Cache.currentTrackedFrames.set(file, newGraphic.imageFrame);
+                        Cache.setFrame(file, {graphic:newGraphic, frame:null});
                     countMutex.release();
                     if (devTrace) trace('ICON: load ' + file + ' finish');
                 }

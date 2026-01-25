@@ -48,7 +48,7 @@ class SkewRoundRect extends FlxSprite
 			+ '-rw:' + Std.int(roundWidth) + '-rh:' + Std.int(roundHeight)
 			+ '-sx:' + Std.int(skewXDeg) + '-sy:' + Std.int(skewYDeg)
 			+ '-ls:' + lineStyle + '-lc:' + lineColor;
-		Cache.setFrame(key, graphic.imageFrame);
+		Cache.setFrame(key, {graphic:graphic, frame:null});
 	}
 
 	function drawSkewRoundRect(
