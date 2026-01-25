@@ -249,11 +249,8 @@ class Paths
 		return file;
 	}
 
-	inline static public function streamMusic(key:String, ?library:String, looped:Bool = false, autoDestroy:Bool = false):FlxSound
+	inline static public function soundPath(key:String, ?library:String):String
 	{
-		var sound:FlxStreamSound = new FlxStreamSound();
-		sound.persist = true; 
-
 		var modLibPath:String = '';
 		if (library != null && library.length > 0)
 			modLibPath = '$library/';
@@ -263,9 +260,7 @@ class Paths
 
 		if (FileSystem.exists(file))
 		{
-			sound.loadStream(file, looped, autoDestroy);
-			trace('loaded stream: $file finnish');
-			return sound;
+			return file;
 		}
 
 		var gottenPath:String = getPath('$key.$SOUND_EXT', SOUND, library);
@@ -273,11 +268,10 @@ class Paths
 		trace('gottenPath: $gottenPath');
 		if (FileSystem.exists(gottenPath))
 		{
-			sound.loadStream(gottenPath, looped, autoDestroy);
-			return sound;
+			return gottenPath;
 		}
-
-		return sound;
+		
+		return null;
 	}
 
 	inline static public function voices(song:String, postfix:String = null):Any

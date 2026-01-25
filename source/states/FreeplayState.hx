@@ -573,7 +573,7 @@ class FreeplayState extends MusicBeatState
 		////////////////////////////////////////////////////////////
 
 		if (FlxG.sound.music != null) FlxG.sound.music.stop();
-		FlxG.sound.music = Paths.streamMusic('${Paths.formatToSongPath(songsData[curSelected].songName)}/Inst', 'songs', true);
+		FlxG.sound.music.loadStream(Paths.soundPath('${Paths.formatToSongPath(songsData[curSelected].songName)}/Inst', 'songs'), true, false);
 		FlxG.sound.music.play();
 	}
 

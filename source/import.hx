@@ -76,8 +76,6 @@ import flxanimate.*;
 import flxanimate.PsychFlxAnimate as FlxAnimate;
 #end
 
-import sound.FlxStreamSound;
-
 //Spine
 import spine.animation.AnimationStateData;
 import spine.animation.AnimationState;
