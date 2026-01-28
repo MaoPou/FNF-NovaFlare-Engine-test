@@ -522,43 +522,39 @@ class FreeplayState extends MusicBeatState
 		{
 			songLowercase = Paths.formatToSongPath(songsData[curSelected].songName);
 			poop = Highscore.formatSong(songLowercase, curDifficulty);
+			PlayState.SONG = Song.loadFromJson(poop, songLowercase);
 		} catch (e:Dynamic) {
 			trace(e);
 			return;
 		}
 
-		PlayState.SONG = Song.loadFromJson(poop, songLowercase);
-
-		var soundAllowed = [];
 		if (FlxG.sound.music != null) FlxG.sound.music.stop();
 
 		if (FileSystem.exists(Paths.songPath('${PlayState.SONG.song}/Inst'))) {
 			FlxG.sound.music.loadStream(Paths.songPath('${PlayState.SONG.song}/Inst'), true, false);
-			soundAllowed.push('1');
 		}
 
 		if (PlayState.SONG.needsVoices)
 		{
 			if (FileSystem.exists(Paths.songPath('${PlayState.SONG.song}/Voices'))) {
-				FlxG.sound.music.addTrack(Paths.songPath('${PlayState.SONG.song}/Voices'));
+				FlxG.sound.music.addTrack(Paths.songPath('${PlayState.SONG.song}/Voices'), null, 2);
 			} else {
 				var playerVocals:String = getVocalFromCharacter(PlayState.SONG.player1);
 				var loadedVocals = Paths.songPath('${PlayState.SONG.song}/Voices${playerVocals}');
 
 				if (FileSystem.exists(loadedVocals)) {
-					FlxG.sound.music.addTrack(loadedVocals);
+					FlxG.sound.music.addTrack(loadedVocals, null, 2);
 				}
 
 				var playerVocals:String = getVocalFromCharacter(PlayState.SONG.player2);
 				var loadedVocals = Paths.songPath('${PlayState.SONG.song}/Voices${playerVocals}');
 
 				if (FileSystem.exists(loadedVocals)) {
-					FlxG.sound.music.addTrack(loadedVocals);
+					FlxG.sound.music.addTrack(loadedVocals, null, 3);
 				}
 			}
 		}
-
-		if (soundAllowed.indexOf('1') != -1) FlxG.sound.music.play();
+		FlxG.sound.music.play();
 
 	}
 
