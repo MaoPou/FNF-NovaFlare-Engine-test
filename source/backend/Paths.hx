@@ -249,29 +249,26 @@ class Paths
 		return file;
 	}
 
-	inline static public function soundPath(key:String, ?library:String):String
+	inline static public function songPath(song:String, ?postfix:String):String
 	{
-		var modLibPath:String = '';
-		if (library != null && library.length > 0)
-			modLibPath = '$library/';
+		var key:String = '${formatToSongPath(song)}';
+		if (postfix != null && postfix.length > 0)
+			key += '-' + postfix;
 
-		var file:String = modsSounds(modLibPath, key);
-		trace('file: $file');
+		#if MODS_ALLOWED
+		var file:String = modsSounds('songs/', key);
+
+		trace(file);
 
 		if (FileSystem.exists(file))
 		{
 			return file;
 		}
+		#end
 
-		var gottenPath:String = getPath('$key.$SOUND_EXT', SOUND, library);
-		gottenPath = gottenPath.substring(gottenPath.indexOf(':') + 1, gottenPath.length);
-		trace('gottenPath: $gottenPath');
-		if (FileSystem.exists(gottenPath))
-		{
-			return gottenPath;
-		}
-		
-		return null;
+		var retKey:String = key;
+		retKey = getPath('$retKey.$SOUND_EXT', SOUND, 'songs');
+		return retKey;
 	}
 
 	inline static public function voices(song:String, postfix:String = null):Any
@@ -279,7 +276,7 @@ class Paths
 		var songKey:String = '${formatToSongPath(song)}/Voices';
 		if (postfix != null)
 			songKey += '-' + postfix;
-		// trace('songKey test: $songKey');
+
 		var voices = returnSound(null, songKey, 'songs');
 		return voices;
 	}

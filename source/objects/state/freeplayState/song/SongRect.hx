@@ -166,9 +166,10 @@ class SongRect extends FlxSpriteGroup {
         selectLight.alpha = 0.6;
 	    FreeplayState.curSelected = this.id;
         FreeplayState.instance.changeSelection();
-        FreeplayState.instance.songsMove.tweenData = FlxG.height * 0.5 - SongRect.fixHeight * 0.5 - FreeplayState.curSelected * SongRect.fixHeight * FreeplayState.instance.rectInter;
         createDiff(imme);
-	}
+        FreeplayState.instance.songsMove.tweenData = FlxG.height * 0.5 - SongRect.fixHeight * 0.5 - FreeplayState.curSelected * SongRect.fixHeight * FreeplayState.instance.rectInter - (FreeplayState.curDifficulty+1) * DiffRect.fixHeight * 1.05;
+        FreeplayState.instance.initSongsData();
+    }
 	
     //////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -221,7 +222,6 @@ class SongRect extends FlxSpriteGroup {
                 }
             }
             diffFouceUpdate();
-            FreeplayState.instance.songsMove.tweenData = FlxG.height * 0.5 - SongRect.fixHeight * 0.5 - FreeplayState.curSelected * SongRect.fixHeight * FreeplayState.instance.rectInter - (FreeplayState.curDifficulty+1) * DiffRect.fixHeight * 1.05;
         } else {
             for (member in diffRectGroup.members)
             {
@@ -233,7 +233,6 @@ class SongRect extends FlxSpriteGroup {
                 rect.startTarY = bg.height + fixHeight / 10 + rect.id * DiffRect.fixHeight * 1.05;
             }
             diffFouceUpdate();
-            FreeplayState.instance.songsMove.tweenData = FlxG.height * 0.5 - SongRect.fixHeight * 0.5 - FreeplayState.curSelected * SongRect.fixHeight * FreeplayState.instance.rectInter - (FreeplayState.curDifficulty+1) * DiffRect.fixHeight * 1.05;
         }
 
         diffAdded = true;

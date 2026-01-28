@@ -338,18 +338,10 @@ class ModsMenuState extends MusicBeatState
 				FlxG.sound.music.fadeOut(0.3);
 				if (!ClientPrefs.data.freeplayOld)
 				{
-					if (FreeplayState.vocals != null)
+					if (FreeplayState.vocalsPlayer1 != null)
 					{
-						FreeplayState.vocals.fadeOut(0.3);
-						FreeplayState.vocals = null;
-					}
-				}
-				else
-				{
-					if (FreeplayStatePsych.vocals != null)
-					{
-						FreeplayStatePsych.vocals.fadeOut(0.3);
-						FreeplayStatePsych.vocals = null;
+						FreeplayState.vocalsPlayer1.fadeOut(0.3);
+						FreeplayState.vocalsPlayer1 = null;
 					}
 				}
 				FlxG.camera.fade(FlxColor.BLACK, 0.5, false, FlxG.resetGame, false);
@@ -420,18 +412,10 @@ class ModsMenuState extends MusicBeatState
 				FlxG.sound.music.fadeOut(0.3);
 				if (!ClientPrefs.data.freeplayOld)
 				{
-					if (FreeplayState.vocals != null)
+					if (FreeplayState.vocalsPlayer1 != null)
 					{
-						FreeplayState.vocals.fadeOut(0.3);
-						FreeplayState.vocals = null;
-					}
-				}
-				else
-				{
-					if (FreeplayStatePsych.vocals != null)
-					{
-						FreeplayStatePsych.vocals.fadeOut(0.3);
-						FreeplayStatePsych.vocals = null;
+						FreeplayState.vocalsPlayer1.fadeOut(0.3);
+						FreeplayState.vocalsPlayer1 = null;
 					}
 				}
 				FlxG.camera.fade(FlxColor.BLACK, 0.5, false, FlxG.resetGame, false);

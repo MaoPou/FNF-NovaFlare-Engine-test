@@ -56,7 +56,8 @@ class FreeplayState extends MusicBeatState
 	var camSongs:FlxCamera;
 	var camAfter:FlxCamera;
 
-	public static var vocals:FlxSound = null;
+	public static var vocalsPlayer1:FlxSound;
+	public static var vocalsPlayer2:FlxSound;
 
 	public var mouseEvent:MouseEvent;
 
@@ -380,7 +381,10 @@ class FreeplayState extends MusicBeatState
 
 		//////////////////////////////////////////////////////////////////////////////////////////
 
-		
+		vocalsPlayer1 = new FlxSound();
+		vocalsPlayer2 = new FlxSound();
+		FlxG.sound.list.add(vocalsPlayer1);
+		FlxG.sound.list.add(vocalsPlayer2);
 
 		//////////////////////////////////////////////////////////////////////////////////////////
 
@@ -502,12 +506,60 @@ class FreeplayState extends MusicBeatState
 			{
 				if (curSelected != SongRect.openRect.id) {
 			   		songGroup[curSelected].changeSelectAll();
+					initSongsData();
 				} else {
 					startGame();
 				}
 			}
 		}
 		updateSongVisibility();
+	}
+
+	public function initSongsData() {
+		var songLowercase:String;
+		var poop:String;
+		try
+		{
+			songLowercase = Paths.formatToSongPath(songsData[curSelected].songName);
+			poop = Highscore.formatSong(songLowercase, curDifficulty);
+		} catch (e:Dynamic) {
+			trace(e);
+			return;
+		}
+
+		PlayState.SONG = Song.loadFromJson(poop, songLowercase);
+
+		var soundAllowed = [];
+		if (FlxG.sound.music != null) FlxG.sound.music.stop();
+
+		if (FileSystem.exists(Paths.songPath('${PlayState.SONG.song}/Inst'))) {
+			FlxG.sound.music.loadStream(Paths.songPath('${PlayState.SONG.song}/Inst'), true, false);
+			soundAllowed.push('1');
+		}
+
+		if (PlayState.SONG.needsVoices)
+		{
+			if (FileSystem.exists(Paths.songPath('${PlayState.SONG.song}/Voices'))) {
+				FlxG.sound.music.addTrack(Paths.songPath('${PlayState.SONG.song}/Voices'));
+			} else {
+				var playerVocals:String = getVocalFromCharacter(PlayState.SONG.player1);
+				var loadedVocals = Paths.songPath('${PlayState.SONG.song}/Voices${playerVocals}');
+
+				if (FileSystem.exists(loadedVocals)) {
+					FlxG.sound.music.addTrack(loadedVocals);
+				}
+
+				var playerVocals:String = getVocalFromCharacter(PlayState.SONG.player2);
+				var loadedVocals = Paths.songPath('${PlayState.SONG.song}/Voices${playerVocals}');
+
+				if (FileSystem.exists(loadedVocals)) {
+					FlxG.sound.music.addTrack(loadedVocals);
+				}
+			}
+		}
+
+		if (soundAllowed.indexOf('1') != -1) FlxG.sound.music.play();
+
 	}
 
 	public function startGame() {
@@ -571,10 +623,6 @@ class FreeplayState extends MusicBeatState
 		}
 
 		////////////////////////////////////////////////////////////
-
-		if (FlxG.sound.music != null) FlxG.sound.music.stop();
-		FlxG.sound.music.loadStream(Paths.soundPath('${Paths.formatToSongPath(songsData[curSelected].songName)}/Inst', 'songs'), true, false);
-		FlxG.sound.music.play();
 	}
 
 	public function updateSongLayerOrder():Void
@@ -630,6 +678,22 @@ class FreeplayState extends MusicBeatState
 	
 	public static function destroyFreeplayVocals() {
 		
+	}
+
+	function getVocalFromCharacter(char:String)
+	{
+		try
+		{
+			var path:String = Paths.getPath('characters/$char.json', TEXT);
+			#if MODS_ALLOWED
+			var character:Dynamic = Json.parse(File.getContent(path));
+			#else
+			var character:Dynamic = Json.parse(Assets.getText(path));
+			#end
+			if (character.vocals_file != null && character.vocals_file != "" && character.vocals_file.length > 0)
+			return '-'+ character.vocals_file;
+		}
+		return '';
 	}
 }
 
