@@ -528,22 +528,34 @@ class FreeplayState extends MusicBeatState
 			return;
 		}
 
+		Conductor.bpm = PlayState.SONG.bpm;
+
+		updateAudio();
+	}
+
+	var allowPlayMusic:Bool = true;
+	public var alreadyLoadSongPath:String = '';
+	public function updateAudio() {
 		if (FlxG.sound.music != null) FlxG.sound.music.stop();
+		allowPlayMusic = false;
 
 		if (FileSystem.exists(Paths.songPath('${PlayState.SONG.song}/Inst'))) {
 			FlxG.sound.music.loadStream(Paths.songPath('${PlayState.SONG.song}/Inst'), true, false);
+			allowPlayMusic = true;
 		}
 
 		if (PlayState.SONG.needsVoices)
 		{
 			if (FileSystem.exists(Paths.songPath('${PlayState.SONG.song}/Voices'))) {
 				FlxG.sound.music.addTrack(Paths.songPath('${PlayState.SONG.song}/Voices'), null, 2);
+				FlxG.sound.music._vlcPlayer.members[1].volume = 0.8;
 			} else {
 				var playerVocals:String = getVocalFromCharacter(PlayState.SONG.player1);
 				var loadedVocals = Paths.songPath('${PlayState.SONG.song}/Voices${playerVocals}');
 
 				if (FileSystem.exists(loadedVocals)) {
 					FlxG.sound.music.addTrack(loadedVocals, null, 2);
+					FlxG.sound.music._vlcPlayer.members[1].volume = 0.8;
 				}
 
 				var playerVocals:String = getVocalFromCharacter(PlayState.SONG.player2);
@@ -551,11 +563,11 @@ class FreeplayState extends MusicBeatState
 
 				if (FileSystem.exists(loadedVocals)) {
 					FlxG.sound.music.addTrack(loadedVocals, null, 3);
+					FlxG.sound.music._vlcPlayer.members[2].volume = 0.8;
 				}
 			}
 		}
-		FlxG.sound.music.play();
-
+		if (allowPlayMusic) FlxG.sound.music.play();
 	}
 
 	public function startGame() {

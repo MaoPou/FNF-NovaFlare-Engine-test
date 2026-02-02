@@ -264,7 +264,7 @@
 
 <config>
 	<android minimum-sdk-version="24" />
-	<android target-sdk-version= "35" />
+	<android target-sdk-version= "36" />
     <!--Fuck you xcode-->
     <ios deployment="13.6"/>
 </config>

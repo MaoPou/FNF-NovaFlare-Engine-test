@@ -37,6 +37,8 @@ import scripts.init.InitScriptData;
 
 import sys.thread.Thread;
 
+import lime.graphics.opengl.GL;
+
 class InitState extends MusicBeatState
 {
 	var skipVideo:FlxText;
@@ -115,6 +117,10 @@ class InitState extends MusicBeatState
 		var maxTextureSize:Int = GL.getParameter(GL.MAX_TEXTURE_SIZE);
 		trace('maxTextureSize: ' + maxTextureSize);
 		Image.setMaxTextureSize(maxTextureSize);
+
+		trace("GL_VENDOR=" + GL.getString(GL.VENDOR));
+		trace("GL_RENDERER=" + GL.getString(GL.RENDERER));
+		trace("GL_VERSION=" + GL.getString(GL.VERSION));
 
 		Language.resetData();
 

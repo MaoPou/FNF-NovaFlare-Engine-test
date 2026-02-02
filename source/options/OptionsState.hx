@@ -48,7 +48,8 @@ class OptionsState extends MusicBeatState
 
 	override function create()
 	{
-		Paths.clearStoredMemory();
+		if (stateType != 2)
+			Paths.clearStoredMemory();
 		
 		persistentUpdate = persistentDraw = true;
 		instance = this;

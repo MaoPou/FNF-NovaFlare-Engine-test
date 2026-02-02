@@ -36,6 +36,7 @@ class KeyboardViewer extends FlxSpriteGroup
 	{
 		super();
 		instance = this;
+		moves = false;
 
 		_x = X;
 		_y = Y;
@@ -71,6 +72,7 @@ class KeyboardViewer extends FlxSpriteGroup
 				obj.y -= obj.height / 2;
 				obj.color = OptionsHelpers.colorArray(ClientPrefs.data.keyboardTextColor);
 				obj.alpha = ClientPrefs.data.keyboardAlpha;
+				obj.moves = false;
 				keyTexts.push(obj);
 				add(obj);
 			}
@@ -90,6 +92,7 @@ class KeyboardViewer extends FlxSpriteGroup
 				obj.color = OptionsHelpers.colorArray(ClientPrefs.data.keyboardTextColor);
 				obj.alpha = ClientPrefs.data.keyboardAlpha;
 				obj.antialiasing = ClientPrefs.data.antialiasing;
+				obj.moves = false;
 				add(obj);
 			}
 			kpsText = new FlxText(members[12].x + members[12].width / 2, members[12].y + members[12].height / 5 * 3.5, KeyButton.size * 2 + 4, '0', 15, false);
@@ -98,6 +101,7 @@ class KeyboardViewer extends FlxSpriteGroup
 			kpsText.y -= kpsText.height / 2;
 			kpsText.color = OptionsHelpers.colorArray(ClientPrefs.data.keyboardTextColor);
 			kpsText.alpha = ClientPrefs.data.keyboardAlpha;
+			kpsText.moves = false;
 
 			if (FlxG.save.data.keyboardtotal != null)
 				total = FlxG.save.data.keyboardtotal;
@@ -108,6 +112,7 @@ class KeyboardViewer extends FlxSpriteGroup
 			totalText.y -= totalText.height / 2;
 			totalText.color = OptionsHelpers.colorArray(ClientPrefs.data.keyboardTextColor);
 			totalText.alpha = ClientPrefs.data.keyboardAlpha;
+			totalText.moves = false;
 			add(kpsText);
 			add(totalText);
 		}
@@ -135,6 +140,7 @@ class KeyboardViewer extends FlxSpriteGroup
 				obj.y -= obj.height / 2;
 				obj.color = OptionsHelpers.colorArray(ClientPrefs.data.keyboardTextColor);
 				obj.alpha = ClientPrefs.data.keyboardAlpha;
+				obj.moves = false;
 				keyTexts.push(obj);
 				add(obj);
 			}
@@ -158,6 +164,7 @@ class KeyboardViewer extends FlxSpriteGroup
 				obj.color = OptionsHelpers.colorArray(ClientPrefs.data.keyboardTextColor);
 				obj.alpha = ClientPrefs.data.keyboardAlpha;
 				obj.antialiasing = ClientPrefs.data.antialiasing;
+				obj.moves = false;
 				add(obj);
 			}
 
@@ -167,6 +174,7 @@ class KeyboardViewer extends FlxSpriteGroup
 			kpsText.y -= kpsText.height / 2;
 			kpsText.color = OptionsHelpers.colorArray(ClientPrefs.data.keyboardTextColor);
 			kpsText.alpha = ClientPrefs.data.keyboardAlpha;
+			kpsText.moves = false;
 
 			if (FlxG.save.data.keyboardtotal != null)
 				total = FlxG.save.data.keyboardtotal;
@@ -177,6 +185,7 @@ class KeyboardViewer extends FlxSpriteGroup
 			totalText.y -= totalText.height / 2;
 			totalText.color = OptionsHelpers.colorArray(ClientPrefs.data.keyboardTextColor);
 			totalText.alpha = ClientPrefs.data.keyboardAlpha;
+			totalText.moves = false;
 			add(kpsText);
 			add(totalText);
 		}
@@ -323,6 +332,7 @@ class KeyButton extends FlxSprite
 		loadGraphic(BitmapData);
 		antialiasing = ClientPrefs.data.antialiasing;
 		color = OptionsHelpers.colorArray(ClientPrefs.data.keyboardBGColor);
+		moves = false;
 	}
 }
 
@@ -347,6 +357,7 @@ class KeyButtonAlpha extends FlxSprite
 		loadGraphic(BitmapData);
 		antialiasing = ClientPrefs.data.antialiasing;
 		alpha = 0;
+		moves = false;
 	}
 }
 
@@ -367,6 +378,7 @@ class TimeDis extends FlxSprite
 		_frame.frame.height = 1;
 		color = OptionsHelpers.colorArray(ClientPrefs.data.keyboardBGColor);
 		alpha = ClientPrefs.data.keyboardAlpha;
+		moves = false;
 	}
 
 	var saveTime:Float;

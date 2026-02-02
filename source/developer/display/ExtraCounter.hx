@@ -79,10 +79,10 @@ class ExtraCounter extends Sprite
 		this.typeName.text = "Update \nDraw \nMemery \n";
 
 		var outputText:String = '';
-		var showTime:Float = Math.floor((DataCalc.updateFrameTime) * 10) / 10;
-		outputText += DataCalc.updateFPS + " / " + ClientPrefs.data.framerate + "fps (" + Display.fix(showTime, 1) + " ms) \n";
-		showTime = Math.floor((DataCalc.drawFrameTime) * 10) / 10;
-		outputText += DataCalc.drawFPS + " / " + (ClientPrefs.data.splitUpdate ? ClientPrefs.data.drawFramerate : ClientPrefs.data.framerate) + "fps (" + Display.fix(showTime, 1) + " ms) \n";
+		var showTime:Float = Math.floor((DataCalc.updateFrameTime) * 100) / 100;
+		outputText += DataCalc.updateFPS + " / " + ClientPrefs.data.framerate + "fps (" + Display.fix(showTime, 2) + " ms) \n";
+		showTime = Math.floor((DataCalc.drawFrameTime) * 100) / 100;
+		outputText += DataCalc.drawFPS + " / " + (ClientPrefs.data.splitUpdate ? ClientPrefs.data.drawFramerate : ClientPrefs.data.framerate) + "fps (" + Display.fix(showTime, 2) + " ms) \n";
 		outputText += "APP:" + Display.fix(DataCalc.appMem, 2) + " GC:" + Display.fix(DataCalc.gcMem, 2) + " MB \n";
 		this.typeData.text = outputText;
 		typeData.width = typeData.textWidth;

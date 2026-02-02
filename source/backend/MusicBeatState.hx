@@ -195,9 +195,9 @@ class MusicBeatState extends FlxUIState
 	{
 		super.draw();
 		
-		if (allowMinorGc) {
-			IncrementalGC.run(1);
-		}
+		#if TRACY_ALLOWED
+			cpp.vm.tracy.TracyProfiler.frameMark();
+		#end
 	}
 
 	private function updateSection():Void

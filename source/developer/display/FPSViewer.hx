@@ -67,10 +67,6 @@ class FPSViewer extends Sprite
 		fpsShow.update();
 		extraShow.update();
 
-		#if TRACY_ALLOWED
-			cpp.vm.tracy.TracyProfiler.frameMark();
-		#end
-
 		this.x = 10 - FlxG.game.x;
 		this.y = 10 - FlxG.game.y;
 	}

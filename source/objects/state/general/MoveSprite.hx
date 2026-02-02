@@ -32,9 +32,9 @@ class MoveSprite extends FlxSprite{
     
 	private var offsetX:Float = 0;
     private var offsetY:Float = 0;
-    override function update(elapsed:Float)
+    override function draw()
 	{
-		super.update(elapsed);
+		super.draw();
         if (allowMove) {
 			var mouseX = FlxG.mouse.getWorldPosition().x;
 			var mouseY = FlxG.mouse.getWorldPosition().y;
@@ -44,9 +44,9 @@ class MoveSprite extends FlxSprite{
 			var targetOffsetX = Math.min(0.99, (mouseX - centerX) / (FlxG.width / 2)) * (realWidth - FlxG.width) / 2;
 			var targetOffsetY = Math.min(0.99, (mouseY - centerY) / (FlxG.height / 2)) * (realHeight - FlxG.height) / 2;
 			
-			if (Math.abs(offsetX - targetOffsetX) > 0.5) offsetX = FlxMath.lerp(targetOffsetX, offsetX, Math.exp(-elapsed * bgFollowSmooth));
+			if (Math.abs(offsetX - targetOffsetX) > 0.5) offsetX = FlxMath.lerp(targetOffsetX, offsetX, Math.exp(-FlxG.drawElapsed * bgFollowSmooth));
 			else offsetX = targetOffsetX;
-			if (Math.abs(offsetY - targetOffsetY) > 0.5) offsetY = FlxMath.lerp(targetOffsetY, offsetY, Math.exp(-elapsed * bgFollowSmooth));
+			if (Math.abs(offsetY - targetOffsetY) > 0.5) offsetY = FlxMath.lerp(targetOffsetY, offsetY, Math.exp(-FlxG.drawElapsed * bgFollowSmooth));
 			else offsetY = targetOffsetY;
 			
 			this.x = centerX - realWidth / 2 + offsetX;

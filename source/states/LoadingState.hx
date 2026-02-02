@@ -39,14 +39,16 @@ import cutscenes.DialogueBoxPsych;
 
 class LoadingState extends MusicBeatState
 {
-	public static var loaded:Int = 0; //已经加载的数量
+	public static var loaded(get, set):Int; //已经加载的数量
 	public static var loadMax:Int = 0; //总体需要加载的数量
 	static var pendingUploads:Int = 0;
-	static var useAsyncUpload:Bool = false;
+	static var current:LoadingState = null;
+	static var _loaded:Int = 0;
 
 	static var requestedBitmaps:Map<String, BitmapData> = []; //储存下加载的纹理，再最后进入playstate的时候输出总结
 
 	static var loadThread:ThreadPool = null; //真正加载时的总线程池
+	static var prepareEvent:ThreadEvent = null;
 
 	static var prepareMutex:Mutex = new Mutex(); //准备资源锁，这是为了防止数据提前被主线程接收
 
@@ -55,6 +57,20 @@ class LoadingState extends MusicBeatState
 
 	inline static public function loadAndSwitchState(target:FlxState, stopMusic = false, intrusive:Bool = true)
 		MusicBeatState.switchState(getNextState(target, stopMusic, intrusive));
+
+	static inline function get_loaded():Int {
+		return _loaded;
+	}
+	static function set_loaded(v:Int):Int {
+		_loaded = v;
+		if (current != null) {
+			if (loadMax > 0)
+				current.intendedPercent = _loaded / loadMax;
+			else
+				current.intendedPercent = 1;
+		}
+		return v;
+	}
 
 	static function getNextState(target:FlxState, stopMusic = false, intrusive:Bool = true):FlxState
 	{
@@ -85,6 +101,7 @@ class LoadingState extends MusicBeatState
 
 		if (doPrecache)
 		{
+			pendingUploads = 0;
 			startThreads();
 			while (true)
 			{
@@ -196,13 +213,13 @@ class LoadingState extends MusicBeatState
 		}
 
 		GCManager.enable(false);
-		useAsyncUpload = true;
 
 		super.create();
+		current = this;
 
 		FlxG.signals.postUpdate.addOnce(function()
 		{
-			ThreadEvent.create(function() {
+			prepareEvent = ThreadEvent.create(function() {
 				prepareMutex.acquire();
 				startPrepare();
 				prepareMutex.release();
@@ -703,10 +720,7 @@ class LoadingState extends MusicBeatState
 				precentText.text = precent + '%'; // 修复显示问题
 		};
 
-		if (loadMax > 0)
-			intendedPercent = loaded / loadMax;
-		else
-			intendedPercent = 1;
+		// intendedPercent 由 loaded 的 set 方法驱动更新
 
 		if (curPercent == 1)
 		{
@@ -717,8 +731,7 @@ class LoadingState extends MusicBeatState
 
 	function onLoad() //加载完毕进行跳转
 	{
-		useAsyncUpload = false;
-		checkLoaded();
+		if (!checkLoaded()) return;
 
 		if (stopMusic && FlxG.sound.music != null)
 			FlxG.sound.music.stop();
@@ -729,6 +742,16 @@ class LoadingState extends MusicBeatState
 		soundsToPrepare = [];
 		musicToPrepare = [];
 		songsToPrepare = [];
+
+		if (loadThread != null) {
+			loadThread.cancel();
+			loadThread = null;
+		}
+		if (prepareEvent != null) {
+			prepareEvent.cancel();
+			prepareEvent.destroy();
+			prepareEvent = null;
+		}
 
 		GCManager.enable(true);
 
@@ -748,29 +771,6 @@ class LoadingState extends MusicBeatState
 
 	static function checkLoaded():Bool
 	{
-		if (useAsyncUpload) {
-			var keys = [for (k in requestedBitmaps.keys()) k];
-			for (key in keys) {
-				var bitmap = requestedBitmaps.get(key);
-				requestedBitmaps.remove(key);
-				if (bitmap != null) {
-					pendingUploads++;
-					AsyncTextureUploader.uploadFromBitmap(key, bitmap, function() {
-						pendingUploads--;
-					}, function(err:String) {
-						trace('IMAGE: failed to async upload image $key: $err');
-						// 如果异步失败，尝试回退到同步缓存（或者直接报错）
-						// 这里我们保守处理，直接用原始bitmap缓存
-						if (Paths.cacheBitmap(key, bitmap, false) != null) {
-							trace('IMAGE: fallback synchronous caching for $key');
-						}
-						pendingUploads--;
-					});
-				}
-			}
-			return (loaded == loadMax && pendingUploads == 0 && !requestedBitmaps.iterator().hasNext());
-		}
-
 		for (key => bitmap in requestedBitmaps)
 		{
 			if (bitmap != null && Paths.cacheBitmap(key, bitmap, false) != null) {

@@ -170,6 +170,7 @@ class PlayState extends MusicBeatState
 
 	public var notes:FlxTypedGroup<Note>;
 	public var killNotes:Array<Note> = [];
+	public var killNotesBudget:Int = 20;
 	public var unspawnNotes:Array<Note> = [];
 	public var eventNotes:Array<EventNote> = [];
 	public var tempNotes:Array<Note> = [];
@@ -2335,7 +2336,7 @@ function musicCheck(music:FlxSound, getTime:Float, deviation:Float):Bool
 
 	var pausedSongPos:Float = 0;
 
-	override public function update(elapsed:Float)
+	override function update(elapsed:Float)
 	{
 		if (ClientPrefs.data.pauseButton)
 		{
@@ -2495,12 +2496,6 @@ function musicCheck(music:FlxSound, getTime:Float, deviation:Float):Bool
 				timeTxt.text = FlxStringUtil.formatTime(secondsTotal, false);
 		}
 
-		if (camZooming)
-		{
-			FlxG.camera.zoom = FlxMath.lerp(defaultCamZoom, FlxG.camera.zoom, Math.exp(-elapsed * 3.125 * camZoomingDecay * playbackRate));
-			camHUD.zoom = FlxMath.lerp(1, camHUD.zoom, Math.exp(-elapsed * 3.125 * camZoomingDecay * playbackRate));
-		}
-
 		FlxG.watch.addQuick("secShit", curSection);
 		FlxG.watch.addQuick("beatShit", curBeat);
 		FlxG.watch.addQuick("stepShit", curStep);
@@ -2520,13 +2515,22 @@ function musicCheck(music:FlxSound, getTime:Float, deviation:Float):Bool
 				time /= songSpeed;
 			if (unspawnNotes[0].multSpeed < 1)
 				time /= unspawnNotes[0].multSpeed;
-
-			while (unspawnNotes.length > 0 && unspawnNotes[0].strumTime - Conductor.songPosition < time)
+			var spawnCount:Int = 0;
+			var lenUnspawn:Int = unspawnNotes.length;
+			while (spawnCount < lenUnspawn && unspawnNotes[spawnCount].strumTime - Conductor.songPosition < time)
 			{
-				var dunceNote:Note = unspawnNotes[0];
-				addNoteInternal(dunceNote);
-
-				unspawnNotes.shift();
+				spawnCount++;
+			}
+			if (spawnCount > 0)
+			{
+				var k:Int = 0;
+				while (k < spawnCount)
+				{
+					var dunceNote:Note = unspawnNotes[k];
+					addNoteInternal(dunceNote);
+					k++;
+				}
+				unspawnNotes.splice(0, spawnCount);
 			}
 		}
 
@@ -2588,7 +2592,7 @@ function musicCheck(music:FlxSound, getTime:Float, deviation:Float):Bool
 								{
 									if (((!daNote.mustPress && !cpuControlled_opponent && ClientPrefs.data.playOpponent) || (daNote.mustPress && !cpuControlled && !ClientPrefs.data.playOpponent))
 										&& !daNote.ignoreNote && !endingSong && (daNote.tooLate == true || daNote.wasGoodHit == false) && !daNote.missed)
-										noteMiss(daNote);
+										noteMiss(daNote, i);
 								}
 							}
 							i++;
@@ -2670,6 +2674,24 @@ function musicCheck(music:FlxSound, getTime:Float, deviation:Float):Bool
 
 		onUpdatePostArgs[0] = elapsed;
 		callOnScripts('onUpdatePost', onUpdatePostArgs);
+	}
+
+	override function draw() {
+		if (camZooming)
+		{
+			if (FlxG.camera.zoom - defaultCamZoom > 0.005)
+				FlxG.camera.zoom = FlxMath.lerp(defaultCamZoom, FlxG.camera.zoom, Math.exp(-FlxG.drawElapsed * 3.125 * camZoomingDecay * playbackRate));
+			else {
+				FlxG.camera.zoom = defaultCamZoom;
+			}
+
+			if (camHUD.zoom - 1 > 0.005)
+				camHUD.zoom = FlxMath.lerp(1, camHUD.zoom, Math.exp(-FlxG.drawElapsed * 3.125 * camZoomingDecay * playbackRate));
+			else {
+				camHUD.zoom = 1;
+			}
+		}
+		super.draw();
 	}
 
 	#if debug
@@ -3711,7 +3733,7 @@ function musicCheck(music:FlxSound, getTime:Float, deviation:Float):Bool
 		comboSpr_S.updateHitbox();
 		rateSpr_S.updateHitbox();
 
-		var seperatedScore:Array<Int> = [];
+		seperatedScore.splice(0, seperatedScore.length);
 		var startShow = 1; // use for combo 1000+
 		if (combo >= 1000)
 		{
@@ -3754,12 +3776,8 @@ function musicCheck(music:FlxSound, getTime:Float, deviation:Float):Bool
 			if (comboNumTweenScaleX[comboNum] != null)
 				comboNumTweenScaleX[comboNum].cancel();
 			numScore.scale.x = numScale + 0.07;
-			comboNumTweenScaleX[comboNum] = FlxTween.tween(numScore.scale, {x: numScale}, 0.2 / playbackRate);
-
-			if (comboNumTweenScaleY[comboNum] != null)
-				comboNumTweenScaleY[comboNum].cancel();
 			numScore.scale.y = numScale + 0.07;
-			comboNumTweenScaleY[comboNum] = FlxTween.tween(numScore.scale, {y: numScale}, 0.2 / playbackRate);
+			comboNumTweenScaleX[comboNum] = FlxTween.tween(numScore.scale, {x: numScale, y: numScale}, 0.2 / playbackRate);
 
 			if (ClientPrefs.data.comboOffsetFix)
 			{
@@ -3785,22 +3803,14 @@ function musicCheck(music:FlxSound, getTime:Float, deviation:Float):Bool
 		if (rateTweenScaleX != null)
 			rateTweenScaleX.cancel();
 		rateSpr_S.scale.x = scale + 0.07;
-		rateTweenScaleX = FlxTween.tween(rateSpr_S.scale, {x: scale}, 0.2 / playbackRate);
+		rateSpr_S.scale.y = scale + 0.07;
+		rateTweenScaleX = FlxTween.tween(rateSpr_S.scale, {x: scale, y: scale}, 0.2 / playbackRate);
 
 		if (comboTweenScaleX != null)
 			comboTweenScaleX.cancel();
 		comboSpr_S.scale.x = scale + 0.07;
-		comboTweenScaleX = FlxTween.tween(comboSpr_S.scale, {x: scale}, 0.2 / playbackRate);
-
-		if (rateTweenScaleY != null)
-			rateTweenScaleY.cancel();
-		rateSpr_S.scale.y = scale + 0.07;
-		rateTweenScaleY = FlxTween.tween(rateSpr_S.scale, {y: scale}, 0.2 / playbackRate);
-
-		if (comboTweenScaleY != null)
-			comboTweenScaleY.cancel();
 		comboSpr_S.scale.y = scale + 0.07;
-		comboTweenScaleY = FlxTween.tween(comboSpr_S.scale, {y: scale}, 0.2 / playbackRate);
+		comboTweenScaleX = FlxTween.tween(comboSpr_S.scale, {x: scale, y: scale}, 0.2 / playbackRate);
 
 		rateSpr_S.offset.x += rateSpr_S.width / 2;
 		rateSpr_S.offset.y += rateSpr_S.height / 2;
@@ -3859,29 +3869,45 @@ function musicCheck(music:FlxSound, getTime:Float, deviation:Float):Bool
 		// had to name it like this else it'd break older scripts lol
 		var ret:Dynamic = callOnScripts('preKeyPress', [key], true);
 
-		// obtain notes that the player can hit
-		var plrInputNotes:Array<Note> = notes.members.filter(function(n:Note):Bool
+		var bestNote:Note = null;
+		var secondNote:Note = null;
+		var i:Int = 0;
+		while (i < notes.length)
 		{
-			if (n == null) return false;
-			var canHit:Bool = !strumsBlocked[n.noteData]
-				&& n.canBeHit
-				&& ((n.mustPress && !ClientPrefs.data.playOpponent) || (!n.mustPress && ClientPrefs.data.playOpponent))
-				&& !n.tooLate
-				&& !n.wasGoodHit
-				&& !n.blockHit;
-			return canHit && !n.isSustainNote && n.noteData == key;
-		});
-		plrInputNotes.sort(sortHitNotes);
+			var n:Note = notes.members[i];
+			if (n != null)
+			{
+				var canHit:Bool = !strumsBlocked[n.noteData]
+					&& n.canBeHit
+					&& ((n.mustPress && !ClientPrefs.data.playOpponent) || (!n.mustPress && ClientPrefs.data.playOpponent))
+					&& !n.tooLate
+					&& !n.wasGoodHit
+					&& !n.blockHit;
+				if (canHit && !n.isSustainNote && n.noteData == key)
+				{
+					if (bestNote == null || n.strumTime < bestNote.strumTime)
+					{
+						secondNote = bestNote;
+						bestNote = n;
+					}
+					else if (secondNote == null || n.strumTime < secondNote.strumTime)
+					{
+						secondNote = n;
+					}
+				}
+			}
+			i++;
+		}
 
 		var shouldMiss:Bool = !ClientPrefs.data.ghostTapping;
 
-		if (plrInputNotes.length != 0)
+		if (bestNote != null)
 		{ // slightly faster than doing `> 0` lol
-			var funnyNote:Note = plrInputNotes[0]; // front note
+			var funnyNote:Note = bestNote; // front note
 
-			if (plrInputNotes.length > 1)
+			if (secondNote != null)
 			{
-				var doubleNote:Note = plrInputNotes[1];
+				var doubleNote:Note = secondNote;
 
 				if (doubleNote.noteData == funnyNote.noteData)
 				{
@@ -3915,19 +3941,27 @@ function musicCheck(music:FlxSound, getTime:Float, deviation:Float):Bool
 		}
 		else
 		{
-			var plrInputNotes:Array<Note> = notes.members.filter(function(n:Note):Bool
+			var holdNote:Note = null;
+			var j:Int = 0;
+			while (j < notes.length)
 			{
-				if (n == null) return false;
-				var canHit:Bool = !strumsBlocked[n.noteData]
-					&& n.canBeHit
-					&& ((n.mustPress && !ClientPrefs.data.playOpponent) || (!n.mustPress && ClientPrefs.data.playOpponent))
-					&& !n.tooLate
-					&& !n.wasGoodHit
-					&& !n.blockHit;
-				return canHit && n.isSustainNote && n.noteData == key;
-			});
-
-			var holdNote:Note = plrInputNotes[0];
+				var n2:Note = notes.members[j];
+				if (n2 != null)
+				{
+					var canHit2:Bool = !strumsBlocked[n2.noteData]
+						&& n2.canBeHit
+						&& ((n2.mustPress && !ClientPrefs.data.playOpponent) || (!n2.mustPress && ClientPrefs.data.playOpponent))
+						&& !n2.tooLate
+						&& !n2.wasGoodHit
+						&& !n2.blockHit;
+					if (canHit2 && n2.isSustainNote && n2.noteData == key)
+					{
+						holdNote = n2;
+						break;
+					}
+				}
+				j++;
+			}
 
 			if (holdNote != null && holdNote.parent != null)
 			{
@@ -4093,33 +4127,59 @@ function musicCheck(music:FlxSound, getTime:Float, deviation:Float):Bool
 			for (i in 0..._release.length)
 				if (_release[i] || strumsBlocked[i] == true)
 					keyReleased(i);
-		}
+	}
 
-	public function noteMiss(daNote:Note):Void
+	public function noteMiss(daNote:Note, ?index:Int = -1):Void
 	{ // You didn't hit the key and let it go offscreen, also used by Hurt Notes
 		// Dupe note remove
 		if (notes.length > 0)
 		{
-			var len:Int = notes.length;
-			var i:Int = 0;
-			while (i < len)
+			if (index >= 0)
 			{
-				var note:Note = cast notes.members[i];
-				if (note != null && note.exists && note.alive)
+				var start:Int = index - 8;
+				if (start < 0) start = 0;
+				var stop:Int = index + 8;
+				if (stop > notes.length - 1) stop = notes.length - 1;
+				var baseTime:Float = daNote.strumTime;
+				var k:Int = start;
+				while (k <= stop)
 				{
-					if (daNote != note
-						&& (!daNote.mustPress && ClientPrefs.data.playOpponent || daNote.mustPress && !ClientPrefs.data.playOpponent)
-						&& daNote.noteData == note.noteData
-						&& daNote.isSustainNote == note.isSustainNote
-						&& Math.abs(daNote.strumTime - note.strumTime) < 1)
-						invalidateNote(note);
+					var note:Note = cast notes.members[k];
+					if (note != null && note.exists && note.alive)
+					{
+						if (daNote != note
+							&& (!daNote.mustPress && ClientPrefs.data.playOpponent || daNote.mustPress && !ClientPrefs.data.playOpponent)
+							&& daNote.noteData == note.noteData
+							&& daNote.isSustainNote == note.isSustainNote
+							&& Math.abs(baseTime - note.strumTime) < 1)
+							invalidateNote(note);
+					}
+					k++;
 				}
-				i++;
+			}
+			else
+			{
+				var len:Int = notes.length;
+				var i:Int = 0;
+				while (i < len)
+				{
+					var note:Note = cast notes.members[i];
+					if (note != null && note.exists && note.alive)
+					{
+						if (daNote != note
+							&& (!daNote.mustPress && ClientPrefs.data.playOpponent || daNote.mustPress && !ClientPrefs.data.playOpponent)
+							&& daNote.noteData == note.noteData
+							&& daNote.isSustainNote == note.isSustainNote
+							&& Math.abs(daNote.strumTime - note.strumTime) < 1)
+							invalidateNote(note);
+					}
+					i++;
+				}
 			}
 		}
 
 		stagesFunc(function(stage:BaseStage) stage.noteMiss(daNote));
-		noteMissCommon(daNote.noteData, daNote);
+		noteMissCommon(daNote.noteData, daNote, index);
 	}
 
 	public function noteMissPress(direction:Int = 1):Void // You pressed a key when there was no notes to press for this key
@@ -4132,7 +4192,7 @@ function musicCheck(music:FlxSound, getTime:Float, deviation:Float):Bool
 		callOnScripts('noteMissPress', [direction]);
 	}
 
-	public function noteMissCommon(direction:Int, note:Note = null)
+	public function noteMissCommon(direction:Int, note:Note = null, ?index:Int = -1)
 	{
 		// score and data
 		var subtract:Float = 0.05;
@@ -4215,7 +4275,9 @@ function musicCheck(music:FlxSound, getTime:Float, deviation:Float):Bool
 		RecalculateRating(true);
 		if (note != null)
 		{
-			var result:Dynamic = callOnLuas('noteMiss', [notes.members.indexOf(note), note.noteData, note.noteType, note.isSustainNote]);
+			var noteIdx:Int = index;
+			if (noteIdx < 0) noteIdx = notes.members.indexOf(note);
+			var result:Dynamic = callOnLuas('noteMiss', [noteIdx, note.noteData, note.noteType, note.isSustainNote]);
 			if (result != LuaUtils.Function_Stop && result != LuaUtils.Function_StopHScript && result != LuaUtils.Function_StopAll)
 				callOnHScript('noteMiss', [note]);
 		}
@@ -4600,28 +4662,42 @@ function musicCheck(music:FlxSound, getTime:Float, deviation:Float):Bool
 
 	public function destroyNotes():Void
 	{
-		var iterator:Iterator<Note> = killNotes.iterator();
-
-		while (iterator.hasNext())
+		var count:Int = killNotes.length;
+		if (count == 0) return;
+		var limit:Int = killNotesBudget;
+		if (limit < 1) limit = count;
+		if (limit > count) limit = count;
+		var idx:Int = 0;
+		while (idx < limit)
 		{
-			var note:Note = iterator.next();
-			if (note.tail.length != 0 && note.killTail) {
-				var sustainIterator:Iterator<Note> = note.tail.iterator();
-				while (sustainIterator.hasNext())
+			var note:Note = killNotes[idx];
+			if (note != null)
+			{
+				if (note.tail.length != 0 && note.killTail)
 				{
-					var sustain:Note = sustainIterator.next();
-					sustain.kill();
-					notes.remove(sustain, true);
-					sustainLayer.remove(sustain, true);
-					sustain.destroy();
+					var t:Int = 0;
+					var tailLen:Int = note.tail.length;
+					while (t < tailLen)
+					{
+						var sustain:Note = note.tail[t];
+						if (sustain != null)
+						{
+							sustain.kill();
+							notes.remove(sustain, true);
+							sustainLayer.remove(sustain, true);
+							sustain.destroy();
+						}
+						t++;
+					}
 				}
+				note.kill();
+				notes.remove(note, true);
+				if (note.isSustainNote) sustainLayer.remove(note, true); else tapLayer.remove(note, true);
+				note.destroy();
 			}
-			note.kill();
-			notes.remove(note, true);
-			if (note.isSustainNote) sustainLayer.remove(note, true); else tapLayer.remove(note, true);
-			note.destroy();
+			idx++;
 		}
-		killNotes = [];
+		if (idx > 0) killNotes.splice(0, idx);
 	}
 
 	public function spawnNoteSplashOnNote(note:Note)

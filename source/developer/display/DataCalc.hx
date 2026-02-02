@@ -21,6 +21,7 @@ class DataCalc
 	static public function update()
 	{
 		updateMember++;
+
 		if (Lib.getTimer() - updateTimeSave < 100)
 			return;
 

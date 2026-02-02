@@ -656,6 +656,8 @@ class Note extends FlxSprite
 
 	public function followStrumNote(myStrum:StrumNote, fakeCrochet:Float, songSpeed:Float = 1)
 	{
+		if (!FlxG.isFullFrame) return;
+
 		var mania = 3;
 		if (PlayState.SONG != null)	mania = PlayState.SONG.mania;
 		var Mscale = ExtraKeysHandler.instance.data.scales[mania];
@@ -702,6 +704,8 @@ class Note extends FlxSprite
 
 	public function clipToStrumNote(myStrum:StrumNote)
 	{
+		if (!FlxG.isFullFrame) return;
+
 		var mania = 3;
 		if (PlayState.SONG != null)
 			mania = PlayState.SONG.mania;
