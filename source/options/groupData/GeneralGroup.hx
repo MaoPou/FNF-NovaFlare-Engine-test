@@ -19,12 +19,8 @@ class GeneralGroup extends OptionCata
 		addOption(option);
 		option.onChange = onChangeDrawFramerate;
 
-		var option:Option = new Option(this, 'newFrameGeneration', BOOL);
-		addOption(option);
-		option.onChange = onChangeFrameGeneration;
-
 		var option:Option = new Option(this, 'splitUpdate', BOOL);
-		addOption(option, true);
+		addOption(option);
 		option.onChange = onChangeSplitUpdate;
 
 		var langArray:Array<String> = languageArray();
@@ -114,11 +110,6 @@ class GeneralGroup extends OptionCata
 	function onChangeDrawFramerate()
 	{
 		FlxG.stage.application.window.drawFrameRate = ClientPrefs.data.drawFramerate;
-	}
-
-	function onChangeFrameGeneration()
-	{
-		FlxG.stage.application.window.newFrameGeneration = ClientPrefs.data.newFrameGeneration;
 	}
 
 	function onChangeSplitUpdate()

@@ -12,7 +12,6 @@ import states.TitleState;
 	// General
 	public var framerate:Int = 60;
 	public var drawFramerate:Int = 60;
-	public var newFrameGeneration:Bool = true;
 	public var splitUpdate:Bool = true;
 	public var colorblindMode:String = 'None';
 	public var lowQuality:Bool = false;
@@ -568,7 +567,6 @@ class ClientPrefs
 		}
 		#end
 
-		FlxG.stage.application.window.newFrameGeneration = data.newFrameGeneration;
 		FlxG.stage.application.window.splitUpdate = data.splitUpdate;
 		FlxG.stage.application.window.drawFrameRate = data.drawFramerate;
 
