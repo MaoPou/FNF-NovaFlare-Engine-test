@@ -1,4 +1,4 @@
-name: Release
+name: UpdateVersion
 
 on:
   workflow_dispatch:
@@ -11,11 +11,6 @@ on:
 jobs:
   update-versions:
     runs-on: ubuntu-latest
-    outputs:
-      version_name: ${{ steps.parse-version.outputs.version_name }}
-      version_number: ${{ steps.parse-version.outputs.version_number }}
-      version_number_with_commit: ${{ steps.parse-version.outputs.version_number_with_commit }}
-      commit_sha: ${{ steps.parse-version.outputs.commit_sha }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -50,7 +45,9 @@ jobs:
       - name: Update Project.xml
         run: |
           echo "Updating Project.xml..."
+          # 更新版本名
           sed -i "s/\(<app title=\"NovaFlare Engine\".* version=\"\)[^\"]*\(\"\)/\1${{ steps.parse-version.outputs.version_name }}\2/" Project.xml
+          # 智能更新构建编号 (build-number)，加上commit ID
           if grep -q 'build-number="[^"]*"' Project.xml; then
             sed -i "s/\(<app title=\"NovaFlare Engine\".* build-number=\"\)[^\"]*\(\"\)/\1${{ steps.parse-version.outputs.version_number_with_commit }}\2/" Project.xml
             echo "Updated existing build-number attribute with commit ID"
@@ -72,94 +69,5 @@ jobs:
           git config --local user.email "actions@github.com"
           git config --local user.name "GitHub Actions"
           git add gitVersion.txt Project.xml source/states/MainMenuState.hx
-          git commit -m "chore: Release version ${{ steps.parse-version.outputs.version_name }} ${{ steps.parse-version.outputs.version_number_with_commit }}"
+          git commit -m "chore: Update versions to ${{ steps.parse-version.outputs.version_name }} ${{ steps.parse-version.outputs.version_number_with_commit }}"
           git push
-
-  mobile-build:
-    name: "Mobile Build (macOS 14)"
-    needs: update-versions
-    uses: ./.github/workflows/MobileBuild.yml
-    with:
-      dependencies_to_update: all
-
-  macos-build:
-    name: "macOS Build"
-    needs: mobile-build
-    uses: ./.github/workflows/MacBuild.yml
-
-  windows-build:
-    name: "Windows Build"
-    needs: update-versions
-    uses: ./.github/workflows/WindowsBuild.yml
-
-  linux-build:
-    name: "Linux Build"
-    needs: update-versions
-    uses: ./.github/workflows/LinuxBuild.yml
-
-  releaser:
-    name: "Create Release"
-    needs: [mobile-build, macos-build, windows-build, linux-build]
-    runs-on: ubuntu-latest
-    permissions:
-      contents: write
-    steps:
-      - name: Download Android Build
-        uses: actions/download-artifact@v4
-        with:
-          name: androidBuild
-          path: artifacts/
-
-      - name: Download iOS Build
-        uses: actions/download-artifact@v4
-        with:
-          name: iOSBuild
-          path: artifacts/
-
-      - name: Download macOS14 Build
-        uses: actions/download-artifact@v4
-        with:
-          name: macOSBuild-14
-          path: artifacts/
-
-      - name: Download macOS15 Build
-        uses: actions/download-artifact@v4
-        with:
-          name: macOSBuild-15
-          path: artifacts/
-
-      - name: Download Windows Build
-        uses: actions/download-artifact@v4
-        with:
-          name: windowsBuild
-          path: artifacts/
-
-      - name: Download Linux Build
-        uses: actions/download-artifact@v4
-        with:
-          name: LinuxBuild
-          path: artifacts/
-
-      - name: Download Haxelib
-        uses: actions/download-artifact@v4
-        with:
-          name: Haxelib
-          path: artifacts/
-
-      - name: List downloaded artifacts
-        run: |
-          find artifacts/ -type f -name "*" | sort
-          echo "Total files found:"
-          find artifacts/ -type f -name "*" | wc -l
-
-      - name: Publish The Release
-        uses: marvinpinto/action-automatic-releases@latest
-        with:
-          repo_token: "${{ secrets.GITHUB_TOKEN }}"
-          prerelease: false
-          automatic_release_tag: "V${{ needs.update-versions.outputs.version_name }}"
-          title: "V${{ needs.update-versions.outputs.version_name }}"
-          files: |
-            /home/runner/*.apk
-            /home/runner/*.zip
-            /home/runner/*.tar

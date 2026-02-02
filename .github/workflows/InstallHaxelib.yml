@@ -34,11 +34,30 @@ jobs:
         with:
           haxe-version: ${{ env.HAXE_VERSION }}
         
+      - name: Determine install strategy
+        id: install_strategy
+        run: |
+          if [[ "${{ inputs.dependencies_to_update }}" == "all" ]] || \
+             [[ "${{ github.event_name }}" == "workflow_call" ]]; then
+            echo "强制重新安装所有依赖"
+            echo "force_install=true" >> $GITHUB_OUTPUT
+          else
+            echo "按需安装依赖"
+            echo "force_install=false" >> $GITHUB_OUTPUT
+          fi
+        
       - name: Install Libraries
         run: |
           haxelib setup ~/haxelib
-          haxelib install hmm 
-          haxelib run hmm install
+          if [ "${{ steps.install_strategy.outputs.force_install }}" == "true" ]; then
+            echo "强制重新安装所有haxelib依赖..."
+            haxelib install hmm 
+            haxelib run hmm install
+          else
+            echo "按需安装haxelib依赖..."
+            haxelib install hmm 
+            haxelib run hmm install
+          fi
 
       - name: Make Haxelib Zip
         run: |

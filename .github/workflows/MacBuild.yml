@@ -1,6 +1,8 @@
 name: MacBuild
 on:
   workflow_dispatch:
+  
+  workflow_call:
 
 jobs:
   build:
