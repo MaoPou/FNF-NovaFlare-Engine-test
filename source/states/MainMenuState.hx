@@ -28,8 +28,7 @@ class MainMenuState extends MusicBeatState
 	public static var novaFlareEngineVersion:String = '1.2.0-DEV';
 	public static var novaFlareEngineCommit:String = 
 	    #if commit_sha
-            //haxe.macro.Compiler.getDefine("commit_sha");
-	        "huh";
+            haxe.macro.Compiler.getDefine("commit_sha");
         #else
             "dev";
         #end
