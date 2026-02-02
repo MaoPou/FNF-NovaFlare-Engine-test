@@ -39,11 +39,6 @@
       "url": "https://github.com/NovaFlare-Engine-haxelib/haxeui-flixel.git"
     },
     {
-      "name": "actuate",
-      "type": "haxelib",
-      "version": "1.9.0"
-    },
-    {
       "name": "flixel-ui",
       "type": "git",
       "dir": null,
@@ -140,13 +135,6 @@
       "dir": "spine-haxe",
       "ref": "cd726af62b8cbf12ba47c6c0f68d8e04451cf162",
       "url": "https://github.com/EsotericSoftware/spine-runtimes/"
-    },
-    {
-      "name": "hxmaker",
-      "type": "git",
-      "dir": null,
-      "ref": "main",
-      "url": "https://github.com/rainyt/hxmaker"
     },
     {
       "name": "flxanimate",
