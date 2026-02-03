@@ -1,5 +1,13 @@
 name: MobileBuild
 on:
+  workflow_call:
+    inputs:
+      dependencies_to_update:
+        description: '输入 "all" 更新所有haxelib, 或指定库名 (e.g. "lime,openfl")不输入即不给haxelib做任何更新'
+        required: false
+        type: string
+        default: ''
+      
   push:
     branches: [ main ]
     paths-ignore:
@@ -23,10 +31,8 @@ jobs:
     with:
       dependencies_to_update: ${{ github.event.inputs.dependencies_to_update }}
       
-
   Android:
     runs-on: macos-14
-    
     concurrency:
       group: ${{ github.workflow }}-Android-${{ github.ref }}
 
@@ -61,9 +67,23 @@ jobs:
             });
             console.log("Available caches:", caches.data.actions_caches);
             
+      - name: Determine cache strategy
+        id: cache_strategy
+        run: |
+          # 判断是否需要跳过缓存
+          # 被release调用时跳过缓存，或者输入了all/android/ios时跳过缓存
+          if [[ "${{ inputs.dependencies_to_update }}" == "all" ]] || \
+             [[ "${{ inputs.dependencies_to_update }}" == "android" ]] || \
+             [[ "${{ github.event_name }}" == "workflow_call" ]]; then
+            echo "skip_cache=true" >> $GITHUB_OUTPUT
+          else
+            echo "使用缓存：仅更新指定依赖或无需更新"
+            echo "skip_cache=false" >> $GITHUB_OUTPUT
+          fi
+
       - name: cache Build
         id: cache
-        if: github.event.inputs.dependencies_to_update != 'all' || github.event.inputs.dependencies_to_update != 'android'
+        if: steps.cache_strategy.outputs.skip_cache == 'false'
         uses: actions/cache/restore@v4
         with:
           key: cache-build-Android
@@ -73,20 +93,42 @@ jobs:
             .haxelib/
             export/release/android/
             ~/.gradle
-              
+            
+      - name: Determine cache strategy
+        id: cache_use
+        run: |
+          if [[ "${{ github.event.workflow }}" == ".github/workflows/release.yml" ]]; then
+            echo "use_cache=true" >> $GITHUB_OUTPUT
+          else
+            echo "use_cache=false" >> $GITHUB_OUTPUT
+          fi
+          
+      - name: cache Build
+        id: HaxelibCache
+        if: steps.cache_use.outputs.use_cache == 'true'
+        uses: actions/cache/restore@v4
+        with:
+          key: cache-build-haxelib
+          restore-keys: |
+            cache-build-haxelib
+          path: |
+            .haxelib/
+          
       - name: Install Libraries
+        if: steps.cache_strategy.outputs.use_cache == 'false'
         run: |
           haxelib setup ~/haxelib
-          if [ "${{ github.event.inputs.dependencies_to_update }}" == "all" ] || [ "${{ github.event.inputs.dependencies_to_update }}" == "android" ]; then
-            echo "Installing all dependencies..."
+          # 根据缓存策略决定安装方式
+          if [ "${{ steps.cache_strategy.outputs.skip_cache }}" == "true" ]; then
+            echo "强制重新安装所有依赖..."
             haxelib install hmm 
             haxelib run hmm install
           elif [ -n "${{ github.event.inputs.dependencies_to_update }}" ] && [ "${{ github.event.inputs.dependencies_to_update }}" != "ios" ]; then
-            echo "Updating specified dependencies: ${{ github.event.inputs.dependencies_to_update }}"
+            echo "更新指定依赖: ${{ github.event.inputs.dependencies_to_update }}"
             haxelib install hmm
             haxelib run hmm reinstall --force $(echo "${{ github.event.inputs.dependencies_to_update }}")
           else
-            echo "No dependencies specified, only setting up haxelib"
+            echo "使用缓存，仅设置haxelib"
           fi
 
       - name: Configure Android
@@ -96,17 +138,38 @@ jobs:
           haxelib run lime config JAVA_HOME $JAVA_HOME
           haxelib run lime config ANDROID_SETUP true
             
+      - name: Extract current version
+        id: get_version
+        run: |
+          CURRENT_VERSION=$(sed -n 's/.*build-number="\([^"]*\)".*/\1/p' Project.xml)
+          echo "current_version=$CURRENT_VERSION" >> $GITHUB_OUTPUT
+
       - name: Compile
-        run: haxelib run lime build android -Dcommit_sha=$(git rev-parse --short HEAD)
-        
+        run: |
+          COMMIT_SHA=$(git rev-parse --short HEAD)
+          CURRENT_VERSION="${{ steps.get_version.outputs.current_version }}"
+    
+          if [[ "${{ github.event_name }}" == "workflow_dispatch" ]]; then
+            NEW_VERSION="${CURRENT_VERSION/-dev/-$COMMIT_SHA}"
+            haxelib run lime build android -Dcommit_sha=$COMMIT_SHA -Dbuild_number=$NEW_VERSION
+          else
+            haxelib run lime build android -Dcommit_sha=$COMMIT_SHA -Dbuild_number=$CURRENT_VERSION
+          fi
+
+      - name: Create Android zip package
+        run: |
+          cd export/release/android/bin/app/build/outputs/apk/release/
+          zip -r android.zip *.apk
+
       - name: Upload Artifact
         uses: actions/upload-artifact@main
         with:
           name: androidBuild
-          path: export/release/android/bin/app/build/outputs/apk/release/*.apk
+          path: export/release/android/bin/app/build/outputs/apk/release/android.zip
           if-no-files-found: error
 
       - name: Clearing already existing cache
+        if: steps.cache_strategy.outputs.skip_cache == 'true'
         uses: actions/github-script@v6
         with:
           script: |
@@ -127,6 +190,7 @@ jobs:
             }
           
       - name: Uploading new cache
+        if: steps.cache_strategy.outputs.skip_cache == 'false'
         uses: actions/cache/save@v4
         with:
           key: cache-build-Android
@@ -154,9 +218,22 @@ jobs:
         with:
           haxe-version: 4.3.7
    
+      - name: Determine cache strategy
+        id: cache_strategy
+        run: |
+          # 判断是否需要跳过缓存
+          # 被release调用时跳过缓存，或者输入了all/android/ios时跳过缓存
+          if [[ "${{ inputs.dependencies_to_update }}" == "all" ]] || \
+             [[ "${{ inputs.dependencies_to_update }}" == "ios" ]] || \
+             [[ "${{ github.event_name }}" == "workflow_call" ]]; then
+            echo "skip_cache=true" >> $GITHUB_OUTPUT
+          else
+            echo "skip_cache=false" >> $GITHUB_OUTPUT
+          fi
+                
       - name: cache Build
         id: cache
-        if: github.event.inputs.dependencies_to_update != 'all' || github.event.inputs.dependencies_to_update != 'ios'
+        if: steps.cache_strategy.outputs.skip_cache == 'false'
         uses: actions/cache/restore@v4
         with:
           enableCrossOsArchive: true
@@ -166,20 +243,41 @@ jobs:
           path: |
             .haxelib/
             export/release/ios/
-                
+            
+      - name: Determine cache strategy
+        id: cache_use
+        run: |
+          if [[ "${{ github.event.workflow }}" == ".github/workflows/release.yml" ]]; then
+            echo "use_cache=true" >> $GITHUB_OUTPUT
+          else
+            echo "use_cache=false" >> $GITHUB_OUTPUT
+          fi
+          
+      - name: cache Build
+        id: HaxelibCache
+        if: steps.cache_use.outputs.use_cache == 'true'
+        uses: actions/cache/restore@v4
+        with:
+          key: cache-build-haxelib
+          restore-keys: |
+            cache-build-haxelib
+          path: |
+            .haxelib/
+          
       - name: Install Libraries
+        if: steps.cache_strategy.outputs.use_cache == 'false'
         run: |
           haxelib setup ~/haxelib
-          if [ "${{ github.event.inputs.dependencies_to_update }}" == "all" ] || [ "${{ github.event.inputs.dependencies_to_update }}" == "ios" ]; then
-            echo "Installing all dependencies..."
+          if [ "${{ steps.cache_strategy.outputs.skip_cache }}" == "true" ]; then
+            echo "强制重新安装所有依赖..."
             haxelib install hmm 
             haxelib run hmm install
           elif [ -n "${{ github.event.inputs.dependencies_to_update }}" ] && [ "${{ github.event.inputs.dependencies_to_update }}" != "android" ]; then
-              echo "Updating specified dependencies: ${{ github.event.inputs.dependencies_to_update }}"
+            echo "更新指定依赖: ${{ github.event.inputs.dependencies_to_update }}"
             haxelib install hmm
             haxelib run hmm reinstall --force $(echo "${{ github.event.inputs.dependencies_to_update }}")
           else
-            echo "No dependencies specified, only setting up haxelib"
+            echo "使用缓存，仅设置haxelib"
           fi
     
       - name: Compile
@@ -192,16 +290,21 @@ jobs:
           mkdir Payload
           mv *.app Payload
           zip -r NovaFlareEngine.ipa Payload
-          zip -r iOSBuild.zip NovaFlareEngine.ipa
-    
+
+      - name: Create iOS zip package
+        run: |
+          cd export/release/ios/build/Release-iphoneos/
+          zip -r ios.zip *.ipa
+
       - name: Upload Artifact
         uses: actions/upload-artifact@main
         with:
           name: iOSBuild
-          path: export/release/ios/build/Release-iphoneos/*.ipa
+          path: export/release/ios/build/Release-iphoneos/ios.zip
           if-no-files-found: error
 
       - name: Clearing already existing cache
+        if: steps.cache_strategy.outputs.skip_cache == 'true'
         uses: actions/github-script@v6
         with:
           script: |
@@ -222,6 +325,7 @@ jobs:
             }
           
       - name: Save build cache
+        if: steps.cache_strategy.outputs.skip_cache == 'false'
         uses: actions/cache/save@v4
         with:
           key: cache-build-iOS

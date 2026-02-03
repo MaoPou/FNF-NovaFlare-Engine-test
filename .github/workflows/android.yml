@@ -25,7 +25,7 @@ jobs:
         uses: actions/setup-java@main
         with:
           distribution: 'zulu'
-          java-version: '11'
+          java-version: '17'
 
       - name: Setup Haxe
         uses: krdlab/setup-haxe@master
@@ -64,7 +64,7 @@ jobs:
           ANDROID_NDK_HOME: ${{ steps.setup-ndk.outputs.ndk-path }}
 
       - name: Building
-        run: haxelib run lime build android -${{ matrix.arch }} -Dcommit_sha=$(git rev-parse --short HEAD)
+        run: haxelib run lime build android -ONLY_ARMV7 -Dcommit_sha=$(git rev-parse --short HEAD)
         env:
           cert_pass: nullfunni
           cert_alias_pass: nullfunni

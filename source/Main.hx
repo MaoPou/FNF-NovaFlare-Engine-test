@@ -10,6 +10,7 @@ import flixel.graphics.FlxGraphic;
 import flixel.FlxGame;
 
 import haxe.io.Path;
+import haxe.ui.Toolkit;
 
 import openfl.Lib;
 import openfl.display.Sprite;
@@ -44,9 +45,6 @@ import lime.graphics.Image;
 	#define GAMEMODE_AUTO
 ')
 #end
-
-import haxe.ui.Toolkit;
-
 
 class Main extends Sprite
 {

@@ -1,6 +1,8 @@
 name: MacBuild
 on:
   workflow_dispatch:
+  
+  workflow_call:
 
 jobs:
   build:
@@ -18,24 +20,60 @@ jobs:
         with:
           haxe-version: 4.3.7
 
+      - name: Determine cache strategy
+        id: cache_strategy
+        run: |
+          if [[ "${{ github.event.workflow }}" == ".github/workflows/release.yml" ]]; then
+            echo "use_cache=true" >> $GITHUB_OUTPUT
+          else
+            echo "use_cache=false" >> $GITHUB_OUTPUT
+          fi
+          
+      - name: cache Build
+        id: cache
+        if: steps.cache_strategy.outputs.use_cache == 'true'
+        uses: actions/cache/restore@v4
+        with:
+          key: cache-build-haxelib
+          restore-keys: |
+            cache-build-haxelib
+          path: |
+            .haxelib/
+          
       - name: Install Libraries
+        if: steps.cache_strategy.outputs.use_cache == 'false'
         run: |
           haxelib setup ~/haxelib
           haxelib install hmm --quiet
           haxelib run hmm install --quiet
 
-      - name: Compile
-        run: haxelib run lime build mac -Dcommit_sha=$(git rev-parse --short HEAD)
+      - name: Extract current version
+        id: get_version
+        run: |
+          CURRENT_VERSION=$(sed -n 's/.*build-number="\([^"]*\)".*/\1/p' Project.xml)
+          echo "current_version=$CURRENT_VERSION" >> $GITHUB_OUTPUT
 
-      - name: Make tar for relese
+      - name: Compile
+        run: |
+          COMMIT_SHA=$(git rev-parse --short HEAD)
+          CURRENT_VERSION="${{ steps.get_version.outputs.current_version }}"
+    
+          if [[ "${{ github.event_name }}" == "workflow_dispatch" ]]; then
+            NEW_VERSION="${CURRENT_VERSION/-dev/-$COMMIT_SHA}"
+            haxelib run lime build mac -Dcommit_sha=$COMMIT_SHA -Dbuild_number=$NEW_VERSION
+          else
+            haxelib run lime build mac -Dcommit_sha=$COMMIT_SHA -Dbuild_number=$CURRENT_VERSION
+          fi
+
+      - name: Create macOS zip package
         run: |
           cd export/release/macos/bin
-          tar czf macOS${{matrix.version}}.tar .
+          zip -r macOS-${{matrix.version}}.zip .
 
       - name: Upload Artifact
         if: ${{ success() }}
         uses: actions/upload-artifact@main
         with:
           name: macOSBuild-${{matrix.version}}
-          path: export/release/macos/bin/*.tar
+          path: export/release/macos/bin/macOS-${{matrix.version}}.zip
           if-no-files-found: error

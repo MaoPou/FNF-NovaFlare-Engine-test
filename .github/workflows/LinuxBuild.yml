@@ -2,6 +2,8 @@ name: LinuxBuild
 on:
   workflow_dispatch:
   
+  workflow_call:
+  
 jobs:
   build:
     name: LinuxBuild
@@ -25,12 +27,31 @@ jobs:
           haxelib install hmm
           haxelib run hmm install
           
+      - name: Extract current version
+        id: get_version
+        run: |
+          CURRENT_VERSION=$(grep -oP 'build-number="\K[^"]*' Project.xml)
+          echo "current_version=$CURRENT_VERSION" >> $GITHUB_OUTPUT
+        
       - name: Compile
         run: |
-          haxelib run lime build linux  -Dcommit_sha=$(git rev-parse --short HEAD)
-      
+          COMMIT_SHA=$(git rev-parse --short HEAD)
+          CURRENT_VERSION="${{ steps.get_version.outputs.current_version }}"
+            
+          if [[ "${{ github.event_name }}" == "workflow_dispatch" ]]; then
+            NEW_VERSION="${CURRENT_VERSION/-dev/-$COMMIT_SHA}"
+            haxelib run lime build linux -Dcommit_sha=$COMMIT_SHA -Dbuild_number=$NEW_VERSION
+          else
+            haxelib run lime build linux -Dcommit_sha=$COMMIT_SHA -Dbuild_number=$CURRENT_VERSION
+          fi
+          
+      - name: Create Linux zip package
+        run: |
+          cd export/release/linux/bin/
+          zip -r linux.zip .
+
       - name: Uploading artifact
         uses: actions/upload-artifact@v4
         with:
           name: LinuxBuild
-          path: export/release/linux/bin/
+          path: export/release/linux/bin/linux.zip

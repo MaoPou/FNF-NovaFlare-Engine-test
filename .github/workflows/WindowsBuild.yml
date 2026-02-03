@@ -1,9 +1,10 @@
 name: WindowsBuild
-on: workflow_dispatch
+on: 
+  workflow_dispatch:
+  
+  workflow_call:
+
 jobs:
-  installHaxelib:
-     uses: ./.github/workflows/InstallHaxelib.yml
-     
   Windows:
     runs-on: windows-latest
     steps:
@@ -21,19 +22,43 @@ jobs:
           haxelib install hmm --quiet
           haxelib run hmm install --quiet
 
-      - name: Compile
-        run: haxelib run lime build windows -Dcommit_sha=$(git rev-parse --short HEAD)
+      - name: Extract current version
+        id: get_version
+        shell: pwsh
+        run: |
+          $content = Get-Content Project.xml -Raw
+          if ($content -match 'build-number="([^"]*)"') {
+              $CURRENT_VERSION = $matches[1]
+              echo "current_version=$CURRENT_VERSION" >> $env:GITHUB_OUTPUT
+              Write-Output "成功提取版本号: $CURRENT_VERSION"
+          } else {
+              Write-Error "在Project.xml中未找到build-number属性"
+              exit 1
+          }
 
-      - name: Make zip for release
+      - name: Compile
+        shell: pwsh
+        run: |
+          $COMMIT_SHA = (git rev-parse --short HEAD)
+          $CURRENT_VERSION = "${{ steps.get_version.outputs.current_version }}"
+          
+          if ("${{ github.event_name }}" -eq "workflow_dispatch") {
+            $NEW_VERSION = $CURRENT_VERSION -replace "-dev", "-$COMMIT_SHA"
+            haxelib run lime build windows -Dcommit_sha=$COMMIT_SHA -Dbuild_number=$NEW_VERSION
+          } else {
+            haxelib run lime build windows -Dcommit_sha=$COMMIT_SHA -Dbuild_number=$CURRENT_VERSION
+          }
+          
+      - name: Create Windows zip package
         shell: pwsh
         run: | 
           cd export\release\windows\bin
-          Compress-Archive -Path . -DestinationPath windows.zip
+          Compress-Archive -Path * -DestinationPath windows.zip
 
       - name: Upload Artifact
         if: ${{ success() }}
         uses: actions/upload-artifact@main
         with:
           name: windowsBuild
-          path: export\release\windows\bin\*.zip
-          if-no-files-found: error      
+          path: export\release\windows\bin\windows.zip
+          if-no-files-found: error
