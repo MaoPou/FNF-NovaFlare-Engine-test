@@ -58,26 +58,29 @@ jobs:
             haxelib install hmm 
             haxelib run hmm install
           fi
+          
+      - name: Determine cache strategy
+        id: cache_strategy
+        run: |
+          if [[ "${{ github.event.workflow }}" == "release" ]]; then
+            echo "use_cache=true" >> $GITHUB_OUTPUT
+          else
+            echo "use_cache=false" >> $GITHUB_OUTPUT
+          fi
+          
 
       - name: Make Haxelib Zip
+        if: steps.cache_strategy.outputs.use_cache == 'false'
         run: |
           zip -r /Users/runner/haxelib.zip .haxelib/
 
       - name: Upload Haxelib
+        if: steps.cache_strategy.outputs.use_cache == 'false'
         uses: actions/upload-artifact@main
         with:
           name: Haxelib
           path: /Users/runner/haxelib.zip
           if-no-files-found: error
-          
-      - name: Determine cache strategy
-        id: cache_strategy
-        run: |
-          if [[ "${{ github.event.workflow }}" == "Release" ]]; then
-            echo "use_cache=true" >> $GITHUB_OUTPUT
-          else
-            echo "use_cache=false" >> $GITHUB_OUTPUT
-          fi
           
       - name: Clearing already existing cache
         if: steps.cache_strategy.outputs.use_cache == 'true'
