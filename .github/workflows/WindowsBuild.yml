@@ -24,9 +24,17 @@ jobs:
 
       - name: Extract current version
         id: get_version
+        shell: pwsh
         run: |
-          CURRENT_VERSION=$(grep -o 'build-number="[^"]*"' Project.xml | cut -d'"' -f2)
-          echo "current_version=$CURRENT_VERSION" >> $GITHUB_OUTPUT
+          $content = Get-Content Project.xml -Raw
+          if ($content -match 'build-number="([^"]*)"') {
+              $CURRENT_VERSION = $matches[1]
+              echo "current_version=$CURRENT_VERSION" >> $env:GITHUB_OUTPUT
+              Write-Output "成功提取版本号: $CURRENT_VERSION"
+          } else {
+              Write-Error "在Project.xml中未找到build-number属性"
+              exit 1
+          }
 
       - name: Compile
         run: |
