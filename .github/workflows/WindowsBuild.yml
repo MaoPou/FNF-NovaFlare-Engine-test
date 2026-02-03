@@ -62,12 +62,3 @@ jobs:
           name: windowsBuild
           path: export\release\windows\bin\windows.zip
           if-no-files-found: error
-
-
-      - name: Upload Artifact
-        if: ${{ success() }}
-        uses: actions/upload-artifact@main
-        with:
-          name: windowsBuild
-          path: export\release\windows\bin\*.zip
-          if-no-files-found: error
