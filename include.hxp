@@ -1,0 +1,19 @@
+import lime.tools.HXProject;
+import lime.tools.Architecture;
+
+class IncludeHXP
+{
+    public function new()
+    {
+        var project = new HXProject();
+        
+        project.targetFlags.set("ONLY_ARMV7", "");
+        project.architectures.remove(Architecture.ARM64);
+        project.architectures.remove(Architecture.X86);
+        project.architectures.remove(Architecture.X64);
+        
+        this.project = project;
+    }
+    
+    public var project:HXProject;
+}
