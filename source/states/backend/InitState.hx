@@ -170,15 +170,15 @@ class InitState extends MusicBeatState
 		// 检查assets/version.txt存不存在且里面保存的上一个版本号与当前的版本号一不一致，如果不一致或不存在，强制启动copy。
 		if (!FileSystem.exists(Paths.getSharedPath('version.txt')))
 		{
-			sys.io.File.saveContent(Paths.getSharedPath('version.txt'), 'now version: ' + Std.string(states.MainMenuState.novaFlareEngineVersion));
+			sys.io.File.saveContent(Paths.getSharedPath('version.txt'), 'now version: ' + Std.string(states.MainMenuState.novaFlareEngineVersion) + '\n' + 'commit: ' + Std.string(states.MainMenuState.novaFlareEngineCommit));
 			FlxG.switchState(new CopyState(true));
 			return;
 		}
 		else
 		{
-			if (sys.io.File.getContent(Paths.getSharedPath('version.txt')) != 'now version: ' + Std.string(states.MainMenuState.novaFlareEngineVersion))
+			if (sys.io.File.getContent(Paths.getSharedPath('version.txt'), 'now version: ' + Std.string(states.MainMenuState.novaFlareEngineVersion) + '\n' + 'commit: ' + Std.string(states.MainMenuState.novaFlareEngineCommit))
 			{
-				sys.io.File.saveContent(Paths.getSharedPath('version.txt'), 'now version: ' + Std.string(states.MainMenuState.novaFlareEngineVersion));
+				sys.io.File.saveContent(Paths.getSharedPath('version.txt'), 'now version: ' + Std.string(states.MainMenuState.novaFlareEngineVersion) + '\n' + 'commit: ' + Std.string(states.MainMenuState.novaFlareEngineCommit));
 				FlxG.switchState(new CopyState(true));
 				return;
 			}

@@ -134,11 +134,17 @@ jobs:
           else
             haxelib run lime build android -Dcommit_sha=$COMMIT_SHA -Dbuild_number=$CURRENT_VERSION
           fi
+
+      - name: Create Android zip package
+        run: |
+          cd export/release/android/bin/app/build/outputs/apk/release/
+          zip -r android.zip *.apk
+
       - name: Upload Artifact
         uses: actions/upload-artifact@main
         with:
           name: androidBuild
-          path: export/release/android/bin/app/build/outputs/apk/release/*.apk
+          path: export/release/android/bin/app/build/outputs/apk/release/android.zip
           if-no-files-found: error
 
       - name: Clearing already existing cache
@@ -242,13 +248,17 @@ jobs:
           mkdir Payload
           mv *.app Payload
           zip -r NovaFlareEngine.ipa Payload
-          zip -r iOSBuild.zip NovaFlareEngine.ipa
-    
+
+      - name: Create iOS zip package
+        run: |
+          cd export/release/ios/build/Release-iphoneos/
+          zip -r ios.zip *.ipa
+
       - name: Upload Artifact
         uses: actions/upload-artifact@main
         with:
           name: iOSBuild
-          path: export/release/ios/build/Release-iphoneos/*.ipa
+          path: export/release/ios/build/Release-iphoneos/ios.zip
           if-no-files-found: error
 
       - name: Clearing already existing cache

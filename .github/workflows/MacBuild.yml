@@ -44,15 +44,15 @@ jobs:
             haxelib run lime build mac -Dcommit_sha=$COMMIT_SHA -Dbuild_number=$CURRENT_VERSION
           fi
 
-      - name: Make tar for relese
+      - name: Create macOS zip package
         run: |
           cd export/release/macos/bin
-          tar czf macOS${{matrix.version}}.tar .
+          zip -r macOS-${{matrix.version}}.zip .
 
       - name: Upload Artifact
         if: ${{ success() }}
         uses: actions/upload-artifact@main
         with:
           name: macOSBuild-${{matrix.version}}
-          path: export/release/macos/bin/*.tar
+          path: export/release/macos/bin/macOS-${{matrix.version}}.zip
           if-no-files-found: error

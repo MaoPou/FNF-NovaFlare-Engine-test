@@ -49,11 +49,20 @@ jobs:
             haxelib run lime build windows -Dcommit_sha=$COMMIT_SHA -Dbuild_number=$CURRENT_VERSION
           }
           
-      - name: Make zip for release
+      - name: Create Windows zip package
         shell: pwsh
         run: | 
           cd export\release\windows\bin
-          Compress-Archive -Path . -DestinationPath windows.zip
+          Compress-Archive -Path * -DestinationPath windows.zip
+
+      - name: Upload Artifact
+        if: ${{ success() }}
+        uses: actions/upload-artifact@main
+        with:
+          name: windowsBuild
+          path: export\release\windows\bin\windows.zip
+          if-no-files-found: error
+
 
       - name: Upload Artifact
         if: ${{ success() }}

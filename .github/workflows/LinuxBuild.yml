@@ -44,9 +44,14 @@ jobs:
           else
             haxelib run lime build linux -Dcommit_sha=$COMMIT_SHA -Dbuild_number=$CURRENT_VERSION
           fi
+          
+      - name: Create Linux zip package
+        run: |
+          cd export/release/linux/bin/
+          zip -r linux.zip .
 
       - name: Uploading artifact
         uses: actions/upload-artifact@v4
         with:
           name: LinuxBuild
-          path: export/release/linux/bin/
+          path: export/release/linux/bin/linux.zip

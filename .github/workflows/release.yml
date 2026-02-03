@@ -161,9 +161,7 @@ jobs:
         with:
           repo_token: "${{ secrets.GITHUB_TOKEN }}"
           prerelease: false
-          automatic_release_tag: "V${{ needs.update-versions.outputs.version_name }}"
-          title: "V${{ needs.update-versions.outputs.version_name }}"
+          automatic_release_tag: "V${{ steps.parse-version.outputs.version_name }}"
+          title: "V${{ steps.parse-version.outputs.version_name }}"
           files: |
-            /home/runner/*.apk
-            /home/runner/*.zip
-            /home/runner/*.tar
+            artifacts/*.zip
