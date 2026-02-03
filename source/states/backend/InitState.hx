@@ -176,7 +176,7 @@ class InitState extends MusicBeatState
 		}
 		else
 		{
-			if (sys.io.File.getContent(Paths.getSharedPath('version.txt'), 'now version: ' + Std.string(states.MainMenuState.novaFlareEngineVersion) + '\n' + 'commit: ' + Std.string(states.MainMenuState.novaFlareEngineCommit)))
+			if (sys.io.File.getContent(Paths.getSharedPath('version.txt'), 'now version: ' + Std.string(states.MainMenuState.novaFlareEngineVersion) + '\n' + 'commit: ' + Std.string(states.MainMenuState.novaFlareEngineCommit))
 			{
 				sys.io.File.saveContent(Paths.getSharedPath('version.txt'), 'now version: ' + Std.string(states.MainMenuState.novaFlareEngineVersion) + '\n' + 'commit: ' + Std.string(states.MainMenuState.novaFlareEngineCommit));
 				FlxG.switchState(new CopyState(true));
