@@ -115,7 +115,7 @@ jobs:
             .haxelib/
           
       - name: Install Libraries
-        if: steps.cache_strategy.outputs.use_cache == 'false' || steps.cache_strategy.outputs.skip_cache == 'false'
+        if: steps.cache_strategy.outputs.use_cache == 'false' || steps.cache_strategy.outputs.skip_cache == 'true'
         run: |
           haxelib setup ~/haxelib
           # 根据缓存策略决定安装方式
