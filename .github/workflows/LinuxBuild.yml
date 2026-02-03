@@ -21,7 +21,28 @@ jobs:
         run: |
           sudo apt-get install libvlc-dev libvlccore-dev
           
+      - name: Determine cache strategy
+        id: cache_strategy
+        run: |
+          if [[ "${{ github.event.workflow }}" == "Release" ]]; then
+            echo "use_cache=true" >> $GITHUB_OUTPUT
+          else
+            echo "use_cache=false" >> $GITHUB_OUTPUT
+          fi
+          
+      - name: cache Build
+        id: cache
+        if: steps.cache_strategy.outputs.use_cache == 'true'
+        uses: actions/cache/restore@v4
+        with:
+          key: cache-build-haxelib
+          restore-keys: |
+            cache-build-haxelib
+          path: |
+            .haxelib/
+          
       - name: Install Libraries
+        if: steps.cache_strategy.outputs.use_cache == 'false'
         run: |
           haxelib setup ~/haxelib
           haxelib install hmm

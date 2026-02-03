@@ -69,3 +69,41 @@ jobs:
           name: Haxelib
           path: /Users/runner/haxelib.zip
           if-no-files-found: error
+          
+      - name: Determine cache strategy
+        id: cache_strategy
+        run: |
+          if [[ "${{ github.event.workflow }}" == "Release" ]]; then
+            echo "use_cache=true" >> $GITHUB_OUTPUT
+          else
+            echo "use_cache=false" >> $GITHUB_OUTPUT
+          fi
+          
+      - name: Clearing already existing cache
+        if: steps.cache_strategy.outputs.use_cache == 'true'
+        uses: actions/github-script@v6
+        with:
+          script: |
+            const caches = await github.rest.actions.getActionsCacheList({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+            })
+            for (const cache of caches.data.actions_caches) {
+              if (cache.key == "cache-build-haxelib") {
+                console.log('Clearing ' + cache.key + '...')
+                await github.rest.actions.deleteActionsCacheById({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  cache_id: cache.id,
+                })
+                console.log("Cache cleared.")
+              }
+            }
+          
+      - name: Uploading new cache
+        if: steps.cache_strategy.outputs.use_cache == 'true'
+        uses: actions/cache/save@v4
+        with:
+          key: cache-build-haxelib
+          path: |
+            .haxelib/

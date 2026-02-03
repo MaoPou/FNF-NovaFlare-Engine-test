@@ -78,13 +78,17 @@ jobs:
           git add gitVersion.txt Project.xml source/states/MainMenuState.hx
           git commit -m "chore: Release version ${{ steps.parse-version.outputs.version_name }} ${{ steps.parse-version.outputs.version_number_int_with_timestamp }}"
           git push
+          
+  installHaxelib:
+    needs: update-versions
+    uses: ./.github/workflows/InstallHaxelib.yml
+    with:
+      dependencies_to_update: all
 
   mobile-build:
     name: "Mobile Build (macOS 14)"
-    needs: update-versions
+    needs: installHaxelib
     uses: ./.github/workflows/MobileBuild.yml
-    with:
-      dependencies_to_update: all
 
   macos-build:
     name: "macOS Build"
@@ -93,12 +97,12 @@ jobs:
 
   windows-build:
     name: "Windows Build"
-    needs: update-versions
+    needs: installHaxelib
     uses: ./.github/workflows/WindowsBuild.yml
 
   linux-build:
     name: "Linux Build"
-    needs: update-versions
+    needs: installHaxelib
     uses: ./.github/workflows/LinuxBuild.yml
 
   releaser:
