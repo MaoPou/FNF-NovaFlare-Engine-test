@@ -62,20 +62,33 @@ jobs:
       - name: Determine cache strategy
         id: cache_strategy
         run: |
-          if [[ "${{ github.event.workflow }}" == ".github/workflows/release.yml" ]]; then
+          if [[ "${{ github.event_name }}" == "workflow_call" && "${{ github.event.workflow }}" == ".github/workflows/release.yml" ]]; then
+            echo "被 Release 工作流直接调用，使用缓存策略"
             echo "use_cache=true" >> $GITHUB_OUTPUT
-          else
+            echo "make_zip=false" >> $GITHUB_OUTPUT
+          elif [[ "${{ github.event_name }}" == "workflow_call" && "${{ github.event.workflow }}" == ".github/workflows/MobileBuild.yml" && "${{ github.event.workflow }}" != ".github/workflows/release.yml" ]]; then
+            echo "被 MobileBuild 通过 Release 间接调用，不制作 Zip"
+            echo "use_cache=true" >> $GITHUB_OUTPUT
+            echo "make_zip=false" >> $GITHUB_OUTPUT
+          elif [[ "${{ github.event_name }}" == "workflow_call" && "${{ github.event.workflow }}" == ".github/workflows/MobileBuild.yml" ]]; then
+            echo "被 MobileBuild 直接调用，制作 Zip"
             echo "use_cache=false" >> $GITHUB_OUTPUT
+            echo "make_zip=true" >> $GITHUB_OUTPUT
+          else
+            echo "直接触发或其他情况，制作 Zip"
+            echo "use_cache=false" >> $GITHUB_OUTPUT
+            echo "make_zip=true" >> $GITHUB_OUTPUT
           fi
+
           
 
       - name: Make Haxelib Zip
-        if: steps.cache_strategy.outputs.use_cache == 'false'
+        if: steps.cache_strategy.outputs.make_zip == 'true'
         run: |
           zip -r /Users/runner/haxelib.zip .haxelib/
 
       - name: Upload Haxelib
-        if: steps.cache_strategy.outputs.use_cache == 'false'
+        if: steps.cache_strategy.outputs.make_zip == 'true'
         uses: actions/upload-artifact@main
         with:
           name: Haxelib
