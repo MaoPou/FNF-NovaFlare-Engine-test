@@ -547,25 +547,17 @@ class FreeplayState extends MusicBeatState
 		if (PlayState.SONG.needsVoices)
 		{
 			if (FileSystem.exists(Paths.songPath('${PlayState.SONG.song}/Voices'))) {
-				FlxG.sound.music.addTrack(Paths.songPath('${PlayState.SONG.song}/Voices'), null, 2);
-				FlxG.sound.music._vlcPlayer.members[1].volume = 0.8;
+				FlxG.sound.music.addTrack(Paths.songPath('${PlayState.SONG.song}/Voices'), [":group-volume=0.8"], 2);
 			} else {
 				var playerVocals:String = getVocalFromCharacter(PlayState.SONG.player1);
-				var loadedVocals = Paths.songPath('${PlayState.SONG.song}/Voices${playerVocals}');
-
-				if (FileSystem.exists(loadedVocals)) {
-					FlxG.sound.music.addTrack(loadedVocals, null, 2);
-					FlxG.sound.music._vlcPlayer.members[1].volume = 0.8;
-				}
+				FlxG.sound.music.addTrack(Paths.songPath('${PlayState.SONG.song}/Voices${playerVocals}'), [":group-volume=0.8"], 2);
 
 				var playerVocals:String = getVocalFromCharacter(PlayState.SONG.player2);
-				var loadedVocals = Paths.songPath('${PlayState.SONG.song}/Voices${playerVocals}');
-
-				if (FileSystem.exists(loadedVocals)) {
-					FlxG.sound.music.addTrack(loadedVocals, null, 3);
-					FlxG.sound.music._vlcPlayer.members[2].volume = 0.8;
-				}
+				FlxG.sound.music.addTrack(Paths.songPath('${PlayState.SONG.song}/Voices${playerVocals}'), [":group-volume=0.8"], 3);
 			}
+		} else {
+			FlxG.sound.music.releaseMedia(2);
+			FlxG.sound.music.releaseMedia(3);
 		}
 		if (allowPlayMusic) FlxG.sound.music.play();
 	}

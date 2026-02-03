@@ -2679,13 +2679,13 @@ function musicCheck(music:FlxSound, getTime:Float, deviation:Float):Bool
 	override function draw() {
 		if (camZooming)
 		{
-			if (FlxG.camera.zoom - defaultCamZoom > 0.005)
+			if (FlxG.camera.zoom - defaultCamZoom > 5e-4)
 				FlxG.camera.zoom = FlxMath.lerp(defaultCamZoom, FlxG.camera.zoom, Math.exp(-FlxG.drawElapsed * 3.125 * camZoomingDecay * playbackRate));
 			else {
 				FlxG.camera.zoom = defaultCamZoom;
 			}
 
-			if (camHUD.zoom - 1 > 0.005)
+			if (camHUD.zoom - 1 > 5e-4)
 				camHUD.zoom = FlxMath.lerp(1, camHUD.zoom, Math.exp(-FlxG.drawElapsed * 3.125 * camZoomingDecay * playbackRate));
 			else {
 				camHUD.zoom = 1;

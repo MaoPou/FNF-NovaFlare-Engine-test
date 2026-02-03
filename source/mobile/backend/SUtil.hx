@@ -90,25 +90,28 @@ class SUtil
 	#if android
 	public static function doPermissionsShit():Void
 	{
-		if (AndroidVersion.SDK_INT >= AndroidVersionCode.TIRAMISU) { // Android 13 (API level 33) and above
-			// Code for Android 13 and above
-			AndroidPermissions.requestPermissions(['READ_MEDIA_IMAGES', 'READ_MEDIA_VIDEO', 'READ_MEDIA_AUDIO']);
-		} else { // Android 12 and below
-			AndroidPermissions.requestPermissions(['READ_EXTERNAL_STORAGE', 'WRITE_EXTERNAL_STORAGE']);
-		}
-
-		if (!AndroidEnvironment.isExternalStorageManager())
+		if (AndroidVersion.SDK_INT >= AndroidVersionCode.R) // Android 11 (API 30) and above
 		{
-			if (AndroidVersion.SDK_INT >= AndroidVersionCode.R) //android 11(sdk 30)
+			if (!AndroidEnvironment.isExternalStorageManager())
 				AndroidSettings.requestSetting('MANAGE_APP_ALL_FILES_ACCESS_PERMISSION');
 		}
+		else // Android 10 and below
+		{
+			if (!AndroidPermissions.getGrantedPermissions().contains('android.permission.READ_EXTERNAL_STORAGE')
+				|| !AndroidPermissions.getGrantedPermissions().contains('android.permission.WRITE_EXTERNAL_STORAGE'))
+			{
+				AndroidPermissions.requestPermissions(['READ_EXTERNAL_STORAGE', 'WRITE_EXTERNAL_STORAGE']);
+			}
+		}
 
-		if ((AndroidVersion.SDK_INT >= AndroidVersionCode.TIRAMISU
-			&& !AndroidPermissions.getGrantedPermissions().contains('android.permission.READ_MEDIA_IMAGES'))
-			|| (AndroidVersion.SDK_INT < AndroidVersionCode.TIRAMISU
-				&& !AndroidPermissions.getGrantedPermissions().contains('android.permission.READ_EXTERNAL_STORAGE')))
+		if ((AndroidVersion.SDK_INT >= AndroidVersionCode.R
+			&& !AndroidEnvironment.isExternalStorageManager())
+			|| (AndroidVersion.SDK_INT < AndroidVersionCode.R
+				&& (!AndroidPermissions.getGrantedPermissions().contains('android.permission.READ_EXTERNAL_STORAGE')
+					|| !AndroidPermissions.getGrantedPermissions().contains('android.permission.WRITE_EXTERNAL_STORAGE'))))
 			showPopUp('If you accepted the permissions you are all good!' + '\nIf you didn\'t then expect a crash' + '\nPress OK to see what happens',
 				'Notice!');
+
 		try
 		{
 			if (!FileSystem.exists(SUtil.getStorageDirectory()))

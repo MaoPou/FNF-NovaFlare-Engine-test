@@ -33,28 +33,28 @@ class MoveSprite extends FlxSprite{
 	private var offsetX:Float = 0;
     private var offsetY:Float = 0;
     override function draw()
-	{
-		super.draw();
+    {
+        super.draw();
         if (allowMove) {
-			var mouseX = FlxG.mouse.getWorldPosition().x;
-			var mouseY = FlxG.mouse.getWorldPosition().y;
-			var centerX = FlxG.width / 2;
-			var centerY = FlxG.height / 2;
-			
-			var targetOffsetX = Math.min(0.99, (mouseX - centerX) / (FlxG.width / 2)) * (realWidth - FlxG.width) / 2;
-			var targetOffsetY = Math.min(0.99, (mouseY - centerY) / (FlxG.height / 2)) * (realHeight - FlxG.height) / 2;
-			
-			if (Math.abs(offsetX - targetOffsetX) > 0.5) offsetX = FlxMath.lerp(targetOffsetX, offsetX, Math.exp(-FlxG.drawElapsed * bgFollowSmooth));
-			else offsetX = targetOffsetX;
-			if (Math.abs(offsetY - targetOffsetY) > 0.5) offsetY = FlxMath.lerp(targetOffsetY, offsetY, Math.exp(-FlxG.drawElapsed * bgFollowSmooth));
-			else offsetY = targetOffsetY;
-			
-			this.x = centerX - realWidth / 2 + offsetX;
-			this.y = centerY - realHeight / 2 + offsetY;
-		}
-    }
+            var centerX = FlxG.width * 0.5;
+            var centerY = FlxG.height * 0.5;
+            
+            var targetOffsetX = Math.min(0.99, (FlxG.mouse.x - centerX) / centerX) * (realWidth - FlxG.width) * 0.5;
+            var targetOffsetY = Math.min(0.99, (FlxG.mouse.y - centerY) / centerY) * (realHeight - FlxG.height) * 0.5;
+            
+            var lerpFactor = Math.exp(-FlxG.drawElapsed * bgFollowSmooth);
 
-	var colorTween:FlxTween = null;
+            if (Math.abs(offsetX - targetOffsetX) > 0.5) offsetX = FlxMath.lerp(targetOffsetX, offsetX, lerpFactor);
+            else offsetX = targetOffsetX;
+            if (Math.abs(offsetY - targetOffsetY) > 0.5) offsetY = FlxMath.lerp(targetOffsetY, offsetY, lerpFactor);
+            else offsetY = targetOffsetY;
+            
+            this.x = centerX - realWidth * 0.5 + offsetX;
+            this.y = centerY - realHeight * 0.5 + offsetY;
+        }
+    }
+    
+    var colorTween:FlxTween = null;
 	public function changeColor(color:Int, time:Float = 0.6) {
 		if (colorTween != null) colorTween.cancel();
 		var sr = this.color;
