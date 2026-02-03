@@ -97,12 +97,12 @@ jobs:
 
   windows-build:
     name: "Windows Build"
-    needs: installHaxelib
+    needs: update-versions
     uses: ./.github/workflows/WindowsBuild.yml
 
   linux-build:
     name: "Linux Build"
-    needs: installHaxelib
+    needs: update-versions
     uses: ./.github/workflows/LinuxBuild.yml
 
   releaser:
