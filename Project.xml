@@ -9,8 +9,6 @@
 	<!-- NOTE TO SELF: DISABLE THIS IF ISSUES ARE FOUND -->
 	<haxedef name="LINC_LUA_RELATIVE_DYNAMIC_LIB"/> <!-- stable luas PUT AFTER FIRST LINE WITH APP NAME AND ETC -->
 	
-	<include name="include.hxp" if="android" />
-    
 	<!--The flixel preloader is not accurate in Chrome. You can use it regularly if you embed the swf into a html file
 		or you can set the actual size of your file manually at "FlxPreloaderBase-onUpdate-bytesTotal"-->
 	<!-- <app preloader="Preloader" resizable="true" /> -->
@@ -256,7 +254,7 @@
     	<icon path="art/iconOG-PC.png" />
     </section>
 
-	<architecture name="arm64" exclude="armv7" if="android" />
+	<architecture name="armv7" exclude="arm64" if="android" />
 
 <config>
 	<android minimum-sdk-version="24" />
