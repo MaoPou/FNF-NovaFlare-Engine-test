@@ -104,7 +104,7 @@ jobs:
           fi
           
       - name: cache Build
-        id: cache
+        id: HaxelibCache
         if: steps.cache_use.outputs.use_cache == 'true'
         uses: actions/cache/restore@v4
         with:
