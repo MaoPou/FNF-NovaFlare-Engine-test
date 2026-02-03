@@ -19,11 +19,11 @@ jobs:
       - name: Determine cache strategy
         id: cache_strategy
         run: |
-          if [[ "${{ github.event.workflow }}" == "release" ]]; then
-            echo "use_cache=true" >> $GITHUB_OUTPUT
-          else
-            echo "use_cache=false" >> $GITHUB_OUTPUT
-          fi
+          if ("${{ github.event.workflow }}" -eq ".github/workflows/release.yml") {
+            echo "use_cache=true" >> $env:GITHUB_OUTPUT
+          } else {
+            echo "use_cache=false" >> $env:GITHUB_OUTPUT
+          }
           
       - name: cache Build
         id: cache
