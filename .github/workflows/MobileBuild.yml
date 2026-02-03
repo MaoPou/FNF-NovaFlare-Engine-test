@@ -120,7 +120,7 @@ jobs:
       - name: Extract current version
         id: get_version
         run: |
-          CURRENT_VERSION=$(grep -oP 'build-number="\K[^"]*' project.xml)
+          CURRENT_VERSION=$(grep -oP 'build-number="\K[^"]*' Project.xml)
           echo "current_version=$CURRENT_VERSION" >> $GITHUB_OUTPUT
 
       - name: Compile

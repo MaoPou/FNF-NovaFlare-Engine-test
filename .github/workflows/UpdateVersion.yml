@@ -21,39 +21,39 @@ jobs:
           input="${{ github.event.inputs.version_input }}"
           version_name=$(echo "$input" | awk '{print $1}')
           version_number=$(echo "$input" | awk '{print $2}')
-          commit_sha=$(git rev-parse --short HEAD)
-          version_number_with_commit="$version_number-$commit_sha"
+          current_timestamp=$(date +%Y%m%d%H%M)
+          
+          # 去掉版本号的小数点（2.7 → 27）
+          version_number_int=$(echo "$version_number" | tr -d '.')
+          version_number_int_with_timestamp="$version_number_int$current_timestamp"
           
           echo "Parsed version name: $version_name"
           echo "Parsed version number: $version_number"
-          echo "Commit SHA: $commit_sha"
-          echo "Version number with commit: $version_number_with_commit"
+          echo "Version number without dots: $version_number_int"
+          echo "Version number with timestamp: $version_number_int_with_timestamp"
           
           echo "version_name=$version_name" >> $GITHUB_OUTPUT
           echo "version_number=$version_number" >> $GITHUB_OUTPUT
-          echo "version_number_with_commit=$version_number_with_commit" >> $GITHUB_OUTPUT
-          echo "commit_sha=$commit_sha" >> $GITHUB_OUTPUT
+          echo "version_number_int_with_timestamp=$version_number_int_with_timestamp" >> $GITHUB_OUTPUT
 
       - name: Update gitVersion.txt
         run: |
           echo "Updating gitVersion.txt..."
           echo "${{ steps.parse-version.outputs.version_name }}" > gitVersion.txt
-          echo "${{ steps.parse-version.outputs.version_number_with_commit }}" >> gitVersion.txt
+          echo "${{ steps.parse-version.outputs.version_number }}" >> gitVersion.txt
           echo "Updated gitVersion.txt content:"
           cat gitVersion.txt
 
       - name: Update Project.xml
         run: |
           echo "Updating Project.xml..."
-          # 更新版本名
           sed -i "s/\(<app title=\"NovaFlare Engine\".* version=\"\)[^\"]*\(\"\)/\1${{ steps.parse-version.outputs.version_name }}\2/" Project.xml
-          # 智能更新构建编号 (build-number)，加上commit ID
           if grep -q 'build-number="[^"]*"' Project.xml; then
-            sed -i "s/\(<app title=\"NovaFlare Engine\".* build-number=\"\)[^\"]*\(\"\)/\1${{ steps.parse-version.outputs.version_number_with_commit }}\2/" Project.xml
-            echo "Updated existing build-number attribute with commit ID"
+            sed -i "s/\(<app title=\"NovaFlare Engine\".* build-number=\"\)[^\"]*\(\"\)/\1${{ steps.parse-version.outputs.version_number_int_with_timestamp }}\2/" Project.xml
+            echo "Updated existing build-number attribute with integer version and timestamp"
           else
-            sed -i "s/\(<app title=\"NovaFlare Engine\".* version=\"[^\"]*\"\)/\1 build-number=\"${{ steps.parse-version.outputs.version_number_with_commit }}\"/" Project.xml
-            echo "Added build-number attribute with commit ID"
+            sed -i "s/\(<app title=\"NovaFlare Engine\".* version=\"[^\"]*\"\)/\1 build-number=\"${{ steps.parse-version.outputs.version_number_int_with_timestamp }}\"/" Project.xml
+            echo "Added build-number attribute with integer version and timestamp"
           fi
           echo "Updated Project.xml version and build-number attributes"
 
@@ -69,5 +69,5 @@ jobs:
           git config --local user.email "actions@github.com"
           git config --local user.name "GitHub Actions"
           git add gitVersion.txt Project.xml source/states/MainMenuState.hx
-          git commit -m "chore: Update versions to ${{ steps.parse-version.outputs.version_name }} ${{ steps.parse-version.outputs.version_number_with_commit }}"
+          git commit -m "chore: Update versions to ${{ steps.parse-version.outputs.version_name }} ${{ steps.parse-version.outputs.version_number_int_with_timestamp }}"
           git push
