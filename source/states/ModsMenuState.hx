@@ -1,4 +1,4 @@
-package states;
+﻿package states;
 
 import haxe.Json;
 
@@ -50,6 +50,7 @@ class ModsMenuState extends MusicBeatState
 	var noModsSine:Float = 0;
 	var noModsTxt:FlxText;
 
+	var _lastControllerMode:Bool = false;
 	var startMod:String = null;
 
 	public function new(startMod:String = null)
@@ -371,6 +372,7 @@ class ModsMenuState extends MusicBeatState
 
 		add(bgList);
 		add(modsGroup);
+		_lastControllerMode = controls.controllerMode;
 
 		changeSelectedMod();
 		super.create();
@@ -414,8 +416,16 @@ class ModsMenuState extends MusicBeatState
 
 		if (Math.abs(FlxG.mouse.deltaX) > 10 || Math.abs(FlxG.mouse.deltaY) > 10)
 		{
+			controls.controllerMode = false;
 			if (!FlxG.mouse.visible)
 				FlxG.mouse.visible = true;
+		}
+
+		if (controls.controllerMode != _lastControllerMode)
+		{
+			if (controls.controllerMode)
+				FlxG.mouse.visible = false;
+			_lastControllerMode = controls.controllerMode;
 		}
 
 		if (controls.UI_DOWN_R || controls.UI_UP_R)
@@ -423,6 +433,12 @@ class ModsMenuState extends MusicBeatState
 
 		if (modsList.all.length > 0)
 		{
+			if (controls.controllerMode && holdingMod)
+			{
+				holdingMod = false;
+				holdingElapsed = 0;
+				updateItemPositions();
+			}
 
 			var lastMode = hoveringOnMods;
 			if (modsList.all.length > 1)
@@ -452,16 +468,21 @@ class ModsMenuState extends MusicBeatState
 
 				if (hoveringOnMods)
 				{
-					var shiftMult:Int = FlxG.keys.pressed.SHIFT ? 4 : 1;
+					var shiftMult:Int = (FlxG.keys.pressed.SHIFT
+						|| FlxG.gamepads.anyPressed(LEFT_SHOULDER)
+						|| FlxG.gamepads.anyPressed(RIGHT_SHOULDER)) ? 4 : 1;
 					if (controls.UI_DOWN_P)
 						changeSelectedMod(shiftMult);
 					else if (controls.UI_UP_P)
 						changeSelectedMod(-shiftMult);
 					else if (FlxG.mouse.wheel != 0)
 						changeSelectedMod(-FlxG.mouse.wheel * shiftMult, true);
-					else if (FlxG.keys.justPressed.HOME || FlxG.keys.justPressed.END)
+					else if (FlxG.keys.justPressed.HOME
+						|| FlxG.keys.justPressed.END
+						|| FlxG.gamepads.anyJustPressed(LEFT_TRIGGER)
+						|| FlxG.gamepads.anyJustPressed(RIGHT_TRIGGER))
 					{
-						if (FlxG.keys.justPressed.END)
+						if (FlxG.keys.justPressed.END || FlxG.gamepads.anyJustPressed(RIGHT_TRIGGER))
 							curSelectedMod = modsList.all.length - 1;
 						else
 							curSelectedMod = 0;
@@ -1072,7 +1093,7 @@ class MenuButton extends FlxSpriteGroup
 			return;
 		}
 
-		if (!ignoreCheck && FlxG.mouse.justMoved && FlxG.mouse.visible)
+		if (!ignoreCheck && !Controls.instance.controllerMode && FlxG.mouse.justMoved && FlxG.mouse.visible)
 			onFocus = FlxG.mouse.overlaps(this);
 
 		if (onFocus && onClick != null && FlxG.mouse.justPressed)
@@ -1081,7 +1102,8 @@ class MenuButton extends FlxSpriteGroup
 		if (_needACheck)
 		{
 			_needACheck = false;
-			setButtonVisibility(FlxG.mouse.overlaps(this));
+			if (!Controls.instance.controllerMode)
+				setButtonVisibility(FlxG.mouse.overlaps(this));
 		}
 
 		if (FlxG.mouse.overlaps(this) && FlxG.mouse.justReleased)

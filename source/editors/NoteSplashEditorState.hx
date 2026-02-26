@@ -1,4 +1,4 @@
-package editors;
+﻿package editors;
 
 import haxe.Json;
 
@@ -591,7 +591,7 @@ class NoteSplashEditorState extends MusicBeatState
 				}
 			}
 
-			var multiplier:Int = (virtualPad.buttonZ.pressed || FlxG.keys.pressed.SHIFT) ? 10 : 1;
+			var multiplier:Int = (virtualPad.buttonZ.pressed || FlxG.keys.pressed.SHIFT || FlxG.gamepads.anyPressed(LEFT_SHOULDER)) ? 10 : 1;
 
 			var moveKeysP = [
 				virtualPad.buttonLeft.justPressed

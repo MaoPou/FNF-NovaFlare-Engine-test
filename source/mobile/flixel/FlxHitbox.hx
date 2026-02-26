@@ -3,6 +3,7 @@
 import openfl.Lib;
 import openfl.display.Shape;
 import openfl.display.BitmapData;
+import flixel.input.keyboard.FlxKey;
 
 import mobile.flixel.input.FlxMobileInputManager;
 import mobile.flixel.FlxButton;
@@ -16,12 +17,7 @@ import mobile.flixel.FlxButton;
 class FlxHitbox extends FlxMobileInputManager
 {
 	public var buttonNotes:Array<FlxButton> = [];
-	public var buttonExtra1:FlxButton = new FlxButton(0, 0);
-	public var buttonExtra2:FlxButton = new FlxButton(0, 0);
-	public var buttonExtra3:FlxButton = new FlxButton(0, 0);
-	public var buttonExtra4:FlxButton = new FlxButton(0, 0);
-
-	var storedButtonsIDs:Map<String, Array<FlxMobileInputID>> = new Map<String, Array<FlxMobileInputID>>();
+	public var buttonExtra:Array<FlxButton> = [];
 
 	/**
 	 * Create the zone.
@@ -44,17 +40,8 @@ class FlxHitbox extends FlxMobileInputManager
 		var newWidth:Int = Std.int(stage.stageWidth / scale);
 		var newHeight:Int = Std.int(stage.stageHeight / scale);
 
-		for (button in Reflect.fields(this))
-		{
-			if (Std.isOfType(Reflect.field(this, button), FlxButton))
-			{
-				storedButtonsIDs.set(button, Reflect.getProperty(Reflect.field(this, button), 'IDs'));
-			}
-		}
-
 		if (ClientPrefs.data.extraKey == 0)
 		{
-			// Full screen keys
 			for (i in 0...keys)
 			{
 				var button = createHint(newWidth * i / keys, 0, Std.int(newWidth / keys), Std.int(newHeight), getColor(i, mania));
@@ -74,47 +61,15 @@ class FlxHitbox extends FlxMobileInputManager
 					add(button);
 				}
 
-				switch (ClientPrefs.data.extraKey)
+				for (i in 0...ClientPrefs.data.extraKey)
 				{
-					case 1:
-						add(buttonExtra1 = createHint(0, (newHeight / 5) * 4, newWidth, Std.int(newHeight / 5), 0xFFFF00));
-					case 2:
-						add(buttonExtra1 = createHint(0, (newHeight / 5) * 4, Std.int(newWidth / 2), Std.int(newHeight / 5), 0xFFFF00));
-						add(buttonExtra2 = createHint(newWidth / 2, (newHeight / 5) * 4, Std.int(newWidth / 2), Std.int(newHeight / 5), 0xFFFF00));
-					case 3:
-						add(buttonExtra1 = createHint(0, (newHeight / 5) * 4, Std.int(newWidth / 3), Std.int(newHeight / 5), 0xFFFF00));
-						add(buttonExtra2 = createHint(newWidth / 3 - 1, (newHeight / 5) * 4, Std.int(newWidth / 3 + 2), Std.int(newHeight / 5),
-							0xFFFF00));
-						add(buttonExtra3 = createHint(newWidth / 3 * 2, (newHeight / 5) * 4, Std.int(newWidth / 3), Std.int(newHeight / 5), 0xFFFF00));
-					case 4:
-						add(buttonExtra1 = createHint(0, (newHeight / 5) * 4, Std.int(newWidth / 4), Std.int(newHeight / 5), 0xFFFF00));
-						add(buttonExtra2 = createHint(newWidth / 4, (newHeight / 5) * 4, Std.int(newWidth / 4), Std.int(newHeight / 5), 0xFFFF00));
-						add(buttonExtra3 = createHint(newWidth / 4 * 2, (newHeight / 5) * 4, Std.int(newWidth / 4), Std.int(newHeight / 5), 0xFFFF00));
-						add(buttonExtra4 = createHint(newWidth / 4 * 3, (newHeight / 5) * 4, Std.int(newWidth / 4), Std.int(newHeight / 5), 0xFFFF00));
+					var button = createHint(i * Std.int(newWidth / ClientPrefs.data.extraKey), (newHeight / 5) * 4, Std.int(newWidth / ClientPrefs.data.extraKey), Std.int(newHeight / 5), 0xFFFF00);
+					buttonExtra.push(button);
+					add(button);
 				}
 			}
-			else if (ClientPrefs.data.hitboxLocation == 'Top')
+			else
 			{
-				// Top 20% for extra keys
-				switch (ClientPrefs.data.extraKey)
-				{
-					case 1:
-						add(buttonExtra1 = createHint(0, 0, newWidth, Std.int(newHeight / 5), 0xFFFF00));
-					case 2:
-						add(buttonExtra1 = createHint(0, 0, Std.int(newWidth / 2), Std.int(newHeight / 5), 0xFFFF00));
-						add(buttonExtra2 = createHint(newWidth / 2, 0, Std.int(newWidth / 2), Std.int(newHeight / 5), 0xFF0000));
-					case 3:
-						add(buttonExtra1 = createHint(0, 0, Std.int(newWidth / 3), Std.int(newHeight / 5), 0xFFFF00));
-						add(buttonExtra2 = createHint(newWidth / 3, 0, Std.int(newWidth / 3), Std.int(newHeight / 5), 0xFF0000));
-						add(buttonExtra3 = createHint(newWidth / 3 * 2, 0, Std.int(newWidth / 3), Std.int(newHeight / 5), 0x0000FF));
-					case 4:
-						add(buttonExtra1 = createHint(0, 0, Std.int(newWidth / 4), Std.int(newHeight / 5), 0xFFFF00));
-						add(buttonExtra2 = createHint(newWidth / 4, 0, Std.int(newWidth / 4), Std.int(newHeight / 5), 0xFF0000));
-						add(buttonExtra3 = createHint(newWidth / 4 * 2, 0, Std.int(newWidth / 4), Std.int(newHeight / 5), 0x0000FF));
-						add(buttonExtra4 = createHint(newWidth / 4 * 3, 0, Std.int(newWidth / 4), Std.int(newHeight / 5), 0x00FF00));
-				}
-
-				// Bottom 80% for main keys
 				for (i in 0...keys)
 				{
 					var button = createHint(newWidth * i / keys, newHeight * 0.2, Std.int(newWidth / keys), Std.int(newHeight * 0.8),
@@ -122,58 +77,20 @@ class FlxHitbox extends FlxMobileInputManager
 					buttonNotes.push(button);
 					add(button);
 				}
-			}
-			else
-			{ // Middle layout (keep as 4K for now)
-				// Middle layout remains as 4K for compatibility
-				add(createHint(0, 0, Std.int(newWidth / 4), Std.int(newHeight * 0.8), 0xFFC24B99));
-				add(createHint(newWidth / 4, 0, Std.int(newWidth / 4), Std.int(newHeight * 0.8), 0xFF00FFFF));
-				add(createHint(newWidth / 2, 0, Std.int(newWidth / 4), Std.int(newHeight * 0.8), 0xFF12FA05));
-				add(createHint((newWidth / 2) + (newWidth / 4), 0, Std.int(newWidth / 4), Std.int(newHeight * 0.8), 0xFFF9393F));
 
-				// Extra keys for middle layout
-				switch (ClientPrefs.data.extraKey)
+				for (i in 0...ClientPrefs.data.extraKey)
 				{
-					case 1:
-						add(buttonExtra1 = createHint(Std.int(newWidth / 5) * 2, 0, Std.int(newWidth / 5), newHeight, 0xFFFF00));
-					case 2:
-						add(buttonExtra1 = createHint(Std.int(newWidth / 5) * 2, 0, Std.int(newWidth / 5), Std.int(newHeight / 2), 0xFFFF00));
-						add(buttonExtra2 = createHint(Std.int(newWidth / 5) * 2, Std.int(newHeight / 2), Std.int(newWidth / 5),
-							Std.int(newHeight / 2), 0xFFFF00));
-					case 3:
-						add(buttonExtra1 = createHint(Std.int(newWidth / 5) * 2, 0, Std.int(newWidth / 5), Std.int(newHeight / 3), 0xFFFF00));
-						add(buttonExtra2 = createHint(Std.int(newWidth / 5) * 2, Std.int(newHeight / 3), Std.int(newWidth / 5),
-							Std.int(newHeight / 3), 0xFFFF00));
-						add(buttonExtra3 = createHint(Std.int(newWidth / 5) * 2, Std.int(newHeight / 3) * 2, Std.int(newWidth / 5),
-							Std.int(newHeight / 3), 0xFFFF00));
-					case 4:
-						add(buttonExtra1 = createHint(Std.int(newWidth / 5) * 2, 0, Std.int(newWidth / 5), Std.int(newHeight / 4), 0xFFFF00));
-						add(buttonExtra2 = createHint(Std.int(newWidth / 5) * 2, Std.int(newHeight / 4), Std.int(newWidth / 5),
-							Std.int(newHeight / 4), 0xFFFF00));
-						add(buttonExtra3 = createHint(Std.int(newWidth / 5) * 2, Std.int(newHeight / 4) * 2, Std.int(newWidth / 5),
-							Std.int(newHeight / 4), 0xFFFF00));
-						add(buttonExtra4 = createHint(Std.int(newWidth / 5) * 2, Std.int(newHeight / 4) * 3, Std.int(newWidth / 5),
-							Std.int(newHeight / 4), 0xFFFF00));
+					var button = createHint(i * Std.int(newWidth / ClientPrefs.data.extraKey), 0, Std.int(newWidth / ClientPrefs.data.extraKey), Std.int(newHeight / 5), 0xFFFF00);
+					buttonExtra.push(button);
+					add(button);
 				}
-
-				add(createHint(Std.int(newWidth / 5) * 3, 0, Std.int(newWidth / 5), newHeight, 0xFF12FA05));
-				add(createHint(Std.int(newWidth / 5) * 4, 0, Std.int(newWidth / 5), newHeight, 0xFFF9393F));
 			}
 		}
 
 		// Assign input IDs to main keys
 		for (i in 0...buttonNotes.length)
 		{
-			buttonNotes[i].IDs = [getInputID(mania, i)];
-		}
-
-		// Assign input IDs to extra buttons
-		for (button in Reflect.fields(this))
-		{
-			if (Std.isOfType(Reflect.field(this, button), FlxButton))
-			{
-				Reflect.setProperty(Reflect.getProperty(this, button), 'IDs', storedButtonsIDs.get(button));
-			}
+			buttonNotes[i].IDs = getInputID(mania, i);
 		}
 
 		scrollFactor.set();
@@ -183,87 +100,24 @@ class FlxHitbox extends FlxMobileInputManager
 	/**
 	 * Get input ID based on mania and index
 	 */
-	private function getInputID(mania:Int, index:Int):FlxMobileInputID
+	private function getInputID(mania:Int, index:Int):Array<FlxKey>
 	{
-		return switch (mania)
-		{
-			case 0: FlxMobileInputID.EK_0_0; // 1K
-			case 1: index == 0 ? FlxMobileInputID.EK_1_0 : FlxMobileInputID.EK_1_1; // 2K
-			case 2: switch (index) { // 3K
-				case 0: FlxMobileInputID.EK_2_0;
-				case 1: FlxMobileInputID.EK_2_1;
-				case _: FlxMobileInputID.EK_2_2;
+		var key:String = '';
+		if (mania == 3) {
+			switch (index) {
+				case 0: key = 'note_left';
+				case 1: key = 'note_down';
+				case 2: key = 'note_up';
+				case 3: key = 'note_right';
 			}
-			case 3: switch (index) { // 4K (default)
-				case 0: FlxMobileInputID.noteLEFT;
-				case 1: FlxMobileInputID.noteDOWN; 
-				case 2: FlxMobileInputID.noteUP;
-				case _: FlxMobileInputID.noteRIGHT;
-			}
-			case 4: switch (index) { // 5K
-				case 0: FlxMobileInputID.EK_4_0;
-				case 1: FlxMobileInputID.EK_4_1;
-				case 2: FlxMobileInputID.EK_4_2;
-				case 3: FlxMobileInputID.EK_4_3;
-				case _: FlxMobileInputID.EK_4_4;
-			}
-			case 5: switch (index) { // 6K
-				case 0: FlxMobileInputID.EK_5_0;
-				case 1: FlxMobileInputID.EK_5_1;
-				case 2: FlxMobileInputID.EK_5_2;
-				case 3: FlxMobileInputID.EK_5_3;
-				case 4: FlxMobileInputID.EK_5_4;
-				case _: FlxMobileInputID.EK_5_5;
-			}
-			case 6: switch (index) { // 7K
-				case 0: FlxMobileInputID.EK_6_0;
-				case 1: FlxMobileInputID.EK_6_1;
-				case 2: FlxMobileInputID.EK_6_2;
-				case 3: FlxMobileInputID.EK_6_3;
-				case 4: FlxMobileInputID.EK_6_4;
-				case 5: FlxMobileInputID.EK_6_5;
-				case _: FlxMobileInputID.EK_6_6;
-			}
-			case 7: switch (index) { // 8K
-				case 0: FlxMobileInputID.EK_7_0;
-				case 1: FlxMobileInputID.EK_7_1;
-				case 2: FlxMobileInputID.EK_7_2;
-				case 3: FlxMobileInputID.EK_7_3;
-				case 4: FlxMobileInputID.EK_7_4;
-				case 5: FlxMobileInputID.EK_7_5;
-				case 6: FlxMobileInputID.EK_7_6;
-				case _: FlxMobileInputID.EK_7_7;
-			}
-			case 8: switch (index) { // 9K
-				case 0: FlxMobileInputID.EK_8_0;
-				case 1: FlxMobileInputID.EK_8_1;
-				case 2: FlxMobileInputID.EK_8_2;
-				case 3: FlxMobileInputID.EK_8_3;
-				case 4: FlxMobileInputID.EK_8_4;
-				case 5: FlxMobileInputID.EK_8_5;
-				case 6: FlxMobileInputID.EK_8_6;
-				case 7: FlxMobileInputID.EK_8_7;
-				case _: FlxMobileInputID.EK_8_8;
-			}
-			case 9: switch (index) { // 10K
-				case 0: FlxMobileInputID.EK_9_0;
-				case 1: FlxMobileInputID.EK_9_1;
-				case 2: FlxMobileInputID.EK_9_2;
-				case 3: FlxMobileInputID.EK_9_3;
-				case 4: FlxMobileInputID.EK_9_4;
-				case 5: FlxMobileInputID.EK_9_5;
-				case 6: FlxMobileInputID.EK_9_6;
-				case 7: FlxMobileInputID.EK_9_7;
-				case 8: FlxMobileInputID.EK_9_8;
-				case _: FlxMobileInputID.EK_9_9;
-			}
-			default: switch (index) { // Default to 4K
-				case 0: FlxMobileInputID.noteLEFT;
-				case 1: FlxMobileInputID.noteDOWN;
-				case 2: FlxMobileInputID.noteUP;
-				case _: FlxMobileInputID.noteRIGHT;
-			}
+		} else {
+			key = '${mania}_key_${index}';
 		}
+
+		if (ClientPrefs.keyBinds.exists(key))
+			return ClientPrefs.keyBinds.get(key);
+
+		return [];
 	}
 
 	/**
@@ -317,10 +171,10 @@ class FlxHitbox extends FlxMobileInputManager
 		{
 			button = FlxDestroyUtil.destroy(button);
 		}
-		buttonExtra1 = FlxDestroyUtil.destroy(buttonExtra1);
-		buttonExtra2 = FlxDestroyUtil.destroy(buttonExtra2);
-		buttonExtra3 = FlxDestroyUtil.destroy(buttonExtra3);
-		buttonExtra4 = FlxDestroyUtil.destroy(buttonExtra4);
+		for (button in buttonExtra)
+		{
+			button = FlxDestroyUtil.destroy(button);
+		}
 	}
 
 	private function createHint(X:Float, Y:Float, Width:Int, Height:Int, Color:Int = 0xFFFFFF):FlxButton
@@ -379,3 +233,4 @@ class FlxHitbox extends FlxMobileInputManager
 		return bitmap;
 	}
 }
+

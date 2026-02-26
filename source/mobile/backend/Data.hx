@@ -23,8 +23,11 @@ enum FlxDPadMode
 	LEFT_RIGHT;
 	UP_LEFT_RIGHT;
 	LEFT_FULL;
+	LEFT_FULL_GAME;
 	RIGHT_FULL;
+	RIGHT_FULL_GAME;
 	BOTH;
+	BOTH_GAME;
 	PauseSubstateC;
 	OptionStateC;
 	MainMenuStateC;

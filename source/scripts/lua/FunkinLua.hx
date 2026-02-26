@@ -1,4 +1,4 @@
-#if LUA_ALLOWED
+﻿#if LUA_ALLOWED
 package scripts.lua;
 
 import haxe.Json;
@@ -12,6 +12,7 @@ import flixel.addons.display.FlxRuntimeShader;
 import flixel.FlxBasic;
 import flixel.FlxObject;
 import flixel.input.keyboard.FlxKey;
+import flixel.input.gamepad.FlxGamepadInputID;
 import flixel.math.FlxMatrix;
 
 import states.MainMenuState;

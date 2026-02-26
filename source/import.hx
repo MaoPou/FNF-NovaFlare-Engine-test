@@ -46,7 +46,6 @@ import flixel.addons.transition.FlxTransitionableState;
 import mobile.objects.MobileControls;
 import mobile.flixel.FlxHitbox;
 import mobile.flixel.FlxVirtualPad;
-import mobile.flixel.input.FlxMobileInputID;
 import mobile.backend.Data;
 import mobile.backend.SUtil;
 

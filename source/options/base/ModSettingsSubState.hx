@@ -1,6 +1,7 @@
-package options.base;
+﻿package options.base;
 
 import flixel.input.keyboard.FlxKey;
+import flixel.input.gamepad.FlxGamepadInputID;
 
 import games.funkin.objects.Character;
 
@@ -39,19 +40,25 @@ class ModSettingsSubState extends BaseOptionsMenu
 					case 'keybind':
 						// Defaulting and error checking
 						var keyboardStr:String = option.keyboard;
+						var gamepadStr:String = option.gamepad;
 						if (keyboardStr == null)
 							keyboardStr = 'NONE';
+						if (gamepadStr == null)
+							gamepadStr = 'NONE';
 
 						newOption.defaultKeys.keyboard = keyboardStr;
+						newOption.defaultKeys.gamepad = gamepadStr;
 						if (save.get(option.save) == null)
 						{
 							newOption.keys.keyboard = newOption.defaultKeys.keyboard;
+							newOption.keys.gamepad = newOption.defaultKeys.gamepad;
 							save.set(option.save, newOption.keys);
 						}
 
 						// getting inputs and checking
 						var keyboardKey:FlxKey = cast FlxKey.fromString(keyboardStr);
-						// trace('${keyboardStr}: $keyboardKey');
+						var gamepadKey:FlxGamepadInputID = cast FlxGamepadInputID.fromString(gamepadStr);
+						// trace('${keyboardStr}: $keyboardKey, ${gamepadStr}: $gamepadKey');
 
 						@:privateAccess
 						{
@@ -60,15 +67,18 @@ class ModSettingsSubState extends BaseOptionsMenu
 								var data = save.get(newOption.variable);
 								if (data == null)
 									return 'NONE';
-								return data.keyboard;
+								return !Controls.instance.controllerMode ? data.keyboard : data.gamepad;
 							};
 							newOption.setValue = function(value:Dynamic)
 							{
 								var data = save.get(newOption.variable);
 								if (data == null)
-									data = {keyboard: 'NONE'};
+									data = {keyboard: 'NONE', gamepad: 'NONE'};
 
-								data.keyboard = value;
+								if (!controls.controllerMode)
+									data.keyboard = value;
+								else
+									data.gamepad = value;
 								save.set(newOption.variable, data);
 							};
 						}
@@ -105,9 +115,9 @@ class ModSettingsSubState extends BaseOptionsMenu
 					{
 						myValue = save.get(option.save);
 						if (newOption.type != 'keybind')
-						newOption.setValue(myValue);
-					else
-						newOption.setValue(myValue.keyboard);
+							newOption.setValue(myValue);
+						else
+							newOption.setValue(!Controls.instance.controllerMode ? myValue.keyboard : myValue.gamepad);
 					}
 					else
 					{

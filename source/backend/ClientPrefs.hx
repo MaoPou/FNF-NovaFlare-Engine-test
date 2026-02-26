@@ -1,12 +1,12 @@
-package backend;
+﻿package backend;
 
 import flixel.util.FlxSave;
 import flixel.input.keyboard.FlxKey;
+import flixel.input.gamepad.FlxGamepadInputID;
 
 import states.TitleState;
 
 import games.funkin.backend.ExtraKeysHandler.EKNoteColor;
-import mobile.flixel.input.FlxMobileInputID;
 
 // Add a variable here and it will get automatically saved
 @:structInit class SaveVariables
@@ -215,7 +215,6 @@ class ClientPrefs
 		'note_up' => [J, UP],
 		'note_right' => [K, RIGHT],
 
-		//multi keys support (maybe)	//屎山）
 		'0_key_0' => [SPACE],
 
 		'1_key_0' => [D, LEFT],
@@ -291,106 +290,33 @@ class ClientPrefs
 		'debug_2' => [EIGHT],
 		'fullscreen' => [F11]
 	];
-	public static var mobileBinds:Map<String, Array<FlxMobileInputID>> = [
-		'note_up' => [noteUP, UP2],
-		'note_left' => [noteLEFT, LEFT2],
-		'note_down' => [noteDOWN, DOWN2],
-		'note_right' => [noteRIGHT, RIGHT2],
-		
-		'0_key_0' => [EK_0_0],
-
-		'1_key_0' => [EK_1_0],
-		'1_key_1' => [EK_1_1],
-
-		'2_key_0' => [EK_2_0],
-		'2_key_1' => [EK_2_1],
-		'2_key_2' => [EK_2_2],
-
-		'4_key_0' => [EK_4_0],
-		'4_key_1' => [EK_4_1],
-		'4_key_2' => [EK_4_2],
-		'4_key_3' => [EK_4_3],
-		'4_key_4' => [EK_4_4],
-
-		'5_key_0' => [EK_5_0],
-		'5_key_1' => [EK_5_1],
-		'5_key_2' => [EK_5_2],
-		'5_key_3' => [EK_5_3],
-		'5_key_4' => [EK_5_4],
-		'5_key_5' => [EK_5_5],
-
-		'6_key_0' => [EK_6_0],
-		'6_key_1' => [EK_6_1],
-		'6_key_2' => [EK_6_2],
-		'6_key_3' => [EK_6_3],
-		'6_key_4' => [EK_6_4],
-		'6_key_5' => [EK_6_5],
-		'6_key_6' => [EK_6_6],
-
-		'7_key_0' => [EK_7_0],
-		'7_key_1' => [EK_7_1],
-		'7_key_2' => [EK_7_2],
-		'7_key_3' => [EK_7_3],
-		'7_key_4' => [EK_7_4],
-		'7_key_5' => [EK_7_5],
-		'7_key_6' => [EK_7_6],
-		'7_key_7' => [EK_7_7],
-
-		'8_key_0' => [EK_8_0],
-		'8_key_1' => [EK_8_1],
-		'8_key_2' => [EK_8_2],
-		'8_key_3' => [EK_8_3],
-		'8_key_4' => [EK_8_4],
-		'8_key_5' => [EK_8_5],
-		'8_key_6' => [EK_8_6],
-		'8_key_7' => [EK_8_7],
-		'8_key_8' => [EK_8_8],
-
-		'9_key_0' => [EK_9_0],
-		'9_key_1' => [EK_9_1],
-		'9_key_2' => [EK_9_2],
-		'9_key_3' => [EK_9_3],
-		'9_key_4' => [EK_9_4],
-		'9_key_5' => [EK_9_5],
-		'9_key_6' => [EK_9_6],
-		'9_key_7' => [EK_9_7],
-		'9_key_8' => [EK_9_8],
-		'9_key_9' => [EK_9_9],
-
-		'ui_up' => [UP, noteUP],
-		'ui_left' => [LEFT, noteLEFT],
-		'ui_down' => [DOWN, noteDOWN],
-		'ui_right' => [RIGHT, noteRIGHT],
-		'accept' => [A],
-		'back' => [B],
-		'pause' => [#if android NONE #else P #end],
-		'reset' => [NONE]
-	];
-	public static var defaultMobileBinds:Map<String, Array<FlxMobileInputID>> = null;
+	public static var defaultMobileBinds:Map<String, Array<FlxKey>> = null;
 	public static var defaultKeys:Map<String, Array<FlxKey>> = null;
+	public static var defaultButtons:Map<String, Array<FlxGamepadInputID>> = null;
 
 	public static function resetKeys(controller:Null<Bool> = null) // Null = both, False = Keyboard, True = Controller
 	{
 		if (controller != true)
 			for (key in keyBinds.keys())
 				if (defaultKeys.exists(key))
-					keyBinds.set(key, defaultKeys.get(key).copy());
+				{
+					var arr = keyBinds.get(key);
+					arr.resize(0);
+					for (i in defaultKeys.get(key))
+						arr.push(i);
+				}
 	}
 
 	public static function clearInvalidKeys(key:String)
 	{
 		var keyBind:Array<FlxKey> = keyBinds.get(key);
-		var mobileBind:Array<FlxMobileInputID> = mobileBinds.get(key);
 		while (keyBind != null && keyBind.contains(NONE))
 			keyBind.remove(NONE);
-		while (mobileBind != null && mobileBind.contains(NONE))
-			mobileBind.remove(NONE);
 	}
 
 	public static function loadDefaultKeys()
 	{
-		defaultKeys = keyBinds.copy();
-		defaultMobileBinds = mobileBinds.copy();
+		defaultKeys = [for (key => value in keyBinds) key => value.copy()];
 	}
 
 	public static function saveSettings()
@@ -416,7 +342,6 @@ class ClientPrefs
 		var save:FlxSave = new FlxSave();
 		save.bind('controls_v3', CoolUtil.getSavePath());
 		save.data.keyboard = keyBinds;
-		save.data.mobile = mobileBinds;
 
 		save.flush();
 		FlxG.log.add("Settings saved!");
@@ -578,14 +503,12 @@ class ClientPrefs
 				var loadedControls:Map<String, Array<FlxKey>> = save.data.keyboard;
 				for (control => keys in loadedControls)
 					if (keyBinds.exists(control))
-						keyBinds.set(control, keys);
-			}
-			if (save.data.mobile != null)
-			{
-				var loadedControls:Map<String, Array<FlxMobileInputID>> = save.data.mobile;
-				for (control => keys in loadedControls)
-					if (mobileBinds.exists(control))
-						mobileBinds.set(control, keys);
+					{
+						var arr = keyBinds.get(control);
+						arr.resize(0);
+						for (i in keys)
+							arr.push(i);
+					}
 			}
 
 			reloadVolumeKeys();
@@ -656,3 +579,4 @@ class ClientPrefs
 		}
 	}
 }
+

@@ -1,4 +1,4 @@
-package options.base;
+﻿package options.base;
 
 import lime.system.Clipboard;
 
@@ -6,6 +6,7 @@ import flixel.addons.display.FlxBackdrop;
 import flixel.addons.display.FlxGridOverlay;
 import flixel.addons.display.shapes.FlxShapeCircle;
 import flixel.input.keyboard.FlxKey;
+import flixel.input.gamepad.FlxGamepadInputID;
 import flixel.util.FlxGradient;
 import flixel.addons.ui.FlxUIInputText;
 
@@ -44,6 +45,9 @@ class NotesSubState extends MusicBeatSubstate
 	var modeBG:FlxSprite;
 	var notesBG:FlxSprite;
 
+	// controller support
+	var controllerPointer:FlxSprite;
+	var _lastControllerMode:Bool = false;
 	var tipTxt:FlxText;
 
 	var AndroidColorGet:FlxUIInputText;
@@ -198,7 +202,15 @@ class NotesSubState extends MusicBeatSubstate
 		add(tipTxt);
 		updateTip();
 
-		FlxG.mouse.visible = true;
+		controllerPointer = new FlxShapeCircle(0, 0, 20, {thickness: 0}, FlxColor.WHITE);
+		controllerPointer.offset.set(20, 20);
+		controllerPointer.screenCenter();
+		controllerPointer.alpha = 0.6;
+		add(controllerPointer);
+
+		FlxG.mouse.visible = !controls.controllerMode;
+		controllerPointer.visible = controls.controllerMode;
+		_lastControllerMode = controls.controllerMode;
 
 		AndroidColorGet = new FlxUIInputText(940, 20, 160, '', 30);
 		AndroidColorGet.focusGained = () -> FlxG.stage.window.textInputEnabled = true;
@@ -227,7 +239,7 @@ class NotesSubState extends MusicBeatSubstate
 		}
 		else
 		{
-			tipTxt.text = 'Hold Shift + Press RESET key to fully reset the selected Note.';
+			tipTxt.text = 'Hold ' + (!controls.controllerMode ? 'Shift' : 'Left Shoulder Button') + ' + Press RESET key to fully reset the selected Note.';
 		}
 	}
 
@@ -292,6 +304,59 @@ class NotesSubState extends MusicBeatSubstate
 
 		super.update(elapsed);
 
+		// Early controller checking
+		if (FlxG.gamepads.anyJustPressed(ANY))
+			controls.controllerMode = true;
+		else if (FlxG.mouse.justPressed || FlxG.mouse.deltaScreenX != 0 || FlxG.mouse.deltaScreenY != 0)
+			controls.controllerMode = false;
+		//
+
+		var changedToController:Bool = false;
+		if (controls.controllerMode != _lastControllerMode)
+		{
+			// trace('changed controller mode');
+			FlxG.mouse.visible = !controls.controllerMode;
+			controllerPointer.visible = controls.controllerMode;
+
+			// changed to controller mid state
+			if (controls.controllerMode)
+			{
+				controllerPointer.x = FlxG.mouse.x;
+				controllerPointer.y = FlxG.mouse.y;
+				changedToController = true;
+			}
+			// changed to keyboard mid state
+			/*else
+				{
+					FlxG.mouse.x = controllerPointer.x;
+					FlxG.mouse.y = controllerPointer.y;
+				}
+				// apparently theres no easy way to change mouse position that i know, oh well
+			 */
+			_lastControllerMode = controls.controllerMode;
+			updateTip();
+		}
+
+		// controller things
+		var analogX:Float = 0;
+		var analogY:Float = 0;
+		var analogMoved:Bool = false;
+		if (controls.controllerMode && (changedToController || FlxG.gamepads.anyInput()))
+		{
+			for (gamepad in FlxG.gamepads.getActiveGamepads())
+			{
+				analogX = gamepad.getXAxis(LEFT_ANALOG_STICK);
+				analogY = gamepad.getYAxis(LEFT_ANALOG_STICK);
+				analogMoved = (analogX != 0 || analogY != 0);
+				if (analogMoved)
+					break;
+			}
+			controllerPointer.x = Math.max(0, Math.min(FlxG.width, controllerPointer.x + analogX * 1000 * elapsed));
+			controllerPointer.y = Math.max(0, Math.min(FlxG.height, controllerPointer.y + analogY * 1000 * elapsed));
+		}
+		var controllerPressed:Bool = (controls.controllerMode && controls.ACCEPT);
+		//
+
 		if (FlxG.keys.justPressed.CONTROL)
 		{
 			onPixel = !onPixel;
@@ -355,12 +420,15 @@ class NotesSubState extends MusicBeatSubstate
 		else
 		{
 			var add:Int = 0;
-			if (controls.UI_LEFT_P)
-				add = -1;
-			else if (controls.UI_RIGHT_P)
-				add = 1;
+			if (analogX == 0 && !changedToController)
+			{
+				if (controls.UI_LEFT_P)
+					add = -1;
+				else if (controls.UI_RIGHT_P)
+					add = 1;
+			}
 
-			if (controls.UI_UP_P || controls.UI_DOWN_P)
+			if (analogY == 0 && !changedToController && (controls.UI_UP_P || controls.UI_DOWN_P))
 			{
 				onModeColumn = !onModeColumn;
 				modeBG.visible = onModeColumn;
@@ -378,8 +446,8 @@ class NotesSubState extends MusicBeatSubstate
 		}
 
 		// Copy/Paste buttons
-		var generalMoved:Bool = FlxG.mouse.justMoved;
-		var generalPressed:Bool = FlxG.mouse.justPressed;
+		var generalMoved:Bool = (FlxG.mouse.justMoved || analogMoved);
+		var generalPressed:Bool = (FlxG.mouse.justPressed || controllerPressed);
 		if (generalMoved)
 		{
 			copyButton.alpha = 0.6;
@@ -498,7 +566,7 @@ class NotesSubState extends MusicBeatSubstate
 		// holding
 		if (holdingOnObj != null)
 		{
-			if (FlxG.mouse.justReleased)
+			if (FlxG.mouse.justReleased || (controls.controllerMode && controls.justReleased('accept')))
 			{
 				holdingOnObj = null;
 				_storedColor = getShaderColor();
@@ -534,7 +602,7 @@ class NotesSubState extends MusicBeatSubstate
 		}
 		else if (virtualPad.buttonC.justPressed || controls.RESET && hexTypeNum < 0)
 		{
-			if (FlxG.keys.pressed.SHIFT)
+			if (FlxG.keys.pressed.SHIFT || FlxG.gamepads.anyJustPressed(LEFT_SHOULDER))
 			{
 				for (i in 0...3)
 				{
@@ -560,22 +628,30 @@ class NotesSubState extends MusicBeatSubstate
 
 	function pointerOverlaps(obj:Dynamic)
 	{
-		return FlxG.mouse.overlaps(obj);
+		if (!controls.controllerMode)
+			return FlxG.mouse.overlaps(obj);
+		return FlxG.overlap(controllerPointer, obj);
 	}
 
 	function pointerX():Float
 	{
-		return FlxG.mouse.x;
+		if (!controls.controllerMode)
+			return FlxG.mouse.x;
+		return controllerPointer.x;
 	}
 
 	function pointerY():Float
 	{
-		return FlxG.mouse.y;
+		if (!controls.controllerMode)
+			return FlxG.mouse.y;
+		return controllerPointer.y;
 	}
 
 	function pointerFlxPoint():FlxPoint
 	{
-		return FlxG.mouse.getScreenPosition();
+		if (!controls.controllerMode)
+			return FlxG.mouse.getScreenPosition();
+		return controllerPointer.getScreenPosition();
 	}
 
 	function centerHexTypeLine()

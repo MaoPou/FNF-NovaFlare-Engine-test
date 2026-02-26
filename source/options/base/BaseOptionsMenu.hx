@@ -1,6 +1,9 @@
 package options.base;
 
 import flixel.input.keyboard.FlxKey;
+import flixel.input.gamepad.FlxGamepad;
+import flixel.input.gamepad.FlxGamepadInputID;
+import flixel.input.gamepad.FlxGamepadManager;
 
 import backend.InputFormatter;
 
@@ -301,7 +304,7 @@ class BaseOptionsMenu extends MusicBeatSubstate
 				}
 				else
 				{
-					leOption.setValue(leOption.defaultKeys.keyboard);
+					leOption.setValue(!Controls.instance.controllerMode ? leOption.defaultKeys.keyboard : leOption.defaultKeys.gamepad);
 					updateBind(leOption);
 				}
 				leOption.change();
@@ -318,7 +321,7 @@ class BaseOptionsMenu extends MusicBeatSubstate
 
 	function bindingKeyUpdate(elapsed:Float)
 	{
-		if (virtualPad.buttonB.pressed || FlxG.keys.pressed.ESCAPE)
+		if (virtualPad.buttonB.pressed || FlxG.keys.pressed.ESCAPE || FlxG.gamepads.anyPressed(B))
 		{
 			holdingEsc += elapsed;
 			if (holdingEsc > 0.5)
@@ -327,13 +330,16 @@ class BaseOptionsMenu extends MusicBeatSubstate
 				closeBinding();
 			}
 		}
-		else if (virtualPad.buttonC.pressed || FlxG.keys.pressed.BACKSPACE)
+		else if (virtualPad.buttonC.pressed || FlxG.keys.pressed.BACKSPACE || FlxG.gamepads.anyPressed(BACK))
 		{
 			holdingEsc += elapsed;
 			if (holdingEsc > 0.5)
 			{
-				curOption.keys.keyboard = NONE;
-				updateBind(InputFormatter.getKeyName(NONE));
+				if (!controls.controllerMode)
+					curOption.keys.keyboard = NONE;
+				else
+					curOption.keys.gamepad = NONE;
+				updateBind(!controls.controllerMode ? InputFormatter.getKeyName(NONE) : InputFormatter.getGamepadName(NONE));
 				FlxG.sound.play(Paths.sound('cancelMenu'));
 				closeBinding();
 			}
@@ -342,31 +348,80 @@ class BaseOptionsMenu extends MusicBeatSubstate
 		{
 			holdingEsc = 0;
 			var changed:Bool = false;
-
-			if (FlxG.keys.justPressed.ANY || FlxG.keys.justReleased.ANY)
+			if (!controls.controllerMode)
 			{
-				var keyPressed:FlxKey = cast(FlxG.keys.firstJustPressed(), FlxKey);
-				var keyReleased:FlxKey = cast(FlxG.keys.firstJustReleased(), FlxKey);
+				if (FlxG.keys.justPressed.ANY || FlxG.keys.justReleased.ANY)
+				{
+					var keyPressed:FlxKey = cast(FlxG.keys.firstJustPressed(), FlxKey);
+					var keyReleased:FlxKey = cast(FlxG.keys.firstJustReleased(), FlxKey);
 
-				if (keyPressed != NONE && keyPressed != ESCAPE && keyPressed != BACKSPACE)
-				{
-					changed = true;
-					curOption.keys.keyboard = keyPressed;
+					if (keyPressed != NONE && keyPressed != ESCAPE && keyPressed != BACKSPACE)
+					{
+						changed = true;
+						curOption.keys.keyboard = keyPressed;
+					}
+					else if (keyReleased != NONE && (keyReleased == ESCAPE || keyReleased == BACKSPACE))
+					{
+						changed = true;
+						curOption.keys.keyboard = keyReleased;
+					}
 				}
-				else if (keyReleased != NONE && (keyReleased == ESCAPE || keyReleased == BACKSPACE))
+			}
+			else if (FlxG.gamepads.anyJustPressed(ANY)
+				|| FlxG.gamepads.anyJustPressed(LEFT_TRIGGER)
+				|| FlxG.gamepads.anyJustPressed(RIGHT_TRIGGER)
+				|| FlxG.gamepads.anyJustReleased(ANY))
+			{
+				var keyPressed:FlxGamepadInputID = NONE;
+				var keyReleased:FlxGamepadInputID = NONE;
+				if (FlxG.gamepads.anyJustPressed(LEFT_TRIGGER))
+					keyPressed = LEFT_TRIGGER; // it wasnt working for some reason
+				else if (FlxG.gamepads.anyJustPressed(RIGHT_TRIGGER))
+					keyPressed = RIGHT_TRIGGER; // it wasnt working for some reason
+				else
+				{
+					for (i in 0...FlxG.gamepads.numActiveGamepads)
+					{
+						var gamepad:FlxGamepad = FlxG.gamepads.getByID(i);
+						if (gamepad != null)
+						{
+							keyPressed = gamepad.firstJustPressedID();
+							keyReleased = gamepad.firstJustReleasedID();
+							if (keyPressed != NONE || keyReleased != NONE)
+								break;
+						}
+					}
+				}
+
+				if (keyPressed != NONE && keyPressed != FlxGamepadInputID.BACK && keyPressed != FlxGamepadInputID.B)
 				{
 					changed = true;
-					curOption.keys.keyboard = keyReleased;
+					curOption.keys.gamepad = keyPressed;
+				}
+				else if (keyReleased != NONE && (keyReleased == FlxGamepadInputID.BACK || keyReleased == FlxGamepadInputID.B))
+				{
+					changed = true;
+					curOption.keys.gamepad = keyReleased;
 				}
 			}
 
 			if (changed)
 			{
 				var key:String = null;
-				if (curOption.keys.keyboard == null)
-					curOption.keys.keyboard = 'NONE';
-				curOption.setValue(curOption.keys.keyboard);
-				key = InputFormatter.getKeyName(FlxKey.fromString(curOption.keys.keyboard));
+				if (!controls.controllerMode)
+				{
+					if (curOption.keys.keyboard == null)
+						curOption.keys.keyboard = 'NONE';
+					curOption.setValue(curOption.keys.keyboard);
+					key = InputFormatter.getKeyName(FlxKey.fromString(curOption.keys.keyboard));
+				}
+				else
+				{
+					if (curOption.keys.gamepad == null)
+						curOption.keys.gamepad = 'NONE';
+					curOption.setValue(curOption.keys.gamepad);
+					key = InputFormatter.getGamepadName(FlxGamepadInputID.fromString(curOption.keys.gamepad));
+				}
 				updateBind(key);
 				FlxG.sound.play(Paths.sound('confirmMenu'));
 				closeBinding();
@@ -386,7 +441,10 @@ class BaseOptionsMenu extends MusicBeatSubstate
 			if (text == null)
 				text = 'NONE';
 
-			text = InputFormatter.getKeyName(FlxKey.fromString(text));
+			if (!controls.controllerMode)
+				text = InputFormatter.getKeyName(FlxKey.fromString(text));
+			else
+				text = InputFormatter.getGamepadName(FlxGamepadInputID.fromString(text));
 		}
 
 		var bind:AttachedText = cast option.child;
@@ -394,6 +452,7 @@ class BaseOptionsMenu extends MusicBeatSubstate
 		attach.sprTracker = bind.sprTracker;
 		attach.copyAlpha = true;
 		attach.ID = bind.ID;
+		playstationCheck(attach);
 		attach.scaleX = Math.min(1, MAX_KEYBIND_WIDTH / attach.width);
 		attach.x = bind.x;
 		attach.y = bind.y;
@@ -402,6 +461,28 @@ class BaseOptionsMenu extends MusicBeatSubstate
 		grpTexts.insert(grpTexts.members.indexOf(bind), attach);
 		grpTexts.remove(bind);
 		bind.destroy();
+	}
+
+	function playstationCheck(alpha:Alphabet)
+	{
+		if (!controls.controllerMode)
+			return;
+
+		var gamepad:FlxGamepad = FlxG.gamepads.firstActive;
+		var model:FlxGamepadModel = gamepad != null ? gamepad.detectedModel : UNKNOWN;
+		var letter = alpha.letters[0];
+		if (model == PS4)
+		{
+			switch (alpha.text)
+			{
+				case '[', ']': // Square and Triangle respectively
+					letter.image = 'alphabet_playstation';
+					letter.updateHitbox();
+
+					letter.offset.x += 4;
+					letter.offset.y -= 5;
+			}
+		}
 	}
 
 	function closeBinding()

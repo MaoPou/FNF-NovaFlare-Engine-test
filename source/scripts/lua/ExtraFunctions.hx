@@ -72,6 +72,51 @@ class ExtraFunctions
 			return false;
 		});
 
+		funk.set("anyGamepadJustPressed", function(name:String) return FlxG.gamepads.anyJustPressed(name.toUpperCase()));
+		funk.set("anyGamepadPressed", function(name:String) return FlxG.gamepads.anyPressed(name.toUpperCase()));
+		funk.set("anyGamepadReleased", function(name:String) return FlxG.gamepads.anyJustReleased(name.toUpperCase()));
+
+		funk.set("gamepadAnalogX", function(id:Int, ?leftStick:Bool = true)
+		{
+			var controller = FlxG.gamepads.getByID(id);
+			if (controller == null)
+				return 0.0;
+
+			return controller.getXAxis(leftStick ? LEFT_ANALOG_STICK : RIGHT_ANALOG_STICK);
+		});
+		funk.set("gamepadAnalogY", function(id:Int, ?leftStick:Bool = true)
+		{
+			var controller = FlxG.gamepads.getByID(id);
+			if (controller == null)
+				return 0.0;
+
+			return controller.getYAxis(leftStick ? LEFT_ANALOG_STICK : RIGHT_ANALOG_STICK);
+		});
+		funk.set("gamepadJustPressed", function(id:Int, name:String)
+		{
+			var controller = FlxG.gamepads.getByID(id);
+			if (controller == null)
+				return false;
+
+			return Reflect.getProperty(controller.justPressed, name) == true;
+		});
+		funk.set("gamepadPressed", function(id:Int, name:String)
+		{
+			var controller = FlxG.gamepads.getByID(id);
+			if (controller == null)
+				return false;
+
+			return Reflect.getProperty(controller.pressed, name) == true;
+		});
+		funk.set("gamepadReleased", function(id:Int, name:String)
+		{
+			var controller = FlxG.gamepads.getByID(id);
+			if (controller == null)
+				return false;
+
+			return Reflect.getProperty(controller.justReleased, name) == true;
+		});
+
 		funk.set("keyJustPressed", function(name:String = '')
 		{
 			name = name.toLowerCase();

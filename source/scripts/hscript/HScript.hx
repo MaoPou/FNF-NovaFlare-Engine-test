@@ -549,6 +549,46 @@ class HScript implements ISharedScript {
 			return false;
 		});
 
+		set('anyGamepadJustPressed', function(name: String) return FlxG.gamepads.anyJustPressed(name));
+		set('anyGamepadPressed', function(name: String) FlxG.gamepads.anyPressed(name));
+		set('anyGamepadReleased', function(name: String) return FlxG.gamepads.anyJustReleased(name));
+
+		set('gamepadAnalogX', function(id: Int, ?leftStick: Bool = true) {
+			var controller = FlxG.gamepads.getByID(id);
+			if (controller == null)
+				return 0.0;
+
+			return controller.getXAxis(leftStick ? LEFT_ANALOG_STICK : RIGHT_ANALOG_STICK);
+		});
+		set('gamepadAnalogY', function(id: Int, ?leftStick: Bool = true) {
+			var controller = FlxG.gamepads.getByID(id);
+			if (controller == null)
+				return 0.0;
+
+			return controller.getYAxis(leftStick ? LEFT_ANALOG_STICK : RIGHT_ANALOG_STICK);
+		});
+		set('gamepadJustPressed', function(id: Int, name: String) {
+			var controller = FlxG.gamepads.getByID(id);
+			if (controller == null)
+				return false;
+
+			return Reflect.getProperty(controller.justPressed, name) == true;
+		});
+		set('gamepadPressed', function(id: Int, name: String) {
+			var controller = FlxG.gamepads.getByID(id);
+			if (controller == null)
+				return false;
+
+			return Reflect.getProperty(controller.pressed, name) == true;
+		});
+		set('gamepadReleased', function(id: Int, name: String) {
+			var controller = FlxG.gamepads.getByID(id);
+			if (controller == null)
+				return false;
+
+			return Reflect.getProperty(controller.justReleased, name) == true;
+		});
+
 		// For adding your own callbacks
 		// not very tested but should work
 
