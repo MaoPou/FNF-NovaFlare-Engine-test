@@ -157,9 +157,6 @@ class EditorPlayState extends MusicBeatSubstate
 
 		generateSong(PlayState.SONG.song);
 
-		FlxG.stage.addEventListener(KeyboardEvent.KEY_DOWN, onKeyPress);
-		FlxG.stage.addEventListener(KeyboardEvent.KEY_UP, onKeyRelease);
-
 		#if DISCORD_ALLOWED
 		// Updating Discord Rich Presence (with Time Left)
 		DiscordClient.changePresence('Playtesting on Chart Editor', PlayState.SONG.song, null, true, songLength);
@@ -312,8 +309,6 @@ class EditorPlayState extends MusicBeatSubstate
 
 	override function destroy()
 	{
-		FlxG.stage.removeEventListener(KeyboardEvent.KEY_DOWN, onKeyPress);
-		FlxG.stage.removeEventListener(KeyboardEvent.KEY_UP, onKeyRelease);
 		FlxG.mouse.visible = true;
 		super.destroy();
 	}
@@ -783,25 +778,6 @@ class EditorPlayState extends MusicBeatSubstate
 		});
 	}
 
-	private function onKeyPress(event:KeyboardEvent):Void
-	{
-		var eventKey:FlxKey = event.keyCode;
-		var key:Int = PlayState.getKeyFromEvent(keysArray, eventKey);
-		// trace('Pressed: ' + eventKey);
-
-		if (!controls.controllerMode)
-		{
-			#if debug
-			// Prevents crash specifically on debug without needing to try catch shit
-			@:privateAccess if (!FlxG.keys._keyListMap.exists(eventKey))
-				return;
-			#end
-
-			if (FlxG.keys.checkStatus(eventKey, JUST_PRESSED))
-				keyPressed(key);
-		}
-	}
-
 	private function keyPressed(key:Int)
 	{
 		if (key < 0)
@@ -856,16 +832,6 @@ class EditorPlayState extends MusicBeatSubstate
 			spr.playAnim('pressed');
 			spr.resetAnim = 0;
 		}
-	}
-
-	private function onKeyRelease(event:KeyboardEvent):Void
-	{
-		var eventKey:FlxKey = event.keyCode;
-		var key:Int = PlayState.getKeyFromEvent(keysArray, eventKey);
-		// trace('Pressed: ' + eventKey);
-
-		if (!controls.controllerMode && key > -1)
-			keyReleased(key);
 	}
 
 	private function keyReleased(key:Int)

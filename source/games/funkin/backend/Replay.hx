@@ -49,8 +49,6 @@ class Replay extends FlxBasic
 	private var follow:Dynamic;
 	private var isRecording:Bool = true;
 	public static var preparedPath:String;
-	private var pressEvent:openfl.events.KeyboardEvent;
-	private var releaseEvent:openfl.events.KeyboardEvent;
 	private var keysHeld:Map<FlxKey, Bool> = new Map<FlxKey, Bool>();
 
 	/////////////////////////////////////////////
@@ -59,8 +57,6 @@ class Replay extends FlxBasic
 	{
 		super();
 		this.follow = follow;
-		pressEvent = new openfl.events.KeyboardEvent(openfl.events.KeyboardEvent.KEY_DOWN, true, false, 0, 0);
-		releaseEvent = new openfl.events.KeyboardEvent(openfl.events.KeyboardEvent.KEY_UP, true, false, 0, 0);
 	}
 
 	public function load() {
@@ -69,18 +65,25 @@ class Replay extends FlxBasic
 	}
 
 	private var lastSaveTime:Float = 0;
-	private var lastFrameCount:Int = 0;
 	override function update(elapsed:Float)
 	{
-		if (isRecording) {
-			if (FlxG.keys.justPressed.ANY || FlxG.keys.justReleased.ANY || lastSaveTime >= 0.01666) {
-				lastSaveTime = 0;
-				frameData.push(inputUpload());
-			} else {
-				lastSaveTime += elapsed;
-			}
+		super.update(elapsed);
+		if (!isRecording) return;
+
+		if (FlxG.keys.justPressed.ANY || FlxG.keys.justReleased.ANY || lastSaveTime >= 0.01666) {
+			lastSaveTime = 0;
+			frameData.push(inputUpload());
 		} else {
-			while (lastFrameCount < frameData.length && frameData[lastFrameCount].time <= Conductor.songPosition) {
+			lastSaveTime += elapsed;
+		}
+	}
+
+	private var lastFrameCount:Int = 0;
+	override function handleInput(elapsed:Float) 
+	{
+		if (isRecording) return;
+
+		while (lastFrameCount < frameData.length && frameData[lastFrameCount].time <= Conductor.songPosition) {
 				var frame = frameData[lastFrameCount];
 				
 				for (keyName in frame.pressKey) {
@@ -93,12 +96,6 @@ class Replay extends FlxBasic
 						}
 						
 						keysHeld.set(flxKey, true);
-
-						// Manually trigger onKeyPress for PlayState
-						if (PlayState.instance != null) {
-							pressEvent.keyCode = flxKey;
-							PlayState.instance.onReplayPress(pressEvent, frame.time);
-						}
 					}
 				}
 				
@@ -112,12 +109,6 @@ class Replay extends FlxBasic
 						}
 						
 						keysHeld.remove(flxKey);
-
-						// Manually trigger onKeyRelease for PlayState
-						if (PlayState.instance != null) {
-							releaseEvent.keyCode = flxKey;
-							PlayState.instance.onKeyRelease(releaseEvent);
-						}
 					}
 				}
 				lastFrameCount++;
@@ -135,7 +126,6 @@ class Replay extends FlxBasic
 				}
 			}
 		}
-		super.update(elapsed);
 	}
 
 	private var pressKey:Array<String> = [];

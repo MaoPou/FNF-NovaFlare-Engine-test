@@ -842,9 +842,6 @@ class PlayState extends MusicBeatState
 		startCallback();
 		RecalculateRating();
 
-		FlxG.stage.addEventListener(KeyboardEvent.KEY_DOWN, onKeyPress);
-		FlxG.stage.addEventListener(KeyboardEvent.KEY_UP, onKeyRelease);
-
 		// PRECACHING THINGS THAT GET USED FREQUENTLY TO AVOID LAGSPIKES
 		if (ClientPrefs.data.hitsoundVolume > 0)
 			Paths.sound('hitsound');
@@ -3874,25 +3871,6 @@ function musicCheck(music:FlxSound, getTime:Float, deviation:Float):Bool
         callOnHScript('onSpawnNote', singleArg);
     }
 
-	private function onKeyPress(event:KeyboardEvent):Void
-	{
-		var eventKey = event.keyCode;
-		var key:Int = getKeyFromEvent(keysArray, eventKey);
-
-		
-		if (FlxG.keys.checkStatus(eventKey, JUST_PRESSED))
-			keyPressed(key);
-	}
-
-	private function onReplayPress(event:KeyboardEvent, time:Float = -999999):Void
-	{
-		var eventKey = event.keyCode;
-		var key:Int = getKeyFromEvent(keysArray, eventKey);
-
-		if (FlxG.keys.checkStatus(eventKey, JUST_PRESSED))
-			keyPressed(key, time);
-	}
-
 	private function keyPressed(key:Int, ?time:Float = -999999)
 	{
 		if (ClientPrefs.data.playOpponent ? cpuControlled_opponent : cpuControlled || paused || key < 0)
@@ -4049,15 +4027,6 @@ function musicCheck(music:FlxSound, getTime:Float, deviation:Float):Bool
 		return FlxSort.byValues(FlxSort.ASCENDING, a.strumTime, b.strumTime);
 	}
 
-	private function onKeyRelease(event:KeyboardEvent):Void
-	{
-		var eventKey:FlxKey = event.keyCode;
-		var key:Int = getKeyFromEvent(keysArray, eventKey);
-
-		if (key > -1)
-			keyReleased(key);
-	}
-
 	public function keyReleased(key:Int)
 	{
 		if (ClientPrefs.data.playOpponent ? !cpuControlled_opponent : !cpuControlled && startedCountdown && !paused)
@@ -4074,38 +4043,21 @@ function musicCheck(music:FlxSound, getTime:Float, deviation:Float):Bool
 		}
 	}
 
-	public static function getKeyFromEvent(arr:Array<String>, key:FlxKey):Int
-	{
-		if (key != NONE)
-		{
-			for (i in 0...arr.length)
-			{
-				var note:Array<FlxKey> = Controls.instance.keyboardBinds[arr[i]];
-				for (noteKey in note)
-					if (key == noteKey)
-						return i;
-			}
-		}
-		return -1;
-	}
-
 	// Hold notes
 	private function keysCheck():Void
 	{
 		for (i in 0...keysArray.length)
 		{
 			var key = keysArray[i];
-			_hold[i] = controls.pressed(key) || FlxG.keys.checkStatus(key, PRESSED);
+			_hold[i] = controls.pressed(key);
 			_press[i] = controls.justPressed(key);
 			_release[i] = controls.justReleased(key);
 		}
 
-		/*
-		if (controls.controllerMode && _press.contains(true))
+		if (_press.contains(true))
 			for (i in 0..._press.length)
 				if (_press[i] && strumsBlocked[i] != true)
 					keyPressed(i, Conductor.songPosition);
-		*/
 
 		var char:Character = ClientPrefs.data.playOpponent ? dad : boyfriend;
 		if (startedCountdown && !char.stunned && generatedMusic)
@@ -4148,12 +4100,10 @@ function musicCheck(music:FlxSound, getTime:Float, deviation:Float):Bool
 			#end
 		}
 
-		/*
-		if ((controls.controllerMode || strumsBlocked.contains(true)) && _release.contains(true))
+		if (_release.contains(true))
 			for (i in 0..._release.length)
 				if (_release[i] || strumsBlocked[i] == true)
 					keyReleased(i);
-		*/
 	}
 
 	public function noteMiss(daNote:Note, ?index:Int = -1):Void
@@ -4786,9 +4736,6 @@ function musicCheck(music:FlxSound, getTime:Float, deviation:Float):Bool
 		#end
 
 		stagesFunc(function(stage:BaseStage) stage.destroy());
-
-		FlxG.stage.removeEventListener(KeyboardEvent.KEY_DOWN, onKeyPress);
-		FlxG.stage.removeEventListener(KeyboardEvent.KEY_UP, onKeyRelease);
 
 		FlxG.animationTimeScale = 1;
 		#if FLX_PITCH FlxG.sound.music.pitch = 1; #end
