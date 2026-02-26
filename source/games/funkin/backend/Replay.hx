@@ -81,48 +81,49 @@ class Replay extends FlxBasic
 	private var lastFrameCount:Int = 0;
 	override function handleInput(elapsed:Float) 
 	{
+		super.handleInput(elapsed);
+		
 		if (isRecording) return;
 
 		while (lastFrameCount < frameData.length && frameData[lastFrameCount].time <= Conductor.songPosition) {
-				var frame = frameData[lastFrameCount];
-				
-				for (keyName in frame.pressKey) {
-					var flxKey = FlxKey.fromString(keyName);
-					if (flxKey != FlxKey.NONE) {
-						var keyObj = @:privateAccess FlxG.keys.getKey(flxKey);
-						if (keyObj != null) {
-							// Force key state to JUST_PRESSED
-							@:privateAccess keyObj.current = 2;
-						}
-						
-						keysHeld.set(flxKey, true);
+			var frame = frameData[lastFrameCount];
+			
+			for (keyName in frame.pressKey) {
+				var flxKey = FlxKey.fromString(keyName);
+				if (flxKey != FlxKey.NONE) {
+					var keyObj = @:privateAccess FlxG.keys.getKey(flxKey);
+					if (keyObj != null) {
+						// Force key state to JUST_PRESSED
+						@:privateAccess keyObj.current = 2;
 					}
+					
+					keysHeld.set(flxKey, true);
 				}
-				
-				for (keyName in frame.releaseKey) {
-					var flxKey = FlxKey.fromString(keyName);
-					if (flxKey != FlxKey.NONE) {
-						var keyObj = @:privateAccess FlxG.keys.getKey(flxKey);
-						if (keyObj != null) {
-							// Force key state to JUST_RELEASED
-							@:privateAccess keyObj.current = -1;
-						}
-						
-						keysHeld.remove(flxKey);
-					}
-				}
-				lastFrameCount++;
 			}
 			
-			// Maintain PRESSED state for held keys
-			for (flxKey in keysHeld.keys()) {
-				var keyObj = @:privateAccess FlxG.keys.getKey(flxKey);
-				if (keyObj != null) {
-					// If it's not JUST_PRESSED (2) or JUST_RELEASED (-1), force it to PRESSED (1)
-					// This prevents Flixel from resetting it to RELEASED (0)
-					if (keyObj.current != 2 && keyObj.current != -1) {
-						@:privateAccess keyObj.current = 1;
+			for (keyName in frame.releaseKey) {
+				var flxKey = FlxKey.fromString(keyName);
+				if (flxKey != FlxKey.NONE) {
+					var keyObj = @:privateAccess FlxG.keys.getKey(flxKey);
+					if (keyObj != null) {
+						// Force key state to JUST_RELEASED
+						@:privateAccess keyObj.current = -1;
 					}
+					
+					keysHeld.remove(flxKey);
+				}
+			}
+			lastFrameCount++;
+		}
+		
+		// Maintain PRESSED state for held keys
+		for (flxKey in keysHeld.keys()) {
+			var keyObj = @:privateAccess FlxG.keys.getKey(flxKey);
+			if (keyObj != null) {
+				// If it's not JUST_PRESSED (2) or JUST_RELEASED (-1), force it to PRESSED (1)
+				// This prevents Flixel from resetting it to RELEASED (0)
+				if (keyObj.current != 2 && keyObj.current != -1) {
+					@:privateAccess keyObj.current = 1;
 				}
 			}
 		}

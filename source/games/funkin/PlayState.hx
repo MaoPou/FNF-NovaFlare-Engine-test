@@ -2326,16 +2326,16 @@ class PlayState extends MusicBeatState
 
 	public var fixDesyncedStep:Int = 0;
 
-function musicCheck(music:FlxSound, getTime:Float, deviation:Float):Bool
-{
-    if (music == null)
-        return false;
-    if (music.length > 0) {
-        if (getTime > music.length) return false;
-        if (Math.abs(music.time - getTime) > deviation) return true;
-    }
-    return false;
-}
+	function musicCheck(music:FlxSound, getTime:Float, deviation:Float):Bool
+	{
+		if (music == null)
+			return false;
+		if (music.length > 0) {
+			if (getTime > music.length) return false;
+			if (Math.abs(music.time - getTime) > deviation) return true;
+		}
+		return false;
+	}
 
 	public var paused:Bool = false;
 	public var canReset:Bool = true;
@@ -2347,6 +2347,40 @@ function musicCheck(music:FlxSound, getTime:Float, deviation:Float):Bool
 	var pressPaue:Int = 0;
 
 	var pausedTimePos:Float = 0;
+
+	override function handleInput(elapsed:Float)
+	{
+		if (startedCountdown && !paused)
+        {
+            if (Conductor.songPosition < 0)
+                Conductor.songPosition += elapsed * 1000 * playbackRate;
+            else if (timing != null && (timing.isPlaying || timing.tickEnabled))
+                Conductor.songPosition = timing.getPositionMs();
+            if (checkIfDesynced && Conductor.songPosition >= 0)
+                {
+                var diff:Float = 50 * playbackRate; // 0.05秒的音乐延迟偏差
+                var timeSub:Float = Conductor.songPosition - Conductor.offset;
+
+				if (Math.abs(FlxG.sound.music.time - timeSub) > diff
+					|| musicCheck(vocals, timeSub, diff)
+					|| (splitVocals && musicCheck(opponentVocals, timeSub, diff)))
+				{
+					if (fixDesyncedStep >= 5)
+					{
+						fixDesyncedStep = 0;
+						resyncVocals(true);
+						checkIfDesynced = false;
+					}
+					else
+					{
+						fixDesyncedStep++;
+					}
+				}
+			}
+		}
+		
+		super.handleInput(elapsed);
+	}
 
 	override function update(elapsed:Float)
 	{
@@ -2454,35 +2488,6 @@ function musicCheck(music:FlxSound, getTime:Float, deviation:Float):Bool
 
 		updateIconsScale(elapsed);
 		updateIconsPosition();
-
-        if (startedCountdown && !paused)
-        {
-            if (Conductor.songPosition < 0)
-                Conductor.songPosition += elapsed * 1000 * playbackRate;
-            else if (timing != null && (timing.isPlaying || timing.tickEnabled))
-                Conductor.songPosition = timing.getPositionMs();
-            if (checkIfDesynced && Conductor.songPosition >= 0)
-                {
-                var diff:Float = 50 * playbackRate; // 0.05秒的音乐延迟偏差
-                var timeSub:Float = Conductor.songPosition - Conductor.offset;
-
-				if (Math.abs(FlxG.sound.music.time - timeSub) > diff
-					|| musicCheck(vocals, timeSub, diff)
-					|| (splitVocals && musicCheck(opponentVocals, timeSub, diff)))
-				{
-					if (fixDesyncedStep >= 5)
-					{
-						fixDesyncedStep = 0;
-						resyncVocals(true);
-						checkIfDesynced = false;
-					}
-					else
-					{
-						fixDesyncedStep++;
-					}
-				}
-			}
-		}
 
 		if (startingSong)
 		{
