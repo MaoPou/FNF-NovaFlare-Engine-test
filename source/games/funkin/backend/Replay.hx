@@ -82,7 +82,6 @@ class Replay extends FlxBasic
 	override function handleInput(elapsed:Float) 
 	{
 		super.handleInput(elapsed);
-		
 		if (isRecording) return;
 
 		while (lastFrameCount < frameData.length && frameData[lastFrameCount].time <= Conductor.songPosition) {
