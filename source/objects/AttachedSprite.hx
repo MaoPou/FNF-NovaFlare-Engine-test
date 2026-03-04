@@ -51,7 +51,7 @@ class AttachedSprite extends FlxSprite
 
 	override function destroy()
 	{
-		sprTracker = FlxDestroyUtil.destroy(sprTracker);
+		sprTracker = null;
 		super.destroy();
 	}
 }

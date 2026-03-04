@@ -2,6 +2,7 @@
 
 import flixel.input.keyboard.FlxKey;
 import flixel.FlxBasic;
+import backend.KeyBlocker;
 import server.util.EncryptUtil;
 import haxe.Json;
 #if sys
@@ -62,6 +63,12 @@ class Replay extends FlxBasic
 	public function load() {
 		isRecording = false;
 		frameData = ReplaySave.loadPlayRecord();
+		blockKeys();
+	}
+
+	override function destroy() {
+		if (!isRecording) unblockKeys();
+		super.destroy();
 	}
 
 	private var lastSaveTime:Float = 0;
@@ -158,6 +165,58 @@ class Replay extends FlxBasic
 
 	public function savePlayRecord(stateRecord:StateRecord) {
 		ReplaySave.savePlayRecord(frameData, stateRecord);
+	}
+
+	private function blockKeys():Void {
+		var keysList:Array<String> = null;
+		if (Reflect.hasField(follow, 'keysArray')) {
+			keysList = Reflect.field(follow, 'keysArray');
+		}
+
+		if (keysList != null && keysList.length > 0) {
+			for (keyName in keysList) {
+				var keys = ClientPrefs.keyBinds.get(keyName);
+				if (keys != null) {
+					for (key in keys) {
+						if (key != FlxKey.NONE) KeyBlocker.block(key);
+					}
+				}
+			}
+		} else {
+			for (keyName => keys in ClientPrefs.keyBinds) {
+				if (StringTools.startsWith(keyName, "note_") || keyName.indexOf("_key_") != -1) {
+					for (key in keys) {
+						if (key != FlxKey.NONE) KeyBlocker.block(key);
+					}
+				}
+			}
+		}
+	}
+
+	private function unblockKeys():Void {
+		var keysList:Array<String> = null;
+		if (Reflect.hasField(follow, 'keysArray')) {
+			keysList = Reflect.field(follow, 'keysArray');
+		}
+
+		if (keysList != null && keysList.length > 0) {
+			for (keyName in keysList) {
+				var keys = ClientPrefs.keyBinds.get(keyName);
+				if (keys != null) {
+					for (key in keys) {
+						if (key != FlxKey.NONE) KeyBlocker.unblock(key);
+					}
+				}
+			}
+		} else {
+			for (keyName => keys in ClientPrefs.keyBinds) {
+				if (StringTools.startsWith(keyName, "note_") || keyName.indexOf("_key_") != -1) {
+					for (key in keys) {
+						if (key != FlxKey.NONE) KeyBlocker.unblock(key);
+					}
+				}
+			}
+		}
 	}
 }
 
