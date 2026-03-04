@@ -6,7 +6,7 @@ import flixel.input.gamepad.FlxGamepadInputID;
 
 import states.TitleState;
 
-import games.funkin.backend.ExtraKeysHandler.EKNoteColor;
+import games.funkin_legacy.backend.ExtraKeysHandler.EKNoteColor;
 
 // Add a variable here and it will get automatically saved
 @:structInit class SaveVariables

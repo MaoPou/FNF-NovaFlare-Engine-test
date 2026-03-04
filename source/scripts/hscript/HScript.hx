@@ -9,7 +9,7 @@ import scripts.lua.FunkinLua;
 import scripts.lua.LuaUtils;
 import scripts.lua.CustomSubstate;
 
-import games.funkin.objects.Character;
+import games.funkin_legacy.objects.Character;
 
 #if HSCRIPT_ALLOWED
 import crowplexus.iris.Iris;
@@ -327,7 +327,7 @@ class HScript implements ISharedScript {
 		set('FlxTween', flixel.tweens.FlxTween);
 		set('FlxEase', flixel.tweens.FlxEase);
 		set('FlxColor', crowplexus.hscript.proxy.flixel.util.ProxyFlxColor);
-		set('Countdown', games.funkin.stages.base.BaseStage.Countdown);
+		set('Countdown', games.funkin_legacy.stages.base.BaseStage.Countdown);
 		set('PlayState', PlayState);
 		set('Paths', Paths);
 		// set('StorageUtil', StorageUtil); //nf引擎不支持这个玩意
@@ -338,7 +338,7 @@ class HScript implements ISharedScript {
 		#end
 		set('Character', Character);
 		set('Alphabet', Alphabet);
-		set('Note', games.funkin.objects.Note);
+		set('Note', games.funkin_legacy.objects.Note);
 		set('CustomSubstate', CustomSubstate);
 		#if (!flash && sys)
 		set('FlxRuntimeShader', flixel.addons.display.FlxRuntimeShader);

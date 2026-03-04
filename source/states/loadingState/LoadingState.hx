@@ -29,10 +29,10 @@ import states.loadingState.backend.*;
 import states.freeplayState.FreeplayState;
 import states.loadingState.backend.ScriptExprTools;
 
-import games.funkin.backend.Song;
-import games.funkin.backend.StageData;
-import games.funkin.backend.Rating;
-import games.funkin.cutscenes.DialogueBoxPsych;
+import games.funkin_legacy.backend.Song;
+import games.funkin_legacy.backend.StageData;
+import games.funkin_legacy.backend.Rating;
+import games.funkin_legacy.cutscenes.DialogueBoxPsych;
 
 class LoadingState extends MusicBeatState
 {

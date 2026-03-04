@@ -9,7 +9,7 @@ import mobile.substates.MobileControlSelectSubState;
 import mobile.substates.MobileExtraControl;
 import mobile.states.CopyState;
 
-import games.funkin.backend.StageData;
+import games.funkin_legacy.backend.StageData;
 
 class OptionsState extends MusicBeatState
 {

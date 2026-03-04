@@ -1,9 +1,9 @@
 ﻿package backend;
 
-import games.funkin.backend.Song;
-import games.funkin.backend.Section;
-import games.funkin.objects.Note;
-import games.funkin.backend.Rating;
+import games.funkin_legacy.backend.Song;
+import games.funkin_legacy.backend.Section;
+import games.funkin_legacy.objects.Note;
+import games.funkin_legacy.backend.Rating;
 
 typedef BPMChangeEvent =
 {

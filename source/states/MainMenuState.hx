@@ -21,7 +21,7 @@ import editors.MasterEditorMenu;
 
 import options.OptionsState;
 
-import games.funkin.backend.WeekData;
+import games.funkin_legacy.backend.WeekData;
 import states.ServerConnectState;
 
 

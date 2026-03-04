@@ -24,8 +24,8 @@ import objects.MenuItem;
 
 import editors.MasterEditorMenu;
 
-import games.funkin.objects.HealthIcon;
-import games.funkin.backend.WeekData;
+import games.funkin_legacy.objects.HealthIcon;
+import games.funkin_legacy.backend.WeekData;
 
 class WeekEditorState extends MusicBeatState
 {

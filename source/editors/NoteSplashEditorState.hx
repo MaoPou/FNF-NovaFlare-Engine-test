@@ -10,9 +10,9 @@ import openfl.net.FileReference;
 import flixel.group.FlxSpriteGroup.FlxTypedSpriteGroup;
 import flixel.input.keyboard.FlxKey;
 
-import games.funkin.objects.Note;
-import games.funkin.objects.NoteSplash;
-import games.funkin.objects.StrumNote;
+import games.funkin_legacy.objects.Note;
+import games.funkin_legacy.objects.NoteSplash;
+import games.funkin_legacy.objects.StrumNote;
 
 
 @:access(game.funkin.objects.NoteSplash)

@@ -3,9 +3,9 @@
 import flixel.addons.ui.FlxInputText;
 import flixel.addons.ui.FlxUINumericStepper;
 
-import games.funkin.objects.Note;
-import games.funkin.objects.StrumNote;
-import games.funkin.objects.NoteSplash;
+import games.funkin_legacy.objects.Note;
+import games.funkin_legacy.objects.StrumNote;
+import games.funkin_legacy.objects.NoteSplash;
 
 class NoteSplashDebugState extends MusicBeatState
 {

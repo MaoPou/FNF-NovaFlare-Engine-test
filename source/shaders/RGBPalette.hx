@@ -2,7 +2,7 @@
 
 import flixel.system.FlxAssets.FlxShader;
 
-import games.funkin.objects.Note;
+import games.funkin_legacy.objects.Note;
 
 class RGBPalette
 {

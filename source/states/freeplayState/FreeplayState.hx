@@ -26,12 +26,12 @@ import substates.GameplayChangersSubstate;
 import substates.ResetScoreSubState;
 import substates.ErrorSubState;
 
-import games.funkin.backend.WeekData;
-import games.funkin.backend.Highscore;
-import games.funkin.backend.Song;
-import games.funkin.backend.diffCalc.DiffCalc;
-import games.funkin.backend.Replay;
-import games.funkin.backend.diffCalc.StarRating;
+import games.funkin_legacy.backend.WeekData;
+import games.funkin_legacy.backend.Highscore;
+import games.funkin_legacy.backend.Song;
+import games.funkin_legacy.backend.diffCalc.DiffCalc;
+import games.funkin_legacy.backend.Replay;
+import games.funkin_legacy.backend.diffCalc.StarRating;
 
 class FreeplayState extends MusicBeatState
 {

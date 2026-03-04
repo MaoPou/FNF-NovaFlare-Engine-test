@@ -100,10 +100,10 @@ import shaders.flixel.system.FlxShader;
 
 import states.loadingState.LoadingState;
 
-import games.funkin.PlayState;
-import games.funkin.stages.base.BaseStage;
-import games.funkin.backend.Difficulty;
-import games.funkin.backend.ExtraKeysHandler;
+import games.funkin_legacy.PlayState;
+import games.funkin_legacy.stages.base.BaseStage;
+import games.funkin_legacy.backend.Difficulty;
+import games.funkin_legacy.backend.ExtraKeysHandler;
 
 using StringTools;
 #end

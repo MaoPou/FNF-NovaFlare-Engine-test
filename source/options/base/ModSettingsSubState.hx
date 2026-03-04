@@ -3,7 +3,7 @@
 import flixel.input.keyboard.FlxKey;
 import flixel.input.gamepad.FlxGamepadInputID;
 
-import games.funkin.objects.Character;
+import games.funkin_legacy.objects.Character;
 
 class ModSettingsSubState extends BaseOptionsMenu
 {

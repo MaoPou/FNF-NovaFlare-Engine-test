@@ -5,10 +5,10 @@ import haxe.Json;
 import substates.GameplayChangersSubstate;
 import substates.ResetScoreSubState;
 
-import games.funkin.backend.WeekData;
-import games.funkin.backend.Highscore;
-import games.funkin.backend.Song;
-import games.funkin.objects.HealthIcon;
+import games.funkin_legacy.backend.WeekData;
+import games.funkin_legacy.backend.Highscore;
+import games.funkin_legacy.backend.Song;
+import games.funkin_legacy.objects.HealthIcon;
 
 class FreeplayStatePsych extends MusicBeatState
 {
