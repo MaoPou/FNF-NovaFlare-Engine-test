@@ -1,4 +1,4 @@
-﻿package games.funkin_legacy.objects;
+package games.funkin_legacy.objects;
 
 import haxe.Json;
 

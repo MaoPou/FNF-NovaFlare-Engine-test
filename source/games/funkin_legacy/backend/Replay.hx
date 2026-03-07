@@ -145,7 +145,10 @@ class Replay extends FlxBasic
 		{
 			var key:FlxKey = FlxKey.toStringMap.get(keyName);
 			
-			if (key == FlxKey.ANY || key == FlxKey.NONE || key == FlxKey.ENTER) continue;
+			if (key == FlxKey.ANY || key == FlxKey.NONE) continue;
+
+			for (pauseKey in ClientPrefs.keyBinds.get('pause'))
+				if (key == pauseKey) continue;
 
 			if (FlxG.keys.checkStatus(key, JUST_PRESSED)) {
 				pressKey.push(key);

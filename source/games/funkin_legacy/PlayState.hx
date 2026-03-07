@@ -1,4 +1,4 @@
-﻿package games.funkin_legacy;
+package games.funkin_legacy;
 
 import haxe.Timer;
 import haxe.Json;
