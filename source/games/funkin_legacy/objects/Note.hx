@@ -12,6 +12,7 @@ import editors.EditorPlayState;
 
 import games.funkin_legacy.backend.NoteTypesConfig;
 import games.funkin_legacy.objects.StrumNote;
+import games.funkin_legacy.objects.NoteData;
 
 typedef EventNote =
 {
@@ -97,6 +98,10 @@ class Note extends FlxSprite
 
 	public var animSuffix:String = '';
 	public var gfNote:Bool = false;
+	
+	// Object Pool helper
+	public var poolKey:String = null;
+
 	public var earlyHitMult:Float = 1;
 	public var lateHitMult:Float = 1;
 	public var lowPriority:Bool = false;
@@ -468,16 +473,10 @@ class Note extends FlxSprite
 
 			if (Cache.currentTrackedAnims.get(skin + skinPostfix) != null) {
 			    animation.copyFrom(Cache.currentTrackedAnims.get(skin + skinPostfix));
-            	setGraphicSize(Std.int(width * trackedScale));	//等下这都没改吗
+            	setGraphicSize(Std.int(frameWidth * trackedScale));
 				updateHitbox();
 			}
 			else loadNoteAnims();
-
-			if (!isSustainNote)
-			{
-				centerOffsets();
-				centerOrigin();
-			}
 		}
 
 		if (isSustainNote)
@@ -570,7 +569,7 @@ class Note extends FlxSprite
 		// trace(width, ExtraKeysHandler.instance.data.scales[mania]);
 		
 		// 改为使用trackedScale设置大小
-		setGraphicSize(Std.int(width * trackedScale));
+		setGraphicSize(Std.int(frameWidth * trackedScale));
 
 		updateHitbox();
 	}
@@ -601,6 +600,213 @@ class Note extends FlxSprite
 			return;
 
 		animation.addByPrefix(name, prefix, framerate, doLoop);
+	}
+
+	public function resetFromData(data:NoteData)
+	{
+		this.strumTime = data.strumTime;
+		this.noteData = data.noteData;
+		this.mustPress = data.mustPress;
+		this.isSustainNote = data.isSustainNote;
+		this.sustainLength = data.sustainLength;
+		this.gfNote = data.gfNote;
+		this.noteType = data.noteType;
+		this.animSuffix = data.animSuffix;
+		this.extraData = new Map<String, Dynamic>();
+
+		this.hitsound = 'hitsound';
+		if (ClientPrefs.data.hitsoundType != ClientPrefs.defaultData.hitsoundType)
+			this.hitsound = 'hitsounds/' + ClientPrefs.data.hitsoundType;
+
+		this.alpha = 1;
+		this.multAlpha = data.multAlpha;
+		this.scale.x = 1; // Will be set by setGraphicSize
+		this.scale.y = 1;
+		
+		if (PlayState.SONG != null)
+		{
+			trackedScale = ExtraKeysHandler.instance.data.scales[PlayState.SONG.mania];
+			if (PlayState.isPixelStage)
+			{
+				trackedScale = ExtraKeysHandler.instance.data.pixelScales[PlayState.SONG.mania];
+			}
+		}
+		else
+		{
+			this.trackedScale = 0.7;
+		}
+
+		this.angle = 0;
+		this.offsetX = data.offsetX;
+		this.offsetY = data.offsetY;
+		this.offsetAngle = data.offsetAngle;
+		this.multSpeed = data.multSpeed;
+		if (data.cameras != null)
+		{
+			this.cameras = data.cameras;
+		}
+		else if (data.parentData != null && data.parentData.cameras != null)
+		{
+			this.cameras = data.parentData.cameras;
+		}
+		else if (data.camera != null)
+		{
+			this.cameras = [data.camera];
+		}
+		else if (data.parentData != null && data.parentData.camera != null)
+		{
+			this.cameras = [data.parentData.camera];
+		}
+		else
+		{
+			this.cameras = null;
+		}
+		this.copyX = data.copyX;
+		this.copyY = data.copyY;
+		this.copyAngle = data.copyAngle;
+		this.copyAlpha = data.copyAlpha;
+		this.hitHealth = data.hitHealth;
+		this.missHealth = data.missHealth;
+		this.rating = data.rating != null ? data.rating : 'unknown';
+		this.ratingMod = data.ratingMod;
+		this.ratingDisabled = data.ratingDisabled;
+		this.noAnimation = data.noAnimation;
+		this.noMissAnimation = data.noMissAnimation;
+		this.hitCausesMiss = data.hitCausesMiss;
+		this.hitsoundDisabled = data.hitsoundDisabled;
+		this.wasGoodHit = data.wasGoodHit;
+		this.missed = data.missed;
+		this.tooLate = data.tooLate;
+		this.canBeHit = data.canBeHit;
+		this.blockHit = data.blockHit;
+		this.ignoreNote = data.ignoreNote;
+		this.hitByOpponent = data.hitByOpponent;
+		this.noteWasHit = data.noteWasHit;
+		this.spawned = data.spawned;
+		this.killTail = data.killTail;
+		this.parent = null;
+		this.prevNote = this; // Default to self
+		this.nextNote = null;
+		this.tail = [];
+
+		this.scale.x = data.scaleX;
+		this.scale.y = data.scaleY;
+		this.correctionOffset = 0;
+		
+		// Reset clipRect
+		this.clipRect = null;
+
+		var mania = 3;
+		if (PlayState.SONG != null)
+			mania = PlayState.SONG.mania;
+		
+		// Ensure animation data matches current noteData and mania
+		// This fixes recycled sustain notes having wrong texture/color
+		if (animation.curAnim == null || !animation.curAnim.name.startsWith(getAnimSet(getIndex(mania, noteData)).note)) {
+			// If animation name doesn't match current note color, reload animations
+			loadNoteAnims();
+		}
+		
+		var animToPlay = getAnimSet(getIndex(mania, noteData)).note;
+
+		if (isSustainNote)
+		{
+			this.alpha = 0.6;
+			this.multAlpha = 0.6;
+			
+			if (ClientPrefs.data.downScroll)
+				this.flipY = true;
+			else
+				this.flipY = false;
+			
+			animation.play(animToPlay + 'holdend');
+
+			this.scale.x = trackedScale;
+			this.scale.y = data.scaleY; // Ensure Y scale is restored from cache (or 1)
+			
+			updateHitbox();
+
+			var mania = 3;
+			if (PlayState.SONG != null) mania = PlayState.SONG.mania;
+			var mScale = ExtraKeysHandler.instance.data.scales[mania];
+			if (PlayState.isPixelStage) mScale = ExtraKeysHandler.instance.data.pixelScales[mania];
+			var sWidth = Note.swagWidthUnscaled * mScale;
+
+			offsetX += sWidth / 2;
+			offsetX -= width / 2;
+
+			if (PlayState.isPixelStage)
+				offsetX += 30;
+		}
+		else
+		{
+			this.flipY = false;
+			animation.play(animToPlay + 'Scroll');
+			setGraphicSize(Std.int(frameWidth * trackedScale));
+			centerOffsets();
+			centerOrigin();
+			updateHitbox();
+			
+			// Fix offset for custom note skin size
+			var mania = 3;
+			if (PlayState.SONG != null) mania = PlayState.SONG.mania;
+			var mScale = ExtraKeysHandler.instance.data.scales[mania];
+			if (PlayState.isPixelStage) mScale = ExtraKeysHandler.instance.data.pixelScales[mania];
+			var sWidth = Note.swagWidthUnscaled * mScale;
+
+			offsetX += sWidth / 2;
+			offsetX -= width / 2;
+		}
+		this.earlyHitMult = data.earlyHitMult;
+		this.lateHitMult = data.lateHitMult;
+		this.lowPriority = data.lowPriority;
+
+		// Force re-apply note type logic
+		var savedType = this.noteType;
+		this.noteType = null; 
+		if (savedType != null) {
+			this.set_noteType(savedType);
+		} else {
+			// Ensure RGB shader is reset to default if no type is set
+			this.defaultRGB();
+			
+			// Re-check shader enabled status
+			if (rgbShader != null) {
+				rgbShader.enabled = true;
+				if (PlayState.SONG != null && (PlayState.SONG.disableNoteRGB || !ClientPrefs.data.noteRGB || ClientPrefs.data.noteColorSwap))
+					rgbShader.enabled = false;
+			}
+		}
+
+		if (noteType == 'Hurt Note' && rgbShader != null) {
+			rgbShader.enabled = true;
+		}
+
+		// Ensure shader is disabled if global preference says so (Double check)
+		if (noteType != 'Hurt Note' && rgbShader != null && (!ClientPrefs.data.noteRGB || (PlayState.SONG != null && PlayState.SONG.disableNoteRGB))) {
+			rgbShader.enabled = false;
+		}
+
+		if (ClientPrefs.data.noteColorSwap && colorSwap != null && (rgbShader == null || !rgbShader.enabled)) {
+			this.shader = colorSwap.shader;
+		}
+
+		// Handle extra params from script
+		if (data.extraParams != null) {
+			for (key in data.extraParams.keys()) {
+				if (Reflect.hasField(this, key)) {
+					Reflect.setProperty(this, key, data.extraParams.get(key));
+				}
+			}
+		}
+		
+		// Reset animation
+		if (animation.curAnim != null) {
+			animation.curAnim.curFrame = 0;
+		}
+
+		this.revive();
+		this.visible = true;
 	}
 
 	override function update(elapsed:Float)

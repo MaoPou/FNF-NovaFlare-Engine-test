@@ -1,4 +1,4 @@
-﻿package games.funkin_legacy.objects;
+package games.funkin_legacy.objects;
 
 import flixel.math.FlxRect;
 import openfl.display.BitmapData;
@@ -338,9 +338,10 @@ class Bar extends FlxSpriteGroup
 	{
 		active = false;
 		barOffset.put();
-		bg = FlxDestroyUtil.destroy(bg);
-		leftBar = FlxDestroyUtil.destroy(leftBar);
-		rightBar = FlxDestroyUtil.destroy(rightBar);
 		super.destroy();
+
+		bg = null;
+		leftBar = null;
+		rightBar = null;
 	}
 }

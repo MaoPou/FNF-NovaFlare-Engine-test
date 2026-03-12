@@ -6,6 +6,8 @@ import Type.ValueType;
 
 import substates.GameOverSubstate;
 
+import crowplexus.iris.Iris;
+
 //
 // Functions that use a high amount of Reflections, which are somewhat CPU intensive
 // These functions are held together by duct tape
@@ -232,6 +234,17 @@ class ReflectionFunctions
 
 	static function classNameCheck(className:String):String
 	{
+		if(Iris.proxyImports.exists(className))
+		{
+			var myClass:Dynamic = Iris.proxyImports.get(className);
+			if(myClass != null)
+			{
+				var name:String = Type.getClassName(myClass);
+				if(name != null)
+					return name;
+			}
+		}
+
 		var classType:Array<String> = ['backend', 'cutscenes', 'objects', 'options', 'scripts', 'states', 'substates'];
 
 		for (i in 0...classType.length)

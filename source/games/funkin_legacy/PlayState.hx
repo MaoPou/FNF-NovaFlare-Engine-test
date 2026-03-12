@@ -1,4 +1,4 @@
-﻿package games.funkin_legacy;
+package games.funkin_legacy;
 
 import haxe.Timer;
 import haxe.Json;
@@ -41,10 +41,12 @@ import games.funkin_legacy.stages.*;
 
 import games.funkin_legacy.objects.*;
 import games.funkin_legacy.objects.Note.EventNote;
+import games.funkin_legacy.objects.NoteData;
 import games.funkin_legacy.objects.StrumNote.KeybindShowcase;
 import games.funkin_legacy.objects.StrumNote.StrumBoundaries;
 
 import games.funkin_legacy.backend.Highscore;
+import games.funkin_legacy.backend.NotePool;
 import games.funkin_legacy.backend.StageData;
 import games.funkin_legacy.backend.WeekData;
 import games.funkin_legacy.backend.Song;
@@ -183,9 +185,9 @@ class PlayState extends MusicBeatState
 	public var notes:FlxTypedGroup<Note>;
 	public var killNotes:Array<Note> = [];
 	public var killNotesBudget:Int = 20;
-	public var unspawnNotes:Array<Note> = [];
+	public var unspawnNotes:Array<NoteData> = [];
+	private var noteToDataMap:Map<NoteData, Note> = new Map<NoteData, Note>();
 	public var eventNotes:Array<EventNote> = [];
-	public var tempNotes:Array<Note> = [];
 
 	public var camFollow:FlxObject;
 	private static var prevCamFollow:FlxObject;
@@ -886,8 +888,8 @@ class PlayState extends MusicBeatState
 			{
 				for (note in notes.members)
 					note.resizeByRatio(ratio);
-				for (note in unspawnNotes)
-					note.resizeByRatio(ratio);
+				// for (note in unspawnNotes)
+				// 	note.resizeByRatio(ratio);
 			}
 		}
 		songSpeed = value;
@@ -909,8 +911,8 @@ class PlayState extends MusicBeatState
 			{
 				for (note in notes.members)
 					note.resizeByRatio(ratio);
-				for (note in unspawnNotes)
-					note.resizeByRatio(ratio);
+				// for (note in unspawnNotes)
+				// 	note.resizeByRatio(ratio);
 			}
 		}
         playbackRate = value;
@@ -1422,17 +1424,10 @@ class PlayState extends MusicBeatState
 		var i:Int = unspawnNotes.length - 1;
 		while (i >= 0)
 		{
-			var daNote:Note = unspawnNotes[i];
+			var daNote:NoteData = unspawnNotes[i];
 			if (daNote.strumTime - 350 < time)
 			{
-				daNote.active = false;
-				daNote.visible = false;
-				daNote.ignoreNote = true;
-
-				if (!ClientPrefs.data.lowQuality || ClientPrefs.data.playOpponent ? !cpuControlled_opponent : !cpuControlled)
-					daNote.kill();
-				unspawnNotes.remove(daNote);
-				daNote.destroy();
+				unspawnNotes.splice(i, 1);
 			}
 			--i;
 		}
@@ -1743,6 +1738,8 @@ class PlayState extends MusicBeatState
 
 		Note.init();
 
+		var lastNoteData:NoteData = null;
+
 		for (section in songData.notes)
 		{
 			for (songNotes in section.sectionNotes)
@@ -1764,13 +1761,7 @@ class PlayState extends MusicBeatState
 					}
 				}
 
-				var oldNote:Note;
-				if (unspawnNotes.length > 0)
-					oldNote = unspawnNotes[Std.int(unspawnNotes.length - 1)];
-				else
-					oldNote = null;
-
-				var swagNote:Note = new Note(daStrumTime, daNoteData, oldNote);
+				var swagNote:NoteData = new NoteData(daStrumTime, daNoteData);
 				swagNote.mustPress = gottaHitNote;
 				swagNote.sustainLength = songNotes[2];
 				
@@ -1779,7 +1770,10 @@ class PlayState extends MusicBeatState
 				if (!Std.isOfType(songNotes[3], String))
 					swagNote.noteType = ChartingState.noteTypeList[songNotes[3]]; // Backward compatibility + compatibility with Week 7 charts
 
-				swagNote.scrollFactor.set();
+				// Link previous note data
+				if (lastNoteData != null)
+					swagNote.prevData = lastNoteData;
+				lastNoteData = swagNote;
 
 				unspawnNotes.push(swagNote);
 
@@ -1790,60 +1784,36 @@ class PlayState extends MusicBeatState
 				{
 					for (susNote in 0...floorSus + 1)
 					{
-						oldNote = unspawnNotes[Std.int(unspawnNotes.length - 1)];
-
-						var sustainNote:Note = new Note(daStrumTime + (Conductor.stepCrochet * susNote), daNoteData, oldNote, true);
-						sustainNote.hitMultUpdate(susNote, floorSus);
+						var sustainNote:NoteData = new NoteData(daStrumTime + (Conductor.stepCrochet * susNote), daNoteData, null, true);
 						sustainNote.mustPress = gottaHitNote;
 						sustainNote.gfNote = (section.gfSection && (songNotes[1]<(SONG.mania + 1)));
 						sustainNote.noteType = swagNote.noteType;
-						sustainNote.scrollFactor.set();
-						sustainNote.parent = swagNote;
-						unspawnNotes.push(sustainNote);
+						sustainNote.parentData = swagNote;
+						
+						if (susNote == floorSus)
+						{
+							sustainNote.earlyHitMult = 0.75;
+							sustainNote.lateHitMult = 0.25;
+							sustainNote.noAnimation = true; // better anim play
+						}
+						else if (susNote == 0)
+						{
+							sustainNote.earlyHitMult = 0;
+							sustainNote.lateHitMult = 1;
+						}
+						else
+						{
+							sustainNote.earlyHitMult = 0.5;
+							sustainNote.lateHitMult = 0.75;
+						}
+
+						// Link previous note data for sustain
+						if (lastNoteData != null)
+							sustainNote.prevData = lastNoteData;
+						lastNoteData = sustainNote;
+
 						swagNote.tail.push(sustainNote);
-
-						sustainNote.correctionOffset = swagNote.height / 2;
-						if (!PlayState.isPixelStage)
-						{
-							if (oldNote.isSustainNote)
-							{
-								oldNote.scale.y *= Note.SUSTAIN_SIZE / oldNote.frameHeight;
-								oldNote.scale.y /= playbackRate;
-								oldNote.updateHitbox();
-							}
-
-							if (ClientPrefs.data.downScroll)
-								sustainNote.correctionOffset = 0;
-						}
-						else if (oldNote.isSustainNote)
-						{
-							oldNote.scale.y /= playbackRate;
-							oldNote.updateHitbox();
-						}
-
-						if (sustainNote.mustPress)
-							sustainNote.x += FlxG.width / 2; // general offset
-						else if (ClientPrefs.data.middleScroll)
-						{
-							sustainNote.x += 310;
-							if (daNoteData > 1) // Up and Right
-								sustainNote.x += FlxG.width / 2 + 25;
-						}
-					}
-				}
-
-				//trace('work5');
-
-				if (swagNote.mustPress)
-				{
-					swagNote.x += FlxG.width / 2; // general offset
-				}
-				else if (ClientPrefs.data.middleScroll)
-				{
-					swagNote.x += 310;
-					if (daNoteData > 1) // Up and Right
-					{
-						swagNote.x += FlxG.width / 2 + 25;
+						unspawnNotes.push(sustainNote);
 					}
 				}
 
@@ -2530,23 +2500,90 @@ class PlayState extends MusicBeatState
 			var time:Float = spawnTime * playbackRate;
 			if (songSpeed < 1)
 				time /= songSpeed;
-			if (unspawnNotes[0].multSpeed < 1)
-				time /= unspawnNotes[0].multSpeed;
+			// if (unspawnNotes[0].multSpeed < 1)
+			// 	time /= unspawnNotes[0].multSpeed;
+			
 			var spawnCount:Int = 0;
 			var lenUnspawn:Int = unspawnNotes.length;
 			while (spawnCount < lenUnspawn && unspawnNotes[spawnCount].strumTime - Conductor.songPosition < time)
 			{
+				var data = unspawnNotes[spawnCount];
+				if (noteToDataMap.exists(data))
+				{
+					spawnCount++;
+					continue;
+				}
+				var note = NotePool.get(data);
+				noteToDataMap.set(data, note);
+
+				if (data.prevData != null && noteToDataMap.exists(data.prevData)) {
+					note.prevNote = noteToDataMap.get(data.prevData);
+					if (note.prevNote != null)
+						note.prevNote.nextNote = note;
+				} else {
+					note.prevNote = note; // Ensure prevNote is not null (points to self if first)
+				}
+
+				if (data.parentData != null && noteToDataMap.exists(data.parentData))
+				{
+					note.parent = noteToDataMap.get(data.parentData);
+					if (note.parent != null)
+						note.parent.tail.push(note);
+					
+					note.correctionOffset = note.parent.height / 2;
+					if (!PlayState.isPixelStage)
+					{
+						if (note.prevNote != null && note.prevNote.isSustainNote)
+						{
+							var mania = 3;
+							if (PlayState.SONG != null)
+								mania = PlayState.SONG.mania;
+							var animToPlay = note.prevNote.getAnimSet(note.prevNote.getIndex(mania, note.prevNote.noteData)).note;
+							note.prevNote.animation.play(animToPlay + 'hold');
+
+							note.prevNote.scale.y *= Conductor.stepCrochet / 100 * 1.05;
+							note.prevNote.scale.y *= songSpeed;
+
+							note.prevNote.scale.y *= Note.SUSTAIN_SIZE / note.prevNote.frameHeight;
+							note.prevNote.scale.y /= playbackRate;
+							note.prevNote.updateHitbox();
+						}
+						
+						if (ClientPrefs.data.downScroll)
+							note.correctionOffset = 0;
+					}
+					else if (note.prevNote != null && note.prevNote.isSustainNote)
+					{
+						var mania = 3;
+						if (PlayState.SONG != null)
+							mania = PlayState.SONG.mania;
+						var animToPlay = note.prevNote.getAnimSet(note.prevNote.getIndex(mania, note.prevNote.noteData)).note;
+						note.prevNote.animation.play(animToPlay + 'hold');
+
+						note.prevNote.scale.y *= Conductor.stepCrochet / 100 * 1.05;
+						note.prevNote.scale.y *= songSpeed;
+
+						note.prevNote.scale.y /= playbackRate;
+						note.prevNote.updateHitbox();
+					}
+				}
+
+				addNoteInternal(note);
+
+				if (note.mustPress)
+					note.x += FlxG.width / 2;
+				else if (ClientPrefs.data.middleScroll)
+				{
+					note.x += 310;
+					if (note.noteData > 1)
+						note.x += FlxG.width / 2 + 25;
+				}
+
 				spawnCount++;
 			}
+
 			if (spawnCount > 0)
 			{
-				var k:Int = 0;
-				while (k < spawnCount)
-				{
-					var dunceNote:Note = unspawnNotes[k];
-					addNoteInternal(dunceNote);
-					k++;
-				}
 				unspawnNotes.splice(0, spawnCount);
 			}
 		}
@@ -2652,32 +2689,29 @@ class PlayState extends MusicBeatState
 		}
 		#end
 
-		// reverse iterate to remove oldest notes first and not invalidate the iteration
-		// stop iteration as soon as a note is not removed
-		// all notes should be kept in the correct order and this is optimal, safe to do every frame/update
+		// NPS Logic: Remove oldest notes (at the start of the array) that are older than 1 second
+		// Optimized to check from the start (oldest) and stop as soon as a valid note is found.
+		var currentTime = Date.now().getTime();
+		while (notesHitArray.length > 0)
 		{
-			var balls = notesHitArray.length - 1;
-			while (balls >= 0)
-			{
-				var cock:Date = notesHitArray[balls];
-				if (cock != null && cock.getTime() + 1000 < Date.now().getTime())
-					notesHitArray.remove(cock);
-				else
-					balls = 0;
-				balls--;
-			}
-			nps = notesHitArray.length;
-			if (nps > maxNPS)
-				maxNPS = nps;
+			var noteDate:Date = notesHitArray[0];
+			if (noteDate != null && noteDate.getTime() + 1000 < currentTime)
+				notesHitArray.shift();
+			else
+				break;
+		}
 
-			setOnLuas('nps', nps);
-			setOnLuas('maxFPS', maxNPS);
+		nps = notesHitArray.length;
+		if (nps > maxNPS)
+			maxNPS = nps;
 
-			if (npsCheck != nps)
-			{
-				npsCheck = nps;
-				scoreTxtUpdate();
-			}
+		setOnLuas('nps', nps);
+		setOnLuas('maxFPS', maxNPS);
+
+		if (npsCheck != nps)
+		{
+			npsCheck = nps;
+			scoreTxtUpdate();
 		}
 
 		setOnScripts('cameraX', camFollow.x);
@@ -4668,7 +4702,7 @@ class PlayState extends MusicBeatState
 							sustain.kill();
 							notes.remove(sustain, true);
 							sustainLayer.remove(sustain, true);
-							sustain.destroy();
+							NotePool.returnNote(sustain);
 						}
 						t++;
 					}
@@ -4676,7 +4710,7 @@ class PlayState extends MusicBeatState
 				note.kill();
 				notes.remove(note, true);
 				if (note.isSustainNote) sustainLayer.remove(note, true); else tapLayer.remove(note, true);
-				note = FlxDestroyUtil.destroy(note);
+				NotePool.returnNote(note);
 			}
 			idx++;
 		}
@@ -4702,13 +4736,6 @@ class PlayState extends MusicBeatState
 		splash.setupNoteSplash(x, y, data, note);
 		grpNoteSplashes.add(splash);
 	}
-
-	public inline function registerTempNote(note:Note):Void
-	{
-		if (note != null) tempNotes.push(note);
-	}
-
-
 
 	override function destroy()
 	{
@@ -4745,6 +4772,7 @@ class PlayState extends MusicBeatState
 		FlxG.animationTimeScale = 1;
 		#if FLX_PITCH FlxG.sound.music.pitch = 1; #end
 		Note.globalRgbShaders = [];
+		// NotePool.clear();
 		games.funkin_legacy.backend.NoteTypesConfig.clearNoteTypesData();
 		instance = null;
 		@:privateAccess
@@ -4752,6 +4780,7 @@ class PlayState extends MusicBeatState
 		camGame.filters = camHUD.filters = camOther.filters = [];
 
 		super.destroy();
+		NotePool.clear();
 	}
 
 	var checkIfDesynced:Bool = false;
@@ -5243,15 +5272,17 @@ class PlayState extends MusicBeatState
 				return true;
 			}
 		}
+		
 		#if (LUA_ALLOWED || HSCRIPT_ALLOWED)
 		addTextToDebug('Missing shader $name .frag AND .vert files!', FlxColor.RED);
 		#else
 		FlxG.log.warn("Missing shader $name .frag AND .vert files!");
 		#end
+		return false;
 		#else
 		FlxG.log.warn("This platform doesn\'t support Runtime Shaders!");
-		#end
 		return false;
+		#end
 	}
 	#end
 

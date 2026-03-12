@@ -42,6 +42,9 @@ import flixel.group.FlxSpriteGroup;
 import flixel.group.FlxGroup.FlxTypedGroup;
 import flixel.addons.transition.FlxTransitionableState;
 
+// Lime 
+import lime.system.BackendThread;
+
 // Mobile Controls
 import mobile.objects.MobileControls;
 import mobile.flixel.FlxHitbox;

@@ -1,4 +1,4 @@
-﻿package games.funkin_legacy.backend;
+package games.funkin_legacy.backend;
 
 import flixel.input.keyboard.FlxKey;
 import flixel.FlxBasic;
@@ -145,7 +145,10 @@ class Replay extends FlxBasic
 		{
 			var key:FlxKey = FlxKey.toStringMap.get(keyName);
 			
-			if (key == FlxKey.ANY || key == FlxKey.NONE || key == FlxKey.ENTER) continue;
+			if (key == FlxKey.ANY || key == FlxKey.NONE) continue;
+
+			for (pauseKey in ClientPrefs.keyBinds.get('pause'))
+				if (key == pauseKey) continue;
 
 			if (FlxG.keys.checkStatus(key, JUST_PRESSED)) {
 				pressKey.push(key);
@@ -237,103 +240,105 @@ class ReplaySave {
 	public static function savePlayRecord(frameData:Array<FrameSave>, stateRecord:StateRecord)
 	{
 		#if sys
-		var srdSave:StringBuf = new StringBuf();
-		srdSave.add("{\n");
-		
-		// 1. stateRecord
-		srdSave.add('\t"stateRecord": {\n');
-		var fields = [
-			"songName", "difficulty", "playDate", "songLength",
-			"songSpeed", "playbackRate", "healthGain", "healthLoss",
-			"cpuControlled", "practiceMode", "instakillOnMiss", "playOpponent", "flipChart",
-			"songScore", "ratingPercent", "ratingFC", "songHits", "highestCombo", "songMisses",
-			"hitMapTime", "hitMapMs"
-		];
-		for (i in 0...fields.length) {
-			var key = fields[i];
-			var val = Reflect.field(stateRecord, key);
-			srdSave.add('\t\t"$key": ' + Json.stringify(val));
-			if (i < fields.length - 1) srdSave.add(",\n");
-		}
-		srdSave.add("\n\t},\n");
+		BackendThread.run(() -> {
+			var srdSave:StringBuf = new StringBuf();
+			srdSave.add("{\n");
+			
+			// 1. stateRecord
+			srdSave.add('\t"stateRecord": {\n');
+			var fields = [
+				"songName", "difficulty", "playDate", "songLength",
+				"songSpeed", "playbackRate", "healthGain", "healthLoss",
+				"cpuControlled", "practiceMode", "instakillOnMiss", "playOpponent", "flipChart",
+				"songScore", "ratingPercent", "ratingFC", "songHits", "highestCombo", "songMisses",
+				"hitMapTime", "hitMapMs"
+			];
+			for (i in 0...fields.length) {
+				var key = fields[i];
+				var val = Reflect.field(stateRecord, key);
+				srdSave.add('\t\t"$key": ' + Json.stringify(val));
+				if (i < fields.length - 1) srdSave.add(",\n");
+			}
+			srdSave.add("\n\t},\n");
 
-		// 2. frameRecord
-		srdSave.add('\t"frameRecord": [\n');
-		for (i in 0...frameData.length) {
-			var frame = frameData[i];
-			srdSave.add('\t\t{\n');
-			srdSave.add('\t\t\t"time": ' + frame.time + ',\n');
-			srdSave.add('\t\t\t"songSpeed": ' + frame.songSpeed + ',\n');
-			srdSave.add('\t\t\t"playbackRate": ' + frame.playbackRate + ',\n');
-			srdSave.add('\t\t\t"pressKey": ' + Json.stringify(frame.pressKey) + ',\n');
-			srdSave.add('\t\t\t"releaseKey": ' + Json.stringify(frame.releaseKey) + '\n');
-			srdSave.add('\t\t}');
-			if (i < frameData.length - 1) srdSave.add(",\n");
-		}
-		srdSave.add('\n\t]\n');
-		srdSave.add("}");
+			// 2. frameRecord
+			srdSave.add('\t"frameRecord": [\n');
+			for (i in 0...frameData.length) {
+				var frame = frameData[i];
+				srdSave.add('\t\t{\n');
+				srdSave.add('\t\t\t"time": ' + frame.time + ',\n');
+				srdSave.add('\t\t\t"songSpeed": ' + frame.songSpeed + ',\n');
+				srdSave.add('\t\t\t"playbackRate": ' + frame.playbackRate + ',\n');
+				srdSave.add('\t\t\t"pressKey": ' + Json.stringify(frame.pressKey) + ',\n');
+				srdSave.add('\t\t\t"releaseKey": ' + Json.stringify(frame.releaseKey) + '\n');
+				srdSave.add('\t\t}');
+				if (i < frameData.length - 1) srdSave.add(",\n");
+			}
+			srdSave.add('\n\t]\n');
+			srdSave.add("}");
 
-		var content:String = srdSave.toString();
-		content = EncryptUtil.aesEncrypt(content);
+			var content:String = srdSave.toString();
+			content = EncryptUtil.aesEncrypt(content);
 
-		if (!FileSystem.exists("replays/"))
-			FileSystem.createDirectory("replays/");
+			if (!FileSystem.exists("replays/"))
+				FileSystem.createDirectory("replays/");
 
-		var folder:String;
+			var folder:String;
 
-		if (Mods.currentModDirectory == '') {
-			folder = "replays/originFunkin/";
+			if (Mods.currentModDirectory == '') {
+				folder = "replays/originFunkin/";
+				if (!FileSystem.exists(folder))
+					FileSystem.createDirectory(folder);
+			} else {
+				folder = "replays/" + Mods.currentModDirectory + "/";
+				if (!FileSystem.exists(folder))
+					FileSystem.createDirectory(folder);
+			}
+
+			folder = folder + stateRecord.songName + "/";
 			if (!FileSystem.exists(folder))
 				FileSystem.createDirectory(folder);
-		} else {
-			folder = "replays/" + Mods.currentModDirectory + "/";
+
+			folder = folder + "/" + Difficulty.getString().toUpperCase() + "/";
 			if (!FileSystem.exists(folder))
 				FileSystem.createDirectory(folder);
-		}
 
-		folder = folder + stateRecord.songName + "/";
-		if (!FileSystem.exists(folder))
-			FileSystem.createDirectory(folder);
-
-		folder = folder + "/" + Difficulty.getString().toUpperCase() + "/";
-		if (!FileSystem.exists(folder))
-			FileSystem.createDirectory(folder);
-
-		var fileName:String = stateRecord.playDate + ".rsd";
-		fileName = StringTools.replace(fileName, " ", "-");
-		fileName = StringTools.replace(fileName, ":", ".");
-		fileName = StringTools.replace(fileName, "/", "");
-		fileName = StringTools.replace(fileName, "\\", "");
-		
-		var path:String = folder + fileName;
-		Replay.preparedPath = path;
-		File.saveContent(path, content);
-		
-		// Save as TXT
-		var txtSave:StringBuf = new StringBuf();
-		
-		txtSave.add('Song Name: ${stateRecord.songName}\n');
-		txtSave.add('Difficulty: ${stateRecord.difficulty}\n');
-		txtSave.add('Song Length: ${stateRecord.songLength}\n');
-		txtSave.add('Date: ${stateRecord.playDate}\n');
-		txtSave.add('Song Speed: ${stateRecord.songSpeed}\n');
-		txtSave.add('Playback Rate: ${stateRecord.playbackRate}\n');
-		txtSave.add('Health Gain: ${stateRecord.healthGain}\n');
-		txtSave.add('Health Loss: ${stateRecord.healthLoss}\n');
-		txtSave.add('CPU Controlled: ${stateRecord.cpuControlled}\n');
-		txtSave.add('Practice Mode: ${stateRecord.practiceMode}\n');
-		txtSave.add('Instakill On Miss: ${stateRecord.instakillOnMiss}\n');
-		txtSave.add('Play Opponent: ${stateRecord.playOpponent}\n');
-		txtSave.add('Flip Chart: ${stateRecord.flipChart}\n');
-		txtSave.add('Score: ${stateRecord.songScore}\n');
-		txtSave.add('Rating: ${stateRecord.ratingPercent} (${stateRecord.ratingFC})\n');
-		txtSave.add('Hits: ${stateRecord.songHits}\n');
-		txtSave.add('Highest Combo: ${stateRecord.highestCombo}\n');
-		txtSave.add('Misses: ${stateRecord.songMisses}\n');
-		
-		var txtFileName:String = StringTools.replace(fileName, ".rsd", ".txt");
-		var txtPath:String = folder + txtFileName;
-		File.saveContent(txtPath, txtSave.toString());
+			var fileName:String = stateRecord.playDate + ".rsd";
+			fileName = StringTools.replace(fileName, " ", "-");
+			fileName = StringTools.replace(fileName, ":", ".");
+			fileName = StringTools.replace(fileName, "/", "");
+			fileName = StringTools.replace(fileName, "\\", "");
+			
+			var path:String = folder + fileName;
+			Replay.preparedPath = path;
+			File.saveContent(path, content);
+			
+			// Save as TXT
+			var txtSave:StringBuf = new StringBuf();
+			
+			txtSave.add('Song Name: ${stateRecord.songName}\n');
+			txtSave.add('Difficulty: ${stateRecord.difficulty}\n');
+			txtSave.add('Song Length: ${stateRecord.songLength}\n');
+			txtSave.add('Date: ${stateRecord.playDate}\n');
+			txtSave.add('Song Speed: ${stateRecord.songSpeed}\n');
+			txtSave.add('Playback Rate: ${stateRecord.playbackRate}\n');
+			txtSave.add('Health Gain: ${stateRecord.healthGain}\n');
+			txtSave.add('Health Loss: ${stateRecord.healthLoss}\n');
+			txtSave.add('CPU Controlled: ${stateRecord.cpuControlled}\n');
+			txtSave.add('Practice Mode: ${stateRecord.practiceMode}\n');
+			txtSave.add('Instakill On Miss: ${stateRecord.instakillOnMiss}\n');
+			txtSave.add('Play Opponent: ${stateRecord.playOpponent}\n');
+			txtSave.add('Flip Chart: ${stateRecord.flipChart}\n');
+			txtSave.add('Score: ${stateRecord.songScore}\n');
+			txtSave.add('Rating: ${stateRecord.ratingPercent} (${stateRecord.ratingFC})\n');
+			txtSave.add('Hits: ${stateRecord.songHits}\n');
+			txtSave.add('Highest Combo: ${stateRecord.highestCombo}\n');
+			txtSave.add('Misses: ${stateRecord.songMisses}\n');
+			
+			var txtFileName:String = StringTools.replace(fileName, ".rsd", ".txt");
+			var txtPath:String = folder + txtFileName;
+			File.saveContent(txtPath, txtSave.toString());
+		});
 		#end
 	}
 }

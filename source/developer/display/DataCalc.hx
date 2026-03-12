@@ -1,5 +1,7 @@
 package developer.display;
 
+import lime.system.BackendThread;
+
 class DataCalc
 {
 	static public var updateFPS:Float = 0;
@@ -20,35 +22,46 @@ class DataCalc
 	{
 		updateMember++;
 
-		if (Lib.getTimer() - updateTimeSave < 100)
+		var time = Lib.getTimer();
+		if (time - updateTimeSave < 100)
 			return;
 
-		var updateWait:Float = Lib.getTimer() - updateTimeSave;
+		var updateWait:Float = time - updateTimeSave;
+		var currentMember:Float = updateMember;
+		var targetFramerate:Int = ClientPrefs.data.framerate;
 
-		/////////////////// →更新
-		if (Math.abs(Math.floor(1000 / updateFrameTime + 0.5) - Math.floor(1000 / (updateWait / updateMember) + 0.5)) > (ClientPrefs.data.framerate / 5)) 
-			updateFrameTime = updateWait / updateMember;
-		else
-			updateFrameTime = updateFrameTime * 0.9 + updateWait / updateMember * 0.1;
+		updateTimeSave = time;
+		updateMember = 0;
 
-		updateFPS = Math.floor(1000 / updateFrameTime + 0.5);
-		if (updateFPS > ClientPrefs.data.framerate)
-			updateFPS = ClientPrefs.data.framerate;
+		BackendThread.run(() -> {
+			/////////////////// →更新
+			var newFrameTime:Float = 0;
 
-		/////////////////// →fps计算
+			if (Math.abs(Math.floor(1000 / updateFrameTime + 0.5) - Math.floor(1000 / (updateWait / currentMember) + 0.5)) > (targetFramerate / 5)) 
+				newFrameTime = updateWait / currentMember;
+			else
+				newFrameTime = updateFrameTime * 0.9 + updateWait / currentMember * 0.1;
+			
+			updateFrameTime = newFrameTime;
 
-		// Flixel keeps reseting this to 60 on focus gained
-		//if (FlxG.stage.window.frameRate != ClientPrefs.data.framerate && FlxG.stage.window.frameRate != FlxG.game.focusLostFramerate) {
-		//	FlxG.stage.window.frameRate = ClientPrefs.data.framerate;
-		//}
+			var newFPS = Math.floor(1000 / updateFrameTime + 0.5);
+			if (newFPS > targetFramerate)
+				newFPS = targetFramerate;
+			
+			updateFPS = newFPS;
 
-		appMem = getAppMem();
-		gcMem = getGcMem();
+			/////////////////// →fps计算
+
+			// Flixel keeps reseting this to 60 on focus gained
+			//if (FlxG.stage.window.frameRate != ClientPrefs.data.framerate && FlxG.stage.window.frameRate != FlxG.game.focusLostFramerate) {
+			//	FlxG.stage.window.frameRate = ClientPrefs.data.framerate;
+			//}
+
+			appMem = getAppMem();
+			gcMem = getGcMem();
+		});
 
 		/////////////////// →memory计算
-
-		updateTimeSave = Lib.getTimer();
-		updateMember = 0;
 
 		////////////////// 数据初始化
 	}
@@ -60,32 +73,44 @@ class DataCalc
 	{
 		drawCount++;
 		
-		if (Lib.getTimer() - drawTimeSave < 100)
+		var time = Lib.getTimer();
+		if (time - drawTimeSave < 100)
 			return;
 		
-		var drawWait:Float = Lib.getTimer() - drawTimeSave;
+		var drawWait:Float = time - drawTimeSave;
+		var currentCount:Float = drawCount;
+		var lockRender:Bool = ClientPrefs.data.lockRender;
+		var drawFramerate:Int = ClientPrefs.data.drawFramerate;
+		var framerate:Int = ClientPrefs.data.framerate;
 
-		/////////////////// →更新
-		if (Math.abs(Math.floor(1000 / drawFrameTime + 0.5) - Math.floor(1000 / (drawWait / drawCount) + 0.5)) > (ClientPrefs.data.lockRender ? (ClientPrefs.data.drawFramerate / 5) : (ClientPrefs.data.framerate / 5))) 
-			drawFrameTime = drawWait / drawCount;
-		else
-			drawFrameTime = drawFrameTime * 0.9 + drawWait / drawCount * 0.1;
+		drawTimeSave = time;
+		drawCount = 0;
 
-		drawFPS = Math.floor(1000 / drawFrameTime + 0.5);
-		if (ClientPrefs.data.lockRender) {
-			if (drawFPS > ClientPrefs.data.drawFramerate) {
-				drawFPS = ClientPrefs.data.drawFramerate;
+		BackendThread.run(() -> {
+			/////////////////// →更新
+			var newFrameTime:Float = 0;
+
+			if (Math.abs(Math.floor(1000 / drawFrameTime + 0.5) - Math.floor(1000 / (drawWait / currentCount) + 0.5)) > (lockRender ? (drawFramerate / 5) : (framerate / 5))) 
+				newFrameTime = drawWait / currentCount;
+			else
+				newFrameTime = drawFrameTime * 0.9 + drawWait / currentCount * 0.1;
+			
+			drawFrameTime = newFrameTime;
+
+			var newFPS = Math.floor(1000 / drawFrameTime + 0.5);
+			if (lockRender) {
+				if (newFPS > drawFramerate) {
+					newFPS = drawFramerate;
+				}
+			} else {
+				if (newFPS > framerate) {
+					newFPS = framerate;
+				}
 			}
-		} else {
-			if (drawFPS > ClientPrefs.data.framerate) {
-				drawFPS = ClientPrefs.data.framerate;
-			}
-		}
+			drawFPS = newFPS;
+		});
 
 		////////////////////////////// 数据初始化
-
-		drawTimeSave = Lib.getTimer();
-		drawCount = 0;
 	}
 
 	static public function getAppMem():Float

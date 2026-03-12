@@ -326,6 +326,10 @@ class MainMenuState extends MusicBeatState
 		#end
 		#end
 
+		BackendThread.run(() -> {
+             trace("Auto-started thread working!");
+        });
+
 		#if !mobile
 		FlxG.mouse.visible = true;
 		#else

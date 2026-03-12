@@ -362,7 +362,7 @@ class Paths
 		var newGraphic:FlxGraphic = FlxGraphic.fromBitmapData(bitmap, false, file);
 		newGraphic.persist = true;
 		newGraphic.destroyOnNoUse = false;
-		newGraphic.bitmap.getTexture(FlxG.stage.context3D);
+		//newGraphic.bitmap.getTexture(FlxG.stage.context3D);
 		if (thread) bitmapMutex.acquire();
 			Cache.currentTrackedAssets.set(file, newGraphic);
 			

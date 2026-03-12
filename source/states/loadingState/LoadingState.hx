@@ -301,7 +301,7 @@ class LoadingState extends MusicBeatState
 			prepareEvent.destroy();
 			prepareEvent = null;
 		}
-
+		
 		GCManager.enable(true);
 
 		if (isPlayState)
@@ -359,7 +359,6 @@ class LoadingState extends MusicBeatState
 
 		
 		for (image in imagesToPrepare) {
-			//trace('LoadingState: startThreads, image: $image');
 			threadWork(() -> 
 			{
 				var bitmap:BitmapData = null;
@@ -405,7 +404,9 @@ class LoadingState extends MusicBeatState
 				case 'sound', 'song', 'music':
 					trace(msg.type.toUpperCase() + ': finished preloading ' + msg.path);
 				case 'image':
-					if (!msg.alreadyLoaded) requestedBitmaps.set(msg.path, msg.file);
+					if (!msg.alreadyLoaded) {
+						requestedBitmaps.set(msg.path, msg.file);
+					}
 			}
 			addLoadCount();
 		});
