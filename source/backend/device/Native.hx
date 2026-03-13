@@ -93,9 +93,17 @@ class Native
 		final display:Null<Display> = System.getDisplay(0);
 		if (display != null)
 		{
-			final dpiScale:Float = display.dpi / 96;
-			@:privateAccess Application.current.window.width = Std.int(Main.gameConfig.width * dpiScale);
-			@:privateAccess Application.current.window.height = Std.int(Main.gameConfig.height * dpiScale);
+			var dpiScale:Float = display.dpi / 96;
+			final cfgW:Float = @:privateAccess Main.gameConfig.width;
+			final cfgH:Float = @:privateAccess Main.gameConfig.height;
+			final targetRatio:Float = 0.7;
+			final targetW:Float = display.bounds.width * targetRatio;
+			final targetH:Float = display.bounds.height * targetRatio;
+			final maxScale:Float = Math.min(targetW / cfgW, targetH / cfgH);
+			if (dpiScale > maxScale) dpiScale = maxScale;
+
+			@:privateAccess Application.current.window.width = Std.int(cfgW * dpiScale);
+			@:privateAccess Application.current.window.height = Std.int(cfgH * dpiScale);
 
 			Application.current.window.x = Std.int((Application.current.window.display.bounds.width - Application.current.window.width) / 2);
 			Application.current.window.y = Std.int((Application.current.window.display.bounds.height - Application.current.window.height) / 2);
