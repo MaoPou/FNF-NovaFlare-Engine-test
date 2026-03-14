@@ -198,8 +198,6 @@
 	<!--Disable the Flixel core focus lost screen-->
 	<haxedef name="FLX_NO_FOCUS_LOST_SCREEN" />
 
-	<haxedef name="lime_threads" />
-
 	<!-- Show debug traces for hxCodec -->
 	<haxedef name="HXC_DEBUG_TRACE" if="debug hxCodec" />
 	<haxedef name="HXC_LIBVLC_LOGGING" if="debug hxCodec" />

@@ -462,6 +462,8 @@ class ClientPrefs
 		}
 		#end
 
+		lime.graphics.opengl.GL.setMultiThreaded(data.renderThread);
+
 		FlxG.stage.application.window.lockRender = data.lockRender;
 		FlxG.stage.application.window.drawFrameRate = data.drawFramerate;
 

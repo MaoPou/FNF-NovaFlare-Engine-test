@@ -1,7 +1,5 @@
 package developer.display;
 
-import lime.system.BackendThread;
-
 class DataCalc
 {
 	static public var updateFPS:Float = 0;
@@ -33,7 +31,7 @@ class DataCalc
 		updateTimeSave = time;
 		updateMember = 0;
 
-		BackendThread.run(() -> {
+		//BackendThread.run(() -> {
 			/////////////////// →更新
 			var newFrameTime:Float = 0;
 
@@ -59,7 +57,7 @@ class DataCalc
 
 			appMem = getAppMem();
 			gcMem = getGcMem();
-		});
+		//});
 
 		/////////////////// →memory计算
 
@@ -86,7 +84,7 @@ class DataCalc
 		drawTimeSave = time;
 		drawCount = 0;
 
-		BackendThread.run(() -> {
+		//BackendThread.run(() -> {
 			/////////////////// →更新
 			var newFrameTime:Float = 0;
 
@@ -108,7 +106,7 @@ class DataCalc
 				}
 			}
 			drawFPS = newFPS;
-		});
+		//});
 
 		////////////////////////////// 数据初始化
 	}

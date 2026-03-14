@@ -44,6 +44,7 @@ import flixel.addons.transition.FlxTransitionableState;
 
 // Lime 
 import lime.system.BackendThread;
+import haxe.MainLoop;
 
 // Mobile Controls
 import mobile.objects.MobileControls;

@@ -24,7 +24,6 @@ import options.OptionsState;
 import games.funkin_legacy.backend.WeekData;
 import states.ServerConnectState;
 
-
 import cpp.Lib;
 
 @:access(flixel.sound.FlxSound._sound)
@@ -325,10 +324,6 @@ class MainMenuState extends MusicBeatState
 		Achievements.reloadList();
 		#end
 		#end
-
-		BackendThread.run(() -> {
-             trace("Auto-started thread working!");
-        });
 
 		#if !mobile
 		FlxG.mouse.visible = true;
