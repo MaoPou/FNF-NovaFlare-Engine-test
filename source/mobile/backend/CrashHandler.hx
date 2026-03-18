@@ -10,7 +10,7 @@ import states.MainMenuState;
 
 import substates.ErrorSubState;
 
-using backend.CoolUtil;
+using general.backend.CoolUtil;
 
 /**
  * Crash Handler.

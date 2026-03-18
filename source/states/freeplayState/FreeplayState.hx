@@ -8,7 +8,7 @@ import sys.thread.Mutex;
 
 import openfl.system.System;
 
-import editors.ChartingState;
+import developer.editors.ChartingState;
 
 import options.OptionsState;
 

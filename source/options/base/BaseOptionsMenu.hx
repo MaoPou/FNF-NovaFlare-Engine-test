@@ -5,10 +5,10 @@ import flixel.input.gamepad.FlxGamepad;
 import flixel.input.gamepad.FlxGamepadInputID;
 import flixel.input.gamepad.FlxGamepadManager;
 
-import backend.InputFormatter;
+import general.backend.InputFormatter;
 
-import objects.CheckboxThingie;
-import objects.AttachedText;
+import general.objects.CheckboxThingie;
+import general.objects.AttachedText;
 
 import options.base.OptionBase;
 

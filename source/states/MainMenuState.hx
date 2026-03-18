@@ -15,9 +15,9 @@ import flixel.addons.display.FlxBackdrop;
 import flixel.input.keyboard.FlxKey;
 import flixel.ui.FlxButton;
 
-import objects.AchievementPopup;
+import general.objects.AchievementPopup;
 
-import editors.MasterEditorMenu;
+import developer.editors.MasterEditorMenu;
 
 import options.OptionsState;
 

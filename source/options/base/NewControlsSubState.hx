@@ -5,9 +5,9 @@ import flixel.addons.display.FlxGridOverlay;
 import flixel.input.keyboard.FlxKey;
 import flixel.util.FlxSpriteUtil;
 
-import backend.InputFormatter;
+import general.backend.InputFormatter;
 
-import objects.AttachedSprite;
+import general.objects.AttachedSprite;
 
 import options.objects.controlsSubState.*;
 

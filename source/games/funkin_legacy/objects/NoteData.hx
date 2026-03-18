@@ -15,7 +15,9 @@ class NoteData
 	public var cameras:Array<FlxCamera>;
 	public var offsetX:Float = 0;
 	public var offsetY:Float = 0;
+	public var offset(default, null):FlxPoint;
 	public var offsetAngle:Float = 0;
+	public var angle:Float = 0;
 	public var copyX:Bool = true;
 	public var copyY:Bool = true;
 	public var copyAngle:Bool = true;
@@ -68,5 +70,7 @@ class NoteData
 		this.strumTime = strumTime;
 		this.noteData = noteData;
 		this.isSustainNote = sustainNote;
+
+		offset = FlxPoint.get();
 	}
 }

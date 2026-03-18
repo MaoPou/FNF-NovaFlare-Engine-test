@@ -1,8 +1,8 @@
 package states.loadingState.backend;
 
-import backend.ClientPrefs;
-import backend.Mods;
-import backend.Paths;
+import general.backend.ClientPrefs;
+import general.backend.Mods;
+import general.backend.Paths;
 import games.funkin_legacy.backend.Rating;
 import games.funkin_legacy.backend.Song;
 import games.funkin_legacy.backend.StageData;

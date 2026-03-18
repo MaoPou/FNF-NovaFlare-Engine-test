@@ -7,7 +7,7 @@ import openfl.utils.Assets;
 
 import flixel.util.FlxSort;
 
-import backend.animation.PsychAnimationController;
+import general.backend.animation.PsychAnimationController;
 
 import games.funkin_legacy.backend.Song;
 import games.funkin_legacy.stages.objects.TankmenBG;
@@ -498,7 +498,7 @@ class Character extends FlxSprite
 
 	// Atlas support
 	// special thanks ne_eo for the references, you're the goat!!
-	@:allow(editors.CharacterEditorState)
+	@:allow(developer.editors.CharacterEditorState)
 	public var isAnimateAtlas(default, null):Bool = false;
 	#if flxanimate
 	public var atlas:FlxAnimate;

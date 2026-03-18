@@ -4,7 +4,7 @@ import openfl.utils.Assets;
 
 import flixel.util.FlxStringUtil;
 
-import editors.ChartingState;
+import developer.editors.ChartingState;
 
 import states.freeplayState.FreeplayState;
 import states.StoryMenuState;

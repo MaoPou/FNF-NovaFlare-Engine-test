@@ -23,19 +23,19 @@ import flixel.input.touch.FlxTouch;
 
 import modchart.Manager;
 
-import objects.AttachedSprite;
+import general.objects.AttachedSprite;
 
 import states.StoryMenuState;
 import states.freeplayState.FreeplayState;
 
-import editors.ChartingState;
-import editors.CharacterEditorState;
+import developer.editors.ChartingState;
+import developer.editors.CharacterEditorState;
 
 import substates.PauseSubState;
 import substates.GameOverSubstate;
 import substates.ResultsScreen;
 
-import shaders.ErrorHandledShader;
+import general.shaders.ErrorHandledShader;
 
 import games.funkin_legacy.stages.*;
 
@@ -59,8 +59,8 @@ import games.funkin_legacy.cutscenes.CutsceneHandler;
 import games.funkin_legacy.cutscenes.DialogueBoxPsych;
 
 #if CUSTOM_SHADERS_ALLOWED
-import shaders.CustomShaders;
-import shaders.openfl.filters.ShaderFilter as CustomShaderFilter;
+import general.shaders.CustomShaders;
+import general.shaders.openfl.filters.ShaderFilter as CustomShaderFilter;
 import openfl.filters.BitmapFilter;
 #end
 
@@ -2500,8 +2500,6 @@ class PlayState extends MusicBeatState
 			var time:Float = spawnTime * playbackRate;
 			if (songSpeed < 1)
 				time /= songSpeed;
-			// if (unspawnNotes[0].multSpeed < 1)
-			// 	time /= unspawnNotes[0].multSpeed;
 			
 			var spawnCount:Int = 0;
 			var lenUnspawn:Int = unspawnNotes.length;

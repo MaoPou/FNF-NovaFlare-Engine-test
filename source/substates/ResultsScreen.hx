@@ -27,7 +27,7 @@ import flixel.util.FlxSpriteUtil;
 import flixel.graphics.frames.FlxFilterFrames;
 import flixel.addons.display.FlxRuntimeShader;
 
-import objects.state.ResultShape;
+import general.objects.state.ResultShape;
 
 import states.freeplayState.FreeplayState;
 import states.MainMenuState;

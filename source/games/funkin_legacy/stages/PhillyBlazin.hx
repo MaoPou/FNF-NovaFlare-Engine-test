@@ -4,7 +4,7 @@ import openfl.filters.ShaderFilter;
 
 import flixel.addons.display.FlxTiledSprite;
 
-import shaders.RainShader;
+import general.shaders.RainShader;
 
 import substates.GameOverSubstate;
 

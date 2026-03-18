@@ -2,7 +2,7 @@ package games.funkin_legacy.backend;
 
 import flixel.input.keyboard.FlxKey;
 import flixel.FlxBasic;
-import backend.KeyBlocker;
+import general.backend.KeyBlocker;
 import server.util.EncryptUtil;
 import haxe.Json;
 #if sys

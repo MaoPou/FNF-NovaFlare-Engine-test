@@ -4,7 +4,7 @@ import flixel.math.FlxRect;
 import flixel.util.FlxSpriteUtil;
 import flixel.input.keyboard.FlxKey;
 
-import backend.InputFormatter;
+import general.backend.InputFormatter;
 
 class ControlsSprite extends FlxSpriteGroup
 {

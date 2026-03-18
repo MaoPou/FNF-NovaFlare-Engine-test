@@ -1,7 +1,7 @@
 package options.groupData;
 
 import lime.graphics.opengl.GL;
-import shaders.ColorblindFilter;
+import general.shaders.ColorblindFilter;
 
 class GeneralGroup extends OptionCata
 {

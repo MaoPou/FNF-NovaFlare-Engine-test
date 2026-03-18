@@ -1,6 +1,6 @@
 ﻿package;
 
-import backend.ClientPrefs;
+import general.backend.ClientPrefs;
 import haxe.io.Path;
 import haxe.ui.Toolkit;
 
@@ -20,19 +20,19 @@ import developer.display.FPSViewer;
 import developer.display.Graphics;
 import developer.console.TraceInterceptor;
 
-import objects.screen.MouseEffect;
+import general.objects.screen.MouseEffect;
 
 import states.TitleState;
 import states.backend.InitState;
 import states.backend.PassState;
 
 #if android
-import backend.device.AppData;
+import general.backend.device.AppData;
 import states.backend.PirateState;
 #end
 
 #if desktop
-import backend.device.ALSoftConfig;
+import general.backend.device.ALSoftConfig;
 #end
 #if hl
 import hl.Api;
@@ -40,7 +40,7 @@ import hl.Api;
 #if linux
 import lime.graphics.Image;
 
-@:cppInclude('./backend/external/gamemode_client.h')
+@:cppInclude('./general/backend/external/gamemode_client.h')
 @:cppFileCode('
 	#define GAMEMODE_AUTO
 ')
@@ -72,8 +72,8 @@ class Main extends Sprite
 	public static function main():Void
 	{
 		#if (cpp && windows)
-		backend.device.Native.fixScaling();
-		backend.device.Native.setWindowDarkMode(true, true);
+		general.backend.device.Native.fixScaling();
+		general.backend.device.Native.setWindowDarkMode(true, true);
 		#end
 		
 		Lib.current.addChild(new Main());
@@ -250,16 +250,16 @@ class Main extends Sprite
 			"FlxSpriteGroup" => flixel.group.FlxSpriteGroup,
 			"FlxText" => flixel.text.FlxText,
 
-			"MusicBeatState" => backend.MusicBeatState,
+			"MusicBeatState" => general.backend.MusicBeatState,
 			"PlayState" => games.funkin_legacy.PlayState,
 			"Application" => lime.app.Application,
 
 			// Engine Something
-			'Conductor' => backend.Conductor,
-			"Paths" => backend.Paths,
-			'ClientPrefs' => backend.ClientPrefs,
+			'Conductor' => general.backend.Conductor,
+			"Paths" => general.backend.Paths,
+			'ClientPrefs' => general.backend.ClientPrefs,
 			#if ACHIEVEMENTS_ALLOWED
-			'Achievements' => backend.Achievements,
+			'Achievements' => general.backend.Achievements,
 			#end
 		]);
 		#end

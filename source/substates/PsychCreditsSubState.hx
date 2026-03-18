@@ -1,6 +1,6 @@
 package substates;
 
-import objects.AttachedSprite;
+import general.objects.AttachedSprite;
 
 class PsychCreditsSubState extends MusicBeatSubstate
 {

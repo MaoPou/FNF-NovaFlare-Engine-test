@@ -10,8 +10,8 @@ import flixel.input.gamepad.FlxGamepadInputID;
 import flixel.util.FlxGradient;
 import flixel.addons.ui.FlxUIInputText;
 
-import shaders.RGBPalette;
-import shaders.RGBPalette.RGBShaderReference;
+import general.shaders.RGBPalette;
+import general.shaders.RGBPalette.RGBShaderReference;
 
 import games.funkin_legacy.objects.StrumNote;
 import games.funkin_legacy.objects.Note;

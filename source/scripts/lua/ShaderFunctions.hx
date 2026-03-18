@@ -7,7 +7,7 @@ import flixel.addons.display.FlxRuntimeShader;
 #end
 
 #if CUSTOM_SHADERS_ALLOWED
-import shaders.CustomShaders;
+import general.shaders.CustomShaders;
 #end
 
 class ShaderFunctions

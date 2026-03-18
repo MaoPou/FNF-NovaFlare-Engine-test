@@ -2,12 +2,12 @@
 
 import flixel.FlxBasic;
 
-import backend.InputFormatter;
-import backend.animation.PsychAnimationController;
+import general.backend.InputFormatter;
+import general.backend.animation.PsychAnimationController;
 
-import shaders.RGBPalette;
-import shaders.RGBPalette.RGBShaderReference;
-import shaders.ColorSwap;
+import general.shaders.RGBPalette;
+import general.shaders.RGBPalette.RGBShaderReference;
+import general.shaders.ColorSwap;
 
 class StrumNote extends FlxSprite
 {

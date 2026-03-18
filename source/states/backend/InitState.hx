@@ -21,7 +21,7 @@ import states.TitleState;
 
 import scripts.init.InitScriptData;
 
-import shaders.ColorblindFilter;
+import general.shaders.ColorblindFilter;
 
 import games.funkin_legacy.backend.WeekData;
 import games.funkin_legacy.backend.Highscore;
@@ -35,7 +35,7 @@ import hxvlc.flixel.FlxVideoSprite;
 #end
 
 #if android
-import backend.device.AppData;
+import general.backend.device.AppData;
 import states.backend.PirateState;
 #end
 

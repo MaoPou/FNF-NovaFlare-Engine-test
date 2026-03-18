@@ -6,7 +6,7 @@ import tjson.TJSON as Json;
 
 import flixel.addons.text.FlxTypeText;
 
-import objects.TypedAlphabet;
+import general.objects.TypedAlphabet;
 
 import games.funkin_legacy.cutscenes.DialogueCharacter;
 

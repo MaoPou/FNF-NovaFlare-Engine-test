@@ -11,7 +11,7 @@ import flixel.FlxBasic;
 import flixel.graphics.FlxGraphic;
 import flixel.util.FlxSpriteUtil;
 
-import objects.AttachedSprite;
+import general.objects.AttachedSprite;
 
 import options.base.ModSettingsSubState;
 

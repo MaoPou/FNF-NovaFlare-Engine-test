@@ -11,7 +11,7 @@ import flixel.graphics.frames.FlxFrame;
 import flixel.group.FlxGroup;
 import flixel.input.gamepad.FlxGamepad;
 
-import shaders.ColorSwap;
+import general.shaders.ColorSwap;
 
 import states.StoryMenuState;
 import states.MainMenuState;

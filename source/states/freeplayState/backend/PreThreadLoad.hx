@@ -10,7 +10,7 @@ import openfl.display.BitmapData;
 import openfl.geom.ColorTransform;
 import openfl.geom.Rectangle;
 
-import backend.thread.ThreadEvent;
+import general.backend.thread.ThreadEvent;
 
 typedef DataPrepare = {
     modPath:String,

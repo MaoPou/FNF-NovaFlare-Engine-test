@@ -3,7 +3,6 @@ package games.funkin_legacy.backend;
 import games.funkin_legacy.objects.Note;
 import games.funkin_legacy.objects.NoteData;
 import flixel.group.FlxGroup.FlxTypedGroup;
-import flixel.FlxG;
 
 class NotePool
 {

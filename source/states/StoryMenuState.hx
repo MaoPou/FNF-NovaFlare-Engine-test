@@ -5,8 +5,8 @@ import openfl.utils.Assets;
 import flixel.group.FlxGroup;
 import flixel.graphics.FlxGraphic;
 
-import objects.MenuItem;
-import objects.MenuCharacter;
+import general.objects.MenuItem;
+import general.objects.MenuCharacter;
 
 import substates.GameplayChangersSubstate;
 import substates.ResetScoreSubState;

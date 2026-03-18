@@ -12,7 +12,7 @@ import flixel.util.FlxSave;
 import flixel.input.keyboard.FlxKey;
 import flixel.graphics.FlxGraphic;
 
-import shaders.ColorSwap;
+import general.shaders.ColorSwap;
 
 import games.funkin_legacy.objects.Note;
 

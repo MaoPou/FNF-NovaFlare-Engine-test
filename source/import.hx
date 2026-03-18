@@ -21,7 +21,7 @@ import spine.flixel.FlixelTextureLoader;
 
 #if flxanimate
 import flxanimate.*;
-import flxanimate.PsychFlxAnimate as FlxAnimate;
+import general.flxanimate.PsychFlxAnimate as FlxAnimate;
 #end
 
 // Flixel
@@ -65,42 +65,42 @@ import android.Tools as AndroidTools;
 
 // Discord API
 #if DISCORD_ALLOWED
-import backend.Discord;
+import general.backend.Discord;
 #end
 
 // Psych
 #if ACHIEVEMENTS_ALLOWED
-import backend.Achievements;
+import general.backend.Achievements;
 #end
 
-import backend.language.Language;
-import backend.Paths;
-import backend.Cache;
-import backend.Controls;
-import backend.CoolUtil;
-import backend.MusicBeatState;
-import backend.MusicBeatSubstate;
-import backend.CustomFadeTransition;
-import backend.ClientPrefs;
-import backend.Conductor;
-import backend.Mods;
-import backend.ui.*; // Psych-UI
-import backend.data.*;
-import backend.mouse.*;
-import backend.gc.*;
+import general.backend.language.Language;
+import general.backend.Paths;
+import general.backend.Cache;
+import general.backend.Controls;
+import general.backend.CoolUtil;
+import general.backend.MusicBeatState;
+import general.backend.MusicBeatSubstate;
+import general.backend.CustomFadeTransition;
+import general.backend.ClientPrefs;
+import general.backend.Conductor;
+import general.backend.Mods;
+import general.backend.ui.*; // Psych-UI
+import general.backend.data.*;
+import general.backend.mouse.*;
+import general.backend.gc.*;
 
 #if hxvlc
-import objects.VideoSprite;
+import general.objects.VideoSprite;
 #end
 
-import shapeEx.*;
+import general.shapeEX.*;
 
-import objects.Alphabet;
-import objects.BGSprite;
-import objects.AudioDisplay;
-import objects.state.general.*;
+import general.objects.Alphabet;
+import general.objects.BGSprite;
+import general.objects.AudioDisplay;
+import general.objects.state.general.*;
 
-import shaders.flixel.system.FlxShader;
+import general.shaders.flixel.system.FlxShader;
 
 import states.loadingState.LoadingState;
 

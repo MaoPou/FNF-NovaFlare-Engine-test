@@ -23,7 +23,7 @@ import crowplexus.hscript.Parser;
 import flixel.graphics.FlxGraphic;
 import flixel.graphics.frames.FlxFilterFrames;
 
-import backend.thread.ThreadEvent;
+import general.backend.thread.ThreadEvent;
 import states.loadingState.backend.*;
 
 import states.freeplayState.FreeplayState;

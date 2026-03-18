@@ -4,9 +4,9 @@ import flixel.addons.display.FlxBackdrop;
 import flixel.addons.display.FlxGridOverlay;
 import flixel.input.keyboard.FlxKey;
 
-import backend.InputFormatter;
+import general.backend.InputFormatter;
 
-import objects.AttachedSprite;
+import general.objects.AttachedSprite;
 
 class ControlsSubState extends MusicBeatSubstate
 {

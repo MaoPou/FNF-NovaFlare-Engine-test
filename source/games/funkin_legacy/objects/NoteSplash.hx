@@ -3,10 +3,10 @@
 import flixel.system.FlxAssets.FlxShader;
 import flixel.graphics.frames.FlxFrame;
 
-import backend.animation.PsychAnimationController;
+import general.backend.animation.PsychAnimationController;
 
-import shaders.RGBPalette;
-import shaders.ColorSwap;
+import general.shaders.RGBPalette;
+import general.shaders.ColorSwap;
 
 typedef NoteSplashConfig =
 {

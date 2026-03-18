@@ -8,7 +8,7 @@ import openfl.utils.Assets;
 import flixel.graphics.FlxGraphic;
 import flixel.util.FlxSave;
 
-import backend.InputFormatter;
+import general.backend.InputFormatter;
 
 import options.OptionsHelpers;
 

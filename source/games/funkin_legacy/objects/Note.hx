@@ -2,13 +2,13 @@
 
 import flixel.math.FlxRect;
 
-import backend.animation.PsychAnimationController;
+import general.backend.animation.PsychAnimationController;
 
-import shaders.RGBPalette;
-import shaders.ColorSwap;
-import shaders.RGBPalette.RGBShaderReference;
+import general.shaders.RGBPalette;
+import general.shaders.ColorSwap;
+import general.shaders.RGBPalette.RGBShaderReference;
 
-import editors.EditorPlayState;
+import developer.editors.EditorPlayState;
 
 import games.funkin_legacy.backend.NoteTypesConfig;
 import games.funkin_legacy.objects.StrumNote;
@@ -636,9 +636,10 @@ class Note extends FlxSprite
 			this.trackedScale = 0.7;
 		}
 
-		this.angle = 0;
+		this.angle = data.angle;
 		this.offsetX = data.offsetX;
 		this.offsetY = data.offsetY;
+		this.offset = data.offset;
 		this.offsetAngle = data.offsetAngle;
 		this.multSpeed = data.multSpeed;
 		if (data.cameras != null)
