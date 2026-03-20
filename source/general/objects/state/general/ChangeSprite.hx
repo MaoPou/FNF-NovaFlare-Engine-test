@@ -14,10 +14,10 @@ class ChangeSprite extends FlxSpriteGroup //背景切换
 
         bg1 = new MoveSprite(0, 0);
         bg1.antialiasing = ClientPrefs.data.antialiasing;
-		
 
 		bg2 = new MoveSprite(0, 0);
         bg2.antialiasing = ClientPrefs.data.antialiasing;
+
 		add(bg2);
 
         add(bg1);

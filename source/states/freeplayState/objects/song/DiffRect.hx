@@ -184,7 +184,7 @@ class DiffRect extends FlxSpriteGroup {
         startX = Math.pow(Math.abs(this.y + this.background.height / 2 - FlxG.height / 2) / (FlxG.height / 2) * 10, 1.8);
 
         var chooseTar = onFocus ? -fixWidth * 0.125 : 0;
-        if (Math.abs(chooseX - chooseTar) > 1) chooseX = FlxMath.lerp(chooseTar, chooseX, Math.exp(-FreeplayState.instance.songsMove.saveElapsed * FreeplayState.instance.songsMove.lerpSmooth));
+        if (Math.abs(chooseX - chooseTar) > 0.000005) chooseX = FlxMath.lerp(chooseTar, chooseX, Math.exp(-FreeplayState.instance.songsMove.saveElapsed * FreeplayState.instance.songsMove.lerpSmooth));
         else chooseX = chooseTar;
         
         x = FlxG.width - fixWidth * 0.85 + startX + chooseX;
@@ -193,7 +193,7 @@ class DiffRect extends FlxSpriteGroup {
     public var startTarY:Float = 0;
     public var startY:Float = 0;
     public function calcY() {
-        if (Math.abs(startY - startTarY) > 1)
+        if (Math.abs(startY - startTarY) > 0.000005)
             startY = FlxMath.lerp(startTarY, startY, Math.exp(-FreeplayState.instance.songsMove.saveElapsed * FreeplayState.instance.songsMove.lerpSmooth));
         else
             startY = startTarY;

@@ -15,7 +15,6 @@ import options.OptionsState;
 import states.MainMenuState;
 import states.freeplayState.shader.BlurFilter;
 import states.freeplayState.backend.*;
-import states.freeplayState.backend.PreThreadLoad.DataPrepare;
 import states.freeplayState.objects.detail.*;
 import states.freeplayState.objects.down.*;
 import states.freeplayState.objects.others.*;
@@ -83,10 +82,6 @@ class FreeplayState extends MusicBeatState
 	var holdNoteData:DataDis;
 	var speedData:DataDis;
 	var keyCountData:DataDis;
-
-	///////////////////////////////////////////////////////////////////////////////////////////////
-
-	//public var prepareLoad:PreThreadLoad;
 
 	///////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -170,6 +165,7 @@ class FreeplayState extends MusicBeatState
 		camAfter = new FlxCamera();
 		camAfter.bgColor = 0x00000000;
 		FlxG.cameras.add(camAfter);
+		if (mouseEvent != null) mouseEvent.targetCamera = camSongs;
 
 		background = new ChangeSprite(0, 0).load(Paths.image('menuDesat'), 1.05);
 		background.antialiasing = ClientPrefs.data.antialiasing;
@@ -289,22 +285,6 @@ class FreeplayState extends MusicBeatState
 
 		//////////////////////////////////////////////////////////////////////////////////////////
 
-		/*
-		var songRectload:Array<DataPrepare> = [];
-
-		for (time in 0...Math.ceil((Math.ceil(FlxG.height / SongRect.fixHeight * rectInter) + 2) / songsData.length)){
-			for (i in 0...songsData.length)
-			{
-				var data = songsData[i];
-				var rectGrp = {modPath: songsData[i].folder, bgPath: data.songName, iconPath: data.songCharacter, color: data.color};
-				songRectload.push(rectGrp);
-			}
-		}
-
-		prepareLoad = new PreThreadLoad();
-		prepareLoad.start(songRectload); //狗屎haxe，多线程无效了
-		*/
-
 		for (i in 0...songsData.length)
 		{
 			Mods.currentModDirectory = songsData[i].folder;
@@ -395,6 +375,8 @@ class FreeplayState extends MusicBeatState
 			&& leWeek.weekBefore.length > 0
 			&& (!StoryMenuState.weekCompleted.exists(leWeek.weekBefore) || !StoryMenuState.weekCompleted.get(leWeek.weekBefore)));
 	}
+
+	///////////////////////////////////////////////////////////////////////////////////
 
 	public final songPosiStart:Float = 720 * 0.3;
 	public static var songPosiData:Float = 720 * 0.3; //神人haxe不能用FlxG.height
@@ -508,7 +490,6 @@ class FreeplayState extends MusicBeatState
 				}
 			}
 		}
-		updateSongVisibility();
 	}
 
 	public function initSongsData() {
@@ -720,4 +701,3 @@ class SongMetadata
 			this.folder = '';
 	}
 }
-

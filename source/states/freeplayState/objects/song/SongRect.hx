@@ -287,11 +287,11 @@ class SongRect extends FlxSpriteGroup {
         moveX = Math.pow(Math.abs(this.y + this.selectShow.height / 2 - FlxG.height / 2) / (FlxG.height / 2) * 10, 1.8);
 
         var chooseTar = onFocus ? -20 : 0;
-        if (Math.abs(chooseX - chooseTar) > 1) chooseX = FlxMath.lerp(chooseTar, chooseX, Math.exp(-FreeplayState.instance.songsMove.saveElapsed * FreeplayState.instance.songsMove.lerpSmooth));
+        if (Math.abs(chooseX - chooseTar) > 0.00005) chooseX = FlxMath.lerp(chooseTar, chooseX, Math.exp(-FreeplayState.instance.songsMove.saveElapsed * FreeplayState.instance.songsMove.lerpSmooth));
         else chooseX = chooseTar;
 
         var diffTar = diffAdded ? -50 : 0;
-        if (Math.abs(diffX - diffTar) > 1) diffX = FlxMath.lerp(diffTar, diffX, Math.exp(-FreeplayState.instance.songsMove.saveElapsed * FreeplayState.instance.songsMove.lerpSmooth));
+        if (Math.abs(diffX - diffTar) > 0.00005) diffX = FlxMath.lerp(diffTar, diffX, Math.exp(-FreeplayState.instance.songsMove.saveElapsed * FreeplayState.instance.songsMove.lerpSmooth));
         else diffX = diffTar;
         
         this.x = FlxG.width - this.selectShow.width + 80 + moveX + chooseX + diffX;
@@ -311,12 +311,12 @@ class SongRect extends FlxSpriteGroup {
     public var interY:Float = 0;
     public var diffY:Float = 0;    
     public function moveY(startY:Float) {        
-        if (Math.abs(interY - interYTar) > 1)
+        if (Math.abs(interY - interYTar) > 0.00005)
             interY = FlxMath.lerp(interYTar, interY, Math.exp(-FreeplayState.instance.songsMove.saveElapsed * FreeplayState.instance.songsMove.lerpSmooth));
         else 
             interY = interYTar;
         
-        if (Math.abs(diffY - diffYTar) > 1)
+        if (Math.abs(diffY - diffYTar) > 0.00005)
             diffY = FlxMath.lerp(diffYTar, diffY, Math.exp(-FreeplayState.instance.songsMove.saveElapsed * FreeplayState.instance.songsMove.lerpSmooth));
         else 
             diffY = diffYTar;

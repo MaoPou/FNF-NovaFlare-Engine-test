@@ -6,6 +6,7 @@ import lime.system.Clipboard;
 import lime.math.Rectangle;
 
 import openfl.Lib;
+import lime.ui.Window;
 
 import flixel.FlxObject;
 import flixel.input.keyboard.FlxKey;
@@ -744,8 +745,8 @@ class PsychUIInputText extends FlxSpriteGroup
 		super.destroy();
 	}
 
-	private inline function _getWindow():Dynamic {
-		var w:Dynamic = null;
+	private inline function _getWindow():Window {
+		var w:Window = null;
 		try {
 			#if lime
 			w = (Lib.application != null) ? Lib.application.window : null;
@@ -758,7 +759,7 @@ class PsychUIInputText extends FlxSpriteGroup
 	}
 
 	private inline function _isTextInputEnabled():Bool {
-		var win:Dynamic = _getWindow();
+		var win:Window = _getWindow();
 		if (win == null) return false;
 		var enabled:Bool = false;
 		try { enabled = win.textInputEnabled; } catch (e:Dynamic) {}
@@ -766,23 +767,27 @@ class PsychUIInputText extends FlxSpriteGroup
 	}
 
 	inline function _safeEnableTextInput():Void {
-		var win:Dynamic = _getWindow();
+		var win:Window = _getWindow();
 		if (win == null) return;
 		try {
 			win.textInputEnabled = true;
-		} catch (e:Dynamic) {}
+		} catch (e:Dynamic) {
+			trace("Error enabling text input: " + e);
+		}
 	}
 
 	inline function _safeDisableTextInput():Void {
-		var win:Dynamic = _getWindow();
+		var win:Window = _getWindow();
 		if (win == null) return;
 		try {
 			win.textInputEnabled = false;
-		} catch (e:Dynamic) {}
+		} catch (e:Dynamic) {
+			trace("Error disabling text input: " + e);
+		}
 	}
 
 	inline function _updateTextInputRect():Void {
-		var win:Dynamic = _getWindow();
+		var win:Window = _getWindow();
 		if (win == null) return;
 		try {
 			var p = behindText.getScreenPosition(camera);

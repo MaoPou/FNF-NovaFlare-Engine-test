@@ -117,7 +117,7 @@ class MouseMove extends FlxBasic
         }
 
         if (tweenData != 0 && allowLerp) {
-            if (Math.abs(target - tweenData) < 1) {
+            if (Math.abs(target - tweenData) < 0.00005) {
                 target = tweenData;
                 tweenData = 0;
                 allowLerp = false;
@@ -132,14 +132,14 @@ class MouseMove extends FlxBasic
         }
         
         if (__target > target) state = 'up';
-        else if (__target < target)state = 'down';
+        else if (__target < target) state = 'down';
         else if (__target == target) state = 'stop';
 
         __target = target;
 
         Reflect.setProperty(follow, followData, target);
         
-        if (event!= null) {
+        if (event!= null && state != 'stop') {
             event();
         }
 
