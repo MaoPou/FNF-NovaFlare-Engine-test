@@ -38,9 +38,9 @@ class ReflectionFunctions
 		});
 		funk.set("getPropertyFromClass", function(classVar:String, variable:String, ?allowMaps:Bool = false)
 		{
-			classVar = classNameCheck(classVar);
+			classVar = classRepoint(classVar);
 			var myClass:Dynamic = Type.resolveClass(classVar);
-			variable = varCheck(classVar, variable);
+			variable = varRepoint(classVar, variable);
 			
 			if (myClass == null)
 			{
@@ -69,9 +69,9 @@ class ReflectionFunctions
 		});
 		funk.set("setPropertyFromClass", function(classVar:String, variable:String, value:Dynamic, ?allowMaps:Bool = false)
 		{
-			classVar = classNameCheck(classVar);
+			classVar = classRepoint(classVar);
 			var myClass:Dynamic = Type.resolveClass(classVar);
-			variable = varCheck(classVar, variable);
+			variable = varRepoint(classVar, variable);
 
 			if (myClass == null)
 			{
@@ -224,15 +224,15 @@ class ReflectionFunctions
 		});
 	}
 
-	static function varCheck(className:String, variable:String):String
+	static function varRepoint(className:String, variable:String):String
 	{
-		if (className == 'backend.ClientPrefs' && variable.indexOf('data.') == -1)
+		if (className == 'general.backend.ClientPrefs' && variable.indexOf('data.') == -1)
 			return 'data.' + variable;
 
 		return variable;
 	}
 
-	static function classNameCheck(className:String):String
+	static function classRepoint(className:String):String
 	{
 		if(Iris.proxyImports.exists(className))
 		{
@@ -243,15 +243,6 @@ class ReflectionFunctions
 				if(name != null)
 					return name;
 			}
-		}
-
-		var classType:Array<String> = ['backend', 'cutscenes', 'objects', 'options', 'scripts', 'states', 'substates'];
-
-		for (i in 0...classType.length)
-		{
-			var rightClass:Dynamic = Type.resolveClass(classType[i] + '.' + className);
-			if (rightClass != null)
-				return classType[i] + '.' + className;
 		}
 
 		return className;

@@ -79,8 +79,7 @@ class Main extends Sprite
 		Lib.current.addChild(new Main());
 		#if cpp
 
-		GCManager.enable(true);
-		//GCManager.run(true);  
+		GCManager.enable(true); 
 		#end
 	}
 	

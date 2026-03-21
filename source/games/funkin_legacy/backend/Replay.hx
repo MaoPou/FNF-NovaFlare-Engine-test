@@ -141,14 +141,12 @@ class Replay extends FlxBasic
 	{
 		pressKey = [];
 		releaseKey = [];
+		
 		for (keyName in FlxKey.toStringMap.keys()) 
 		{
 			var key:FlxKey = FlxKey.toStringMap.get(keyName);
 			
-			if (key == FlxKey.ANY || key == FlxKey.NONE) continue;
-
-			for (pauseKey in ClientPrefs.keyBinds.get('pause'))
-				if (key == pauseKey) continue;
+			if (key == FlxKey.ANY || key == FlxKey.NONE || checkPauseKey(key)) continue;
 
 			if (FlxG.keys.checkStatus(key, JUST_PRESSED)) {
 				pressKey.push(key);
@@ -164,6 +162,15 @@ class Replay extends FlxBasic
 			pressKey: pressKey,
 			releaseKey: releaseKey
 		};
+	}
+
+	private function checkPauseKey(key:FlxKey):Bool {
+		for (pauseKey in ClientPrefs.keyBinds.get('pause')) {
+			if (key == pauseKey) {
+				return true;
+			}	
+		}
+		return false;
 	}
 
 	public function savePlayRecord(stateRecord:StateRecord) {
