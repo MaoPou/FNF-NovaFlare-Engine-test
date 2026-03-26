@@ -51,6 +51,15 @@ class Replay extends FlxBasic
 	private var isRecording:Bool = true;
 	public static var preparedPath:String;
 	private var keysHeld:Map<FlxKey, Bool> = new Map<FlxKey, Bool>();
+	private var keyToLane:Map<FlxKey, Int> = null;
+	private var laneCount:Int = 0;
+	public static var songSpeedResyncThreshold:Float = 0.1;
+	public static var playbackRateResyncThreshold:Float = 0.1;
+	public static var songSpeedResyncDelayMs:Float = 250;
+	public static var playbackRateResyncDelayMs:Float = 250;
+	private var lastReplayTimeForResync:Float = Math.NaN;
+	private var songSpeedDesyncMs:Float = 0;
+	private var playbackRateDesyncMs:Float = 0;
 
 	/////////////////////////////////////////////
 
@@ -64,6 +73,7 @@ class Replay extends FlxBasic
 		isRecording = false;
 		frameData = ReplaySave.loadPlayRecord();
 		blockKeys();
+		ensureLaneMap();
 	}
 
 	override function destroy() {
@@ -85,52 +95,123 @@ class Replay extends FlxBasic
 		}
 	}
 
+	private var tickCheck:Int = 0; //如果一帧内有多个回放数据加载时候用于模拟hold
 	private var lastFrameCount:Int = 0;
+	private var time:Float;
 	override function handleInput(elapsed:Float) 
 	{
 		super.handleInput(elapsed);
 		if (isRecording) return;
 
-		while (lastFrameCount < frameData.length && frameData[lastFrameCount].time <= Conductor.songPosition) {
+		tickCheck = 0;
+		var targetSongPos:Float = Conductor.songPosition;
+
+		while (lastFrameCount < frameData.length && frameData[lastFrameCount].time <= targetSongPos) {
 			var frame = frameData[lastFrameCount];
-			
-			for (keyName in frame.pressKey) {
-				var flxKey = FlxKey.fromString(keyName);
-				if (flxKey != FlxKey.NONE) {
-					var keyObj = @:privateAccess FlxG.keys.getKey(flxKey);
-					if (keyObj != null) {
-						// Force key state to JUST_PRESSED
-						@:privateAccess keyObj.current = 2;
-					}
-					
-					keysHeld.set(flxKey, true);
-				}
+
+			this.time = frame.time;
+			var dtMs:Float = 0;
+			if (!Math.isNaN(lastReplayTimeForResync)) {
+				dtMs = frame.time - lastReplayTimeForResync;
+				if (dtMs < 0) dtMs = 0;
 			}
-			
+			lastReplayTimeForResync = frame.time;
+			applyRateResync(frame, dtMs);
+
+			var pressLanes:Array<Int> = [];
+			var releaseLanes:Array<Int> = [];
+
 			for (keyName in frame.releaseKey) {
 				var flxKey = FlxKey.fromString(keyName);
-				if (flxKey != FlxKey.NONE) {
-					var keyObj = @:privateAccess FlxG.keys.getKey(flxKey);
-					if (keyObj != null) {
-						// Force key state to JUST_RELEASED
-						@:privateAccess keyObj.current = -1;
+				var lane = keyToLane.get(flxKey);
+				if (lane != null) releaseLanes.push(lane);
+				
+				var keyObj = @:privateAccess FlxG.keys.getKey(flxKey);
+				if (keyObj != null) {
+					@:privateAccess keyObj.current = -1;
+					@:privateAccess keyObj.reTick = -9999;
+				}
+				
+				keysHeld.remove(flxKey);
+			}
+
+			for (keyName in frame.pressKey) {
+				var flxKey = FlxKey.fromString(keyName);
+				var lane = keyToLane.get(flxKey);
+				if (lane != null) pressLanes.push(lane);
+				
+				var keyObj = @:privateAccess FlxG.keys.getKey(flxKey);
+				if (keyObj != null) {
+					@:privateAccess keyObj.current = 2;
+					@:privateAccess keyObj.reTick = tickCheck;
+				}
+				
+				keysHeld.set(flxKey, true);
+			}
+
+			for (flxKey in keysHeld.keys()) {
+				var keyObj = @:privateAccess FlxG.keys.getKey(flxKey);
+				if (keyObj != null) {
+					if ( (tickCheck - keyObj.reTick >= 1 && keyObj.reTick != -9999) || (keyObj.current != 2 && keyObj.current != -1)) {
+						@:privateAccess keyObj.current = 1;
 					}
-					
-					keysHeld.remove(flxKey);
 				}
 			}
+
+			var heldLanes:Array<Bool> = [];
+			for (i in 0...laneCount) heldLanes.push(false);
+			for (flxKey in keysHeld.keys()) {
+				var lane = keyToLane.get(flxKey);
+				if (lane != null && lane >= 0 && lane < laneCount) heldLanes[lane] = true;
+			}
+
+			Reflect.callMethod(follow, Reflect.field(follow, "replayApplyInput"), [frame.time, pressLanes, releaseLanes, heldLanes]);
+			
 			lastFrameCount++;
+			tickCheck++;
 		}
-		
-		// Maintain PRESSED state for held keys
-		for (flxKey in keysHeld.keys()) {
-			var keyObj = @:privateAccess FlxG.keys.getKey(flxKey);
-			if (keyObj != null) {
-				// If it's not JUST_PRESSED (2) or JUST_RELEASED (-1), force it to PRESSED (1)
-				// This prevents Flixel from resetting it to RELEASED (0)
-				if (keyObj.current != 2 && keyObj.current != -1) {
-					@:privateAccess keyObj.current = 1;
+	}
+
+	private function ensureLaneMap():Void
+	{
+		if (keyToLane != null && laneCount > 0) return;
+		if (keyToLane == null) keyToLane = new Map<FlxKey, Int>();
+		laneCount = 0;
+
+		var keysList:Array<String> = null;
+		if (Reflect.hasField(follow, "keysArray")) keysList = Reflect.field(follow, "keysArray");
+		if (keysList == null) keysList = Reflect.getProperty(follow, "keysArray");
+		if (keysList == null || keysList.length <= 0) return;
+
+		laneCount = keysList.length;
+		for (lane in 0...keysList.length)
+		{
+			var bindName = keysList[lane];
+			var keys = ClientPrefs.keyBinds.get(bindName);
+			if (keys != null) {
+				for (key in keys) {
+					if (key != FlxKey.NONE && !keyToLane.exists(key)) keyToLane.set(key, lane);
 				}
+			}
+		}
+	}
+
+	private function applyRateResync(frame:FrameSave, dtMs:Float):Void
+	{
+		if (Reflect.hasField(follow, "songSpeed")) {
+			var curSongSpeed:Float = Reflect.field(follow, "songSpeed");
+			if (Math.abs(curSongSpeed - frame.songSpeed) > songSpeedResyncThreshold) songSpeedDesyncMs += dtMs; else songSpeedDesyncMs = 0;
+			if (songSpeedDesyncMs >= songSpeedResyncDelayMs) {
+				Reflect.setProperty(follow, "songSpeed", frame.songSpeed);
+				songSpeedDesyncMs = 0;
+			}
+		}
+		if (Reflect.hasField(follow, "playbackRate")) {
+			var curPlaybackRate:Float = Reflect.field(follow, "playbackRate");
+			if (Math.abs(curPlaybackRate - frame.playbackRate) > playbackRateResyncThreshold) playbackRateDesyncMs += dtMs; else playbackRateDesyncMs = 0;
+			if (playbackRateDesyncMs >= playbackRateResyncDelayMs) {
+				Reflect.setProperty(follow, "playbackRate", frame.playbackRate);
+				playbackRateDesyncMs = 0;
 			}
 		}
 	}
@@ -287,17 +368,20 @@ class ReplaySave {
 			var content:String = srdSave.toString();
 			content = EncryptUtil.aesEncrypt(content);
 
-			if (!FileSystem.exists("replays/"))
-				FileSystem.createDirectory("replays/");
+			if (!FileSystem.exists('replays/'))
+				FileSystem.createDirectory('replays/');
 
-			var folder:String;
+			var folder:String = 'replays/funkin_legacy/';
+
+			if (!FileSystem.exists(folder))
+				FileSystem.createDirectory(folder);
 
 			if (Mods.currentModDirectory == '') {
-				folder = "replays/originFunkin/";
+				folder = "replays/funkin_legacy/originFunkin/";
 				if (!FileSystem.exists(folder))
 					FileSystem.createDirectory(folder);
 			} else {
-				folder = "replays/" + Mods.currentModDirectory + "/";
+				folder = "replays/funkin_legacy/" + Mods.currentModDirectory + "/";
 				if (!FileSystem.exists(folder))
 					FileSystem.createDirectory(folder);
 			}

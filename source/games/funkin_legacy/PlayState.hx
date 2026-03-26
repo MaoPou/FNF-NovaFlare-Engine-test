@@ -5,9 +5,6 @@ import haxe.Json;
 
 import cpp.vm.Gc;
 
-import sys.thread.Thread;
-import sys.thread.Mutex;
-
 import openfl.utils.Assets;
 import openfl.events.KeyboardEvent;
 
@@ -410,7 +407,9 @@ class PlayState extends MusicBeatState
 
 		replayExam = new Replay(this);
 		add(replayExam);
-		if (replayMode) replayExam.load();
+		if (replayMode) {
+			replayExam.load();
+		}
 
 		camGame = initPsychCamera();
 		camHUD = new FlxCamera();
@@ -2230,6 +2229,7 @@ class PlayState extends MusicBeatState
 					}
 				}
 			}
+			if (replayMode) @:privateAccess replayExam.blockKeys();
 		}
 	}
 
@@ -2248,7 +2248,7 @@ class PlayState extends MusicBeatState
 		#if DISCORD_ALLOWED
 		if (health > 0 && !paused && autoUpdateRPC)
 			DiscordClient.changePresence(detailsPausedText, SONG.song + " (" + storyDifficultyText + ")", iconP2.getCharacter());
-		#else
+
 		if (FlxG.autoPause && startedCountdown && !paused && canPause)
 		{
 			var ret:Dynamic = callOnScripts('onPause', null, true);
@@ -2257,7 +2257,7 @@ class PlayState extends MusicBeatState
 			{
 				openPauseMenu();
 			}
-		} // at android it auto work well for psych0.63h but now it broken, so use code add again
+		}
 		#end
 
 		super.onFocusLost();
@@ -2525,6 +2525,7 @@ class PlayState extends MusicBeatState
 		}
 		doDeathCheck();
 
+		var songPosForNotes:Float = replayMode ? @:privateAccess replayExam.time : Conductor.songPosition;
 		if (unspawnNotes[0] != null)
 		{
 			var time:Float = spawnTime * playbackRate;
@@ -2534,7 +2535,7 @@ class PlayState extends MusicBeatState
 				time /= unspawnNotes[0].multSpeed;
 			var spawnCount:Int = 0;
 			var lenUnspawn:Int = unspawnNotes.length;
-			while (spawnCount < lenUnspawn && unspawnNotes[spawnCount].strumTime - Conductor.songPosition < time)
+			while (spawnCount < lenUnspawn && unspawnNotes[spawnCount].strumTime - songPosForNotes < time)
 			{
 				spawnCount++;
 			}
@@ -2555,10 +2556,12 @@ class PlayState extends MusicBeatState
 		{
 			if (!inCutscene)
 			{
-				if (ClientPrefs.data.playOpponent ? !cpuControlled_opponent : !cpuControlled)
-					keysCheck();
-				else
-					ClientPrefs.data.playOpponent ? opponentDance() : playerDance();
+				if (!replayMode) {
+					if (ClientPrefs.data.playOpponent ? !cpuControlled_opponent : !cpuControlled)
+						keysCheck();
+					else
+						ClientPrefs.data.playOpponent ? opponentDance() : playerDance();
+				}
 
 				if (notes.length > 0)
 				{
@@ -2579,7 +2582,7 @@ class PlayState extends MusicBeatState
 								{
 									if (!ClientPrefs.data.playOpponent)
 									{
-										if (cpuControlled && !daNote.blockHit && daNote.canBeHit && (daNote.isSustainNote || daNote.strumTime <= Conductor.songPosition))
+										if (cpuControlled && !daNote.blockHit && daNote.canBeHit && (daNote.isSustainNote || daNote.strumTime <= songPosForNotes))
 											goodNoteHit(daNote);
 									}
 									else
@@ -2597,17 +2600,18 @@ class PlayState extends MusicBeatState
 									}
 									else
 									{
-										if (cpuControlled_opponent && !daNote.blockHit && daNote.canBeHit && (daNote.isSustainNote || daNote.strumTime <= Conductor.songPosition))
+										if (cpuControlled_opponent && !daNote.blockHit && daNote.canBeHit && (daNote.isSustainNote || daNote.strumTime <= songPosForNotes))
 											opponentNoteHitForOpponent(daNote);
 									}
 								}
 								if (daNote.isSustainNote && strum.sustainReduce) daNote.clipToStrumNote(strum);
-								if (Conductor.songPosition - daNote.strumTime > noteKillOffset * 1.5)
+								if (songPosForNotes - daNote.strumTime > noteKillOffset * 1.5)
 									invalidateNote(daNote);
-								else if (Conductor.songPosition - daNote.strumTime > noteKillOffset)
+								else if (songPosForNotes - daNote.strumTime > noteKillOffset)
 								{
+									var tooLateAt:Bool = daNote.strumTime < songPosForNotes - Conductor.safeZoneOffset && !daNote.wasGoodHit;
 									if (((!daNote.mustPress && !cpuControlled_opponent && ClientPrefs.data.playOpponent) || (daNote.mustPress && !cpuControlled && !ClientPrefs.data.playOpponent))
-										&& !daNote.ignoreNote && !endingSong && (daNote.tooLate == true || daNote.wasGoodHit == false) && !daNote.missed)
+										&& !daNote.ignoreNote && !endingSong && (replayMode ? (tooLateAt || daNote.wasGoodHit == false) : (daNote.tooLate == true || daNote.wasGoodHit == false)) && !daNote.missed)
 										noteMiss(daNote, i);
 								}
 							}
@@ -2851,11 +2855,7 @@ class PlayState extends MusicBeatState
 			videoCutscene.pause();
 		};
 
-		for (key in 0...keysArray.length)
-		{
-			//待修改
-			// 暂停时候回放数据的保存，防止出现错误;
-		}
+		if (replayMode) @:privateAccess replayExam.unblockKeys();
 		openSubState(new PauseSubState());
 
 		#if DISCORD_ALLOWED
@@ -3689,11 +3689,10 @@ class PlayState extends MusicBeatState
 		comboSpr_S.x = xThing + 50 * 2;
 	}
 
-	private function popUpScore(note:Note = null, ?time:Float = -999999):Void
+	private function popUpScore(note:Note = null):Void
 	{
-		var noteDiff:Float = replayMode ? note.strumTime - time + ClientPrefs.data.ratingOffset : note.strumTime
-			- Conductor.songPosition
-			+ ClientPrefs.data.ratingOffset;
+		var noteDiff:Float = replayMode ? note.strumTime - @:privateAccess replayExam.time + ClientPrefs.data.ratingOffset : 
+			note.strumTime - Conductor.songPosition + ClientPrefs.data.ratingOffset;
 
 		if ((ClientPrefs.data.playOpponent && cpuControlled_opponent) || (!ClientPrefs.data.playOpponent && cpuControlled))
 			noteDiff = 0;
@@ -3876,7 +3875,7 @@ class PlayState extends MusicBeatState
         callOnHScript('onSpawnNote', singleArg);
     }
 
-	private function keyPressed(key:Int, ?time:Float = -999999)
+	private function keyPressed(key:Int)
 	{
 		if (ClientPrefs.data.playOpponent ? cpuControlled_opponent : cpuControlled || paused || key < 0)
 			return;
@@ -3889,6 +3888,7 @@ class PlayState extends MusicBeatState
 		// had to name it like this else it'd break older scripts lol
 		var ret:Dynamic = callOnScripts('preKeyPress', [key], true);
 
+		var inputSongPos:Float = replayMode ? @:privateAccess replayExam.time : Conductor.songPosition;
 		var bestNote:Note = null;
 		var secondNote:Note = null;
 		var i:Int = 0;
@@ -3897,10 +3897,13 @@ class PlayState extends MusicBeatState
 			var n:Note = notes.members[i];
 			if (n != null)
 			{
+				var tooLateAt:Bool = n.strumTime < inputSongPos - Conductor.safeZoneOffset && !n.wasGoodHit;
+				var canBeHitAt:Bool = (n.strumTime > inputSongPos - (Conductor.safeZoneOffset * n.lateHitMult)
+					&& n.strumTime < inputSongPos + (Conductor.safeZoneOffset * n.earlyHitMult));
 				var canHit:Bool = !strumsBlocked[n.noteData]
-					&& n.canBeHit
 					&& ((n.mustPress && !ClientPrefs.data.playOpponent) || (!n.mustPress && ClientPrefs.data.playOpponent))
-					&& !n.tooLate
+					&& canBeHitAt
+					&& !tooLateAt
 					&& !n.wasGoodHit
 					&& !n.blockHit;
 				if (canHit && !n.isSustainNote && n.noteData == key)
@@ -3955,9 +3958,9 @@ class PlayState extends MusicBeatState
 				}
 			}
 			if (!ClientPrefs.data.playOpponent)
-				goodNoteHit(funnyNote, time);
+				goodNoteHit(funnyNote);
 			else
-				opponentNoteHitForOpponent(funnyNote, time);
+				opponentNoteHitForOpponent(funnyNote);
 		}
 		else
 		{
@@ -3968,10 +3971,13 @@ class PlayState extends MusicBeatState
 				var n2:Note = notes.members[j];
 				if (n2 != null)
 				{
+					var tooLateAt2:Bool = n2.strumTime < inputSongPos - Conductor.safeZoneOffset && !n2.wasGoodHit;
+					var canBeHitAt2:Bool = (n2.strumTime > inputSongPos - (Conductor.safeZoneOffset * n2.lateHitMult)
+						&& n2.strumTime < inputSongPos + (Conductor.safeZoneOffset * n2.earlyHitMult));
 					var canHit2:Bool = !strumsBlocked[n2.noteData]
-						&& n2.canBeHit
 						&& ((n2.mustPress && !ClientPrefs.data.playOpponent) || (!n2.mustPress && ClientPrefs.data.playOpponent))
-						&& !n2.tooLate
+						&& canBeHitAt2
+						&& !tooLateAt2
 						&& !n2.wasGoodHit
 						&& !n2.blockHit;
 					if (canHit2 && n2.isSustainNote && n2.noteData == key)
@@ -4048,6 +4054,84 @@ class PlayState extends MusicBeatState
 		}
 	}
 
+	public function replayApplyInput(frameTime:Float, pressLanes:Array<Int>, releaseLanes:Array<Int>, heldLanes:Array<Bool>):Void
+	{
+		var laneCount:Int = keysArray.length;
+		for (i in 0...laneCount)
+		{
+			_hold[i] = (heldLanes != null && i < heldLanes.length) ? heldLanes[i] : false;
+			_press[i] = false;
+			_release[i] = false;
+		}
+		if (pressLanes != null)
+		{
+			for (lane in pressLanes)
+			{
+				if (lane >= 0 && lane < laneCount) _press[lane] = true;
+			}
+		}
+		if (releaseLanes != null)
+		{
+			for (lane in releaseLanes)
+			{
+				if (lane >= 0 && lane < laneCount) _release[lane] = true;
+			}
+		}
+
+		if (_press.contains(true))
+			for (i in 0..._press.length)
+				if (_press[i] && strumsBlocked[i] != true)
+					keyPressed(i);
+
+		var char:Character = ClientPrefs.data.playOpponent ? dad : boyfriend;
+		if (startedCountdown && !char.stunned && generatedMusic)
+		{
+			var inputSongPos:Float = frameTime;
+			if (notes.length > 0)
+			{
+				var len:Int = notes.length;
+				var i:Int = 0;
+				while (i < len)
+				{
+					var daNote:Note = cast notes.members[i];
+					if (daNote != null && daNote.exists && daNote.alive)
+					{
+						var tooLateAt:Bool = daNote.strumTime < inputSongPos - Conductor.safeZoneOffset && !daNote.wasGoodHit;
+						var canBeHitAt:Bool = (daNote.strumTime > inputSongPos - (Conductor.safeZoneOffset * daNote.lateHitMult)
+							&& daNote.strumTime < inputSongPos + (Conductor.safeZoneOffset * daNote.earlyHitMult));
+						if (strumsBlocked[daNote.noteData] != true
+							&& daNote.isSustainNote
+							&& _hold[daNote.noteData]
+							&& canBeHitAt
+							&& !tooLateAt
+							&& !daNote.wasGoodHit
+							&& !daNote.blockHit
+							&& daNote.canHold)
+						{
+							if (daNote.mustPress && !ClientPrefs.data.playOpponent)
+								goodNoteHit(daNote);
+							if (!daNote.mustPress && ClientPrefs.data.playOpponent)
+								opponentNoteHitForOpponent(daNote);
+						}
+					}
+					i++;
+				}
+			}
+
+			if (!_hold.contains(true) || endingSong)
+				ClientPrefs.data.playOpponent ? opponentDance() : playerDance();
+			#if ACHIEVEMENTS_ALLOWED
+			else
+				checkForAchievement(['oversinging']);
+			#end
+		}
+
+		if (_release.contains(true))
+			for (i in 0..._release.length)
+				if (_release[i] || strumsBlocked[i] == true)
+					keyReleased(i);
+	}
+
 	// Hold notes
 	private function keysCheck():Void
 	{
@@ -4062,11 +4146,12 @@ class PlayState extends MusicBeatState
 		if (_press.contains(true))
 			for (i in 0..._press.length)
 				if (_press[i] && strumsBlocked[i] != true)
-					keyPressed(i, Conductor.songPosition);
+					keyPressed(i);
 
 		var char:Character = ClientPrefs.data.playOpponent ? dad : boyfriend;
 		if (startedCountdown && !char.stunned && generatedMusic)
 		{
+			var inputSongPos:Float = replayMode ? @:privateAccess replayExam.time : Conductor.songPosition;
 			// rewritten inputs???
 			if (notes.length > 0)
 			{
@@ -4077,19 +4162,22 @@ class PlayState extends MusicBeatState
 					var daNote:Note = cast notes.members[i];
 					if (daNote != null && daNote.exists && daNote.alive)
 					{
+						var tooLateAt:Bool = daNote.strumTime < inputSongPos - Conductor.safeZoneOffset && !daNote.wasGoodHit;
+						var canBeHitAt:Bool = (daNote.strumTime > inputSongPos - (Conductor.safeZoneOffset * daNote.lateHitMult)
+							&& daNote.strumTime < inputSongPos + (Conductor.safeZoneOffset * daNote.earlyHitMult));
 						if (strumsBlocked[daNote.noteData] != true
 							&& daNote.isSustainNote
 							&& _hold[daNote.noteData]
-							&& daNote.canBeHit
-							&& !daNote.tooLate
+							&& canBeHitAt
+							&& !tooLateAt
 							&& !daNote.wasGoodHit
 							&& !daNote.blockHit
 							&& daNote.canHold)
 						{
 							if (daNote.mustPress && !ClientPrefs.data.playOpponent)
-								goodNoteHit(daNote, Conductor.songPosition);
+								goodNoteHit(daNote);
 							if (!daNote.mustPress && ClientPrefs.data.playOpponent)
-								opponentNoteHitForOpponent(daNote, Conductor.songPosition);
+								opponentNoteHitForOpponent(daNote);
 						}
 					}
 					i++;
@@ -4209,6 +4297,13 @@ class PlayState extends MusicBeatState
 				return false;
 
 			var parentNote:Note = note.parent;
+			if (parentNote != null && parentNote.missed)
+			{
+				note.missed = true;
+				return false;
+			}
+			if (parentNote != null)
+				parentNote.missed = true;
 			if (parentNote.tail.length > 0)
 			{
 				for (child in parentNote.tail)
@@ -4224,8 +4319,6 @@ class PlayState extends MusicBeatState
 							child.alpha = 0.3;
 						}
 					}
-				if (note == parentNote.tail[0])
-					return false; // if you want get 2 miss then detele it
 			}
 
 			NoteMs.push(167);
@@ -4368,7 +4461,7 @@ class PlayState extends MusicBeatState
 			invalidateNote(note);
 	}
 
-	public inline function opponentNoteHitForOpponent(note:Note, ?time:Float = -999999):Void
+	public inline function opponentNoteHitForOpponent(note:Note):Void
 	{
 		if (note.wasGoodHit)
 			return;
@@ -4449,7 +4542,7 @@ class PlayState extends MusicBeatState
 			if (combo > highestCombo)
 				highestCombo = combo;
 			notesHitArray.unshift(Date.now());
-			popUpScore(note, time);
+			popUpScore(note);
 		}
 		var gainHealth:Bool = true; // prevent health gain, *if* sustains are treated as a singular note
 		if (guitarHeroSustains && note.isSustainNote)
@@ -4467,7 +4560,7 @@ class PlayState extends MusicBeatState
 			invalidateNote(note);
 	}
 
-	public inline function goodNoteHit(note:Note, ?time:Float = -999999):Void
+	public inline function goodNoteHit(note:Note):Void
 	{
 		if (note.wasGoodHit)
 			return;
@@ -4557,7 +4650,7 @@ class PlayState extends MusicBeatState
 			if (combo > highestCombo)
 				highestCombo = combo;
 			notesHitArray.unshift(Date.now());
-			popUpScore(note, time);
+			popUpScore(note);
 		}
 		var gainHealth:Bool = true; // prevent health gain, *if* sustains are treated as a singular note
 		if (guitarHeroSustains && note.isSustainNote)
@@ -4718,16 +4811,6 @@ class PlayState extends MusicBeatState
 			resetSubState();
 		}
 
-		#if LUA_ALLOWED
-		for (lua in luaArray)
-		{
-			lua.call('onDestroy', []);
-			lua.stop();
-		}
-		luaArray = [];
-		FunkinLua.customFunctions.clear();
-		#end
-
 		#if HSCRIPT_ALLOWED
 		for (script in hscriptArray)
 			if(script != null)
@@ -4738,6 +4821,16 @@ class PlayState extends MusicBeatState
 
 		hscriptArray = null;
 		hscriptGrp.destroy(true);
+		#end
+
+		#if LUA_ALLOWED
+		for (lua in luaArray)
+		{
+			lua.call('onDestroy', []);
+			lua.stop();
+		}
+		luaArray = [];
+		FunkinLua.customFunctions.clear();
 		#end
 
 		stagesFunc(function(stage:BaseStage) stage.destroy());
@@ -5353,4 +5446,3 @@ class PlayState extends MusicBeatState
 		return false;
 	}
 }
-
