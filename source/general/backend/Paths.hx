@@ -286,16 +286,13 @@ class Paths
 		return inst;
 	}
 
-	static public function image(key:String, ?library:String = null, ?allowGPU:Bool = true, ?extraLoad:Bool = false):FlxGraphic
+	static public function image(key:String, ?library:String = null, ?allowGPU:Bool = true, disposeOnUpload:Bool = false):FlxGraphic
 	{
 		var bitmap:BitmapData = null;
 		var file:String = null;
 
 		#if MODS_ALLOWED
-		if (!extraLoad)
-			file = modsImages(key);
-		else
-			file = modsExImages(key);
+		file = modsImages(key);
 
 		if (Cache.currentTrackedAssets.exists(file))
 		{
@@ -303,7 +300,7 @@ class Paths
 			return Cache.currentTrackedAssets.get(file);
 		}
 		else if (FileSystem.exists(file))
-			bitmap = BitmapData.fromFile(file);
+			bitmap = BitmapData.fromFile(file, disposeOnUpload);
 		else
 		#end
 		{
@@ -313,8 +310,10 @@ class Paths
 				Cache.localTrackedAssets.push(file);
 				return Cache.currentTrackedAssets.get(file);
 			}
-			else if (Assets.exists(file, IMAGE))
+			else if (Assets.exists(file, IMAGE)) {
 				bitmap = Assets.getBitmapData(file);
+				bitmap.disposeOnUpload = disposeOnUpload;
+			}
 		}
 
 		if (bitmap != null)
@@ -367,6 +366,18 @@ class Paths
 			Cache.currentTrackedAssets.set(file, newGraphic);
 			
 		if (thread) bitmapMutex.release();
+		
+		return newGraphic;
+	}
+
+	static public function cacheBitmapPBO(file:String, bitmap:BitmapData, ?onPBODeleted:Void->Void = null)
+	{
+		Cache.localTrackedAssets.push(file);
+		var newGraphic:FlxGraphic = FlxGraphic.fromBitmapData(bitmap, false, file);
+		newGraphic.persist = true;
+		newGraphic.destroyOnNoUse = false;
+		newGraphic.bitmap.getTextureAsync(FlxG.stage.context3D, function(tex) {onPBODeleted();});
+		Cache.currentTrackedAssets.set(file, newGraphic);
 		
 		return newGraphic;
 	}

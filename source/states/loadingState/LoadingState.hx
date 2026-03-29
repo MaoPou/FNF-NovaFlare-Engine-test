@@ -372,7 +372,7 @@ class LoadingState extends MusicBeatState
 				}
 				else if (FileSystem.exists(realPath)) {
 					try { 
-						bitmap = BitmapData.fromFile(realPath); 
+						bitmap = BitmapData.fromFile(realPath, true); 
 					} catch(e) {
 						return {type:'image', path: realPath, file: null, alreadyLoaded: false, error: e};
 					}
@@ -388,6 +388,7 @@ class LoadingState extends MusicBeatState
 					else if (OpenFlAssets.exists(realPath, IMAGE)) {
 						try { 
 							bitmap = OpenFlAssets.getBitmapData(realPath); 
+							bitmap.disposeOnUpload = true;
 						} catch(e) {
 							return {type:'image', path: realPath, file: null, alreadyLoaded: false, error: e};
 						}

@@ -244,20 +244,20 @@
     <haxeflag name="-dce" value="no" unless="ios" />
 	<!-- _________________________________ Custom _______________________________ -->
 
-	<!--Place custom nodes like icons here (higher priority to override the HaxeFlixel icon)-->
-
 	<assets path='art/icon16.png' rename='icon.png' if="linux" />
 	<section if="mobile">
-    	<icon path="art/icon16.png" size='16'/>
-    	<icon path="art/icon32.png" size='32'/>
-    	<icon path="art/icon64.png" size='64'/>
-    	<icon path="art/iconOG.png" />
-    </section>
+		<icon path="art/iconOG.png" size="36" />
+		<icon path="art/iconOG.png" size="48" />
+		<icon path="art/iconOG.png" size="72" />
+		<icon path="art/iconOG.png" size="96" />
+		<icon path="art/iconOG.png" size="144" />
+		<icon path="art/iconOG.png" size="192" />
+	</section>
     <section if="desktop">
     	<icon path="art/icon16-PC.png" size='16'/>
     	<icon path="art/icon32-PC.png" size='32'/>
     	<icon path="art/icon64-PC.png" size='64'/>
-    	<icon path="art/iconOG-PC.png" />
+    	<icon path="art/iconOG-PC.png"/>
     </section>
 
 	<architecture name="arm64" exclude="armv7" if="android" />

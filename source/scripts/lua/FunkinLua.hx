@@ -523,7 +523,7 @@ class FunkinLua
 			FlxG.camera.followLerp = 0;
 		});
 
-		set("loadGraphic", function(variable:String, image:String, ?gridX:Int = 0, ?gridY:Int = 0)
+		set("loadGraphic", function(variable:String, image:String, ?gridX:Int = 0, ?gridY:Int = 0, ?disposeOnUpload:Bool = true)
 		{
 			var split:Array<String> = variable.split('.');
 			var spr:FlxSprite = LuaUtils.getObjectDirectly(split[0]);
@@ -536,7 +536,7 @@ class FunkinLua
 
 			if (spr != null && image != null && image.length > 0)
 			{
-				spr.loadGraphic(Paths.image(image), animated, gridX, gridY);
+				spr.loadGraphic(Paths.image(image, null, null, disposeOnUpload), animated, gridX, gridY);
 			}
 		});
 		set("loadFrames", function(variable:String, image:String, spriteType:String = "sparrow")
@@ -922,9 +922,9 @@ class FunkinLua
 			}
 			game.addCharacterToList(name, charType);
 		});
-		set("precacheImage", function(name:String, ?allowGPU:Bool = true)
+		set("precacheImage", function(name:String, ?allowGPU:Bool = true, ?disposeOnUpload:Bool = true)
 		{
-			Paths.image(name, allowGPU);
+			Paths.image(name, null, allowGPU, disposeOnUpload);
 		});
 		set("precacheSound", Paths.sound);
 		set("precacheMusic", Paths.music);
@@ -1167,7 +1167,7 @@ class FunkinLua
 			}
 		});
 
-		set("makeLuaSprite", function(tag:String, ?image:String = null, ?x:Float = 0, ?y:Float = 0)
+		set("makeLuaSprite", function(tag:String, ?image:String = null, ?x:Float = 0, ?y:Float = 0, ?disposeOnUpload:Bool = true)
 		{
 			tag = tag.replace('.', '');
 			if (LuaUtils.checkSpriteTag(game.modchartSprites.get(tag), image)) {
@@ -1175,7 +1175,7 @@ class FunkinLua
 				var leSprite:ModchartSprite = new ModchartSprite(x, y);
 				if (image != null && image.length > 0)
 				{
-					leSprite.loadGraphic(Paths.image(image));
+					leSprite.loadGraphic(Paths.image(image, null, null, disposeOnUpload));
 				}
 				leSprite.imageName = image;
 				game.modchartSprites.set(tag, leSprite);

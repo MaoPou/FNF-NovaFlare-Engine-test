@@ -53,6 +53,10 @@ class Replay extends FlxBasic
 	private var keysHeld:Map<FlxKey, Bool> = new Map<FlxKey, Bool>();
 	private var keyToLane:Map<FlxKey, Int> = null;
 	private var laneCount:Int = 0;
+	private var tmpPressLanes:Array<Int> = [];
+	private var tmpReleaseLanes:Array<Int> = [];
+	private var tmpHeldLanes:Array<Bool> = [];
+	private static var cachedKeyNames:Array<String> = null;
 	public static var songSpeedResyncThreshold:Float = 0.1;
 	public static var playbackRateResyncThreshold:Float = 0.1;
 	public static var songSpeedResyncDelayMs:Float = 250;
@@ -95,7 +99,7 @@ class Replay extends FlxBasic
 		}
 	}
 
-	private var tickCheck:Int = 0; //如果一帧内有多个回放数据加载时候用于模拟hold
+	private var globalTick:Int = 0; // 跨帧累加的全局tick，用于精准判断"下一回放帧"
 	private var lastFrameCount:Int = 0;
 	private var time:Float;
 	override function handleInput(elapsed:Float) 
@@ -103,8 +107,8 @@ class Replay extends FlxBasic
 		super.handleInput(elapsed);
 		if (isRecording) return;
 
-		tickCheck = 0;
 		var targetSongPos:Float = Conductor.songPosition;
+		ensureLaneMap();
 
 		while (lastFrameCount < frameData.length && frameData[lastFrameCount].time <= targetSongPos) {
 			var frame = frameData[lastFrameCount];
@@ -118,13 +122,46 @@ class Replay extends FlxBasic
 			lastReplayTimeForResync = frame.time;
 			applyRateResync(frame, dtMs);
 
-			var pressLanes:Array<Int> = [];
-			var releaseLanes:Array<Int> = [];
+			tmpPressLanes.resize(0);
+			tmpReleaseLanes.resize(0);
+
+			for (keyName in frame.pressKey) {
+				var flxKey = FlxKey.fromString(keyName);
+				var lane = keyToLane.get(flxKey);
+				if (lane != null) tmpPressLanes.push(lane);
+				
+				var keyObj = @:privateAccess FlxG.keys.getKey(flxKey);
+				if (keyObj != null) {
+					@:privateAccess keyObj.current = 2;
+					@:privateAccess keyObj.reTick = globalTick;
+				}
+				
+				keysHeld.set(flxKey, true);
+			}
+
+			for (flxKey in keysHeld.keys()) {
+				var keyObj = @:privateAccess FlxG.keys.getKey(flxKey);
+				if (keyObj != null) {
+					if (keyObj.reTick != -9999 && globalTick - keyObj.reTick >= 1) {
+						@:privateAccess keyObj.current = 1;
+					}
+				}
+			}
+
+			tmpHeldLanes.resize(laneCount);
+			for (i in 0...laneCount) tmpHeldLanes[i] = false;
+			for (flxKey in keysHeld.keys()) {
+				var keyObj = @:privateAccess FlxG.keys.getKey(flxKey);
+				if (keyObj != null && keyObj.reTick != -9999 && globalTick - keyObj.reTick >= 1) {
+					var lane = keyToLane.get(flxKey);
+					if (lane != null && lane >= 0 && lane < laneCount) tmpHeldLanes[lane] = true;
+				}
+			}
 
 			for (keyName in frame.releaseKey) {
 				var flxKey = FlxKey.fromString(keyName);
 				var lane = keyToLane.get(flxKey);
-				if (lane != null) releaseLanes.push(lane);
+				if (lane != null) tmpReleaseLanes.push(lane);
 				
 				var keyObj = @:privateAccess FlxG.keys.getKey(flxKey);
 				if (keyObj != null) {
@@ -135,40 +172,10 @@ class Replay extends FlxBasic
 				keysHeld.remove(flxKey);
 			}
 
-			for (keyName in frame.pressKey) {
-				var flxKey = FlxKey.fromString(keyName);
-				var lane = keyToLane.get(flxKey);
-				if (lane != null) pressLanes.push(lane);
-				
-				var keyObj = @:privateAccess FlxG.keys.getKey(flxKey);
-				if (keyObj != null) {
-					@:privateAccess keyObj.current = 2;
-					@:privateAccess keyObj.reTick = tickCheck;
-				}
-				
-				keysHeld.set(flxKey, true);
-			}
-
-			for (flxKey in keysHeld.keys()) {
-				var keyObj = @:privateAccess FlxG.keys.getKey(flxKey);
-				if (keyObj != null) {
-					if ( (tickCheck - keyObj.reTick >= 1 && keyObj.reTick != -9999) || (keyObj.current != 2 && keyObj.current != -1)) {
-						@:privateAccess keyObj.current = 1;
-					}
-				}
-			}
-
-			var heldLanes:Array<Bool> = [];
-			for (i in 0...laneCount) heldLanes.push(false);
-			for (flxKey in keysHeld.keys()) {
-				var lane = keyToLane.get(flxKey);
-				if (lane != null && lane >= 0 && lane < laneCount) heldLanes[lane] = true;
-			}
-
-			Reflect.callMethod(follow, Reflect.field(follow, "replayApplyInput"), [frame.time, pressLanes, releaseLanes, heldLanes]);
+			Reflect.callMethod(follow, Reflect.field(follow, "replayApplyInput"), [frame.time, tmpPressLanes, tmpReleaseLanes, tmpHeldLanes]);
 			
 			lastFrameCount++;
-			tickCheck++;
+			globalTick++;
 		}
 	}
 
@@ -220,20 +227,22 @@ class Replay extends FlxBasic
 	private var releaseKey:Array<String> = [];
 	private function inputUpload():FrameSave
 	{
-		pressKey = [];
-		releaseKey = [];
+		ensureLaneMap();
+		var pressKey:Array<String> = [];
+		var releaseKey:Array<String> = [];
+		if (cachedKeyNames == null) cachedKeyNames = [for (k in FlxKey.toStringMap.keys()) k];
 		
-		for (keyName in FlxKey.toStringMap.keys()) 
+		for (keyName in cachedKeyNames) 
 		{
 			var key:FlxKey = FlxKey.toStringMap.get(keyName);
 			
 			if (key == FlxKey.ANY || key == FlxKey.NONE || checkPauseKey(key)) continue;
 
 			if (FlxG.keys.checkStatus(key, JUST_PRESSED)) {
-				pressKey.push(key);
+				pressKey.push(keyName);
 			}
 			if (FlxG.keys.checkStatus(key, JUST_RELEASED)) {
-				releaseKey.push(key);
+				releaseKey.push(keyName);
 			}
 		}
 		return {
