@@ -83,25 +83,6 @@ class DiffRect extends FlxSpriteGroup {
     }
 
     override function update(elapsed:Float) {
-
-        for (member in triangles.members) {
-            var tri:Triangle = cast(member, Triangle);
-            if (tri == null) continue;
-            tri.y += tri.velocity.y * elapsed;
-            if (tri.y + tri.height < this.y) {
-                var w = background.width;
-                var h = background.height;
-                var s = FlxG.random.float(5, 15);
-                tri.x = this.x + FlxG.random.float(20, w - 20);
-                tri.y = this.y + h + FlxG.random.float(0, h);
-                tri.velocity.y = -FlxG.random.float(4, 20);
-                tri.scale.set(1, 1);
-            }
-            updateRect(tri);
-        }
-
-        selectLight.alpha -= elapsed;
-
         if (allowSelect) {
             var mouse = FreeplayState.instance.mouseEvent;
 
@@ -122,13 +103,36 @@ class DiffRect extends FlxSpriteGroup {
 
         super.update(elapsed);
 
+        if (allowDestroy && startY == 0) {
+            follow.destroyDiff();
+        }
+    }
+
+    override function drawUpdate(elapsed:Float) {
+
+        for (member in triangles.members) {
+            var tri:Triangle = cast(member, Triangle);
+            if (tri == null) continue;
+            tri.y += tri.velocity.y * elapsed;
+            if (tri.y + tri.height < this.y) {
+                var w = background.width;
+                var h = background.height;
+                var s = FlxG.random.float(5, 15);
+                tri.x = this.x + FlxG.random.float(20, w - 20);
+                tri.y = this.y + h + FlxG.random.float(0, h);
+                tri.velocity.y = -FlxG.random.float(4, 20);
+                tri.scale.set(1, 1);
+            }
+            updateRect(tri);
+        }
+
+        selectLight.alpha -= elapsed;
+
         if (light.alpha > 0) {
             light.alpha -= elapsed / (Conductor.crochet * 2 / 1000);
         }
 
-        if (allowDestroy && startY == 0) {
-            follow.destroyDiff();
-        }
+        super.drawUpdate(elapsed);
     }
 
     private function updateRect(tri:Triangle) {
@@ -184,7 +188,7 @@ class DiffRect extends FlxSpriteGroup {
         startX = Math.pow(Math.abs(this.y + this.background.height / 2 - FlxG.height / 2) / (FlxG.height / 2) * 10, 1.8);
 
         var chooseTar = onFocus ? -fixWidth * 0.125 : 0;
-        if (Math.abs(chooseX - chooseTar) > 0.000005) chooseX = FlxMath.lerp(chooseTar, chooseX, Math.exp(-FreeplayState.instance.songsMove.saveElapsed * FreeplayState.instance.songsMove.lerpSmooth));
+        if (Math.abs(chooseX - chooseTar) > 0.01) chooseX = FlxMath.lerp(chooseTar, chooseX, Math.exp(-FreeplayState.instance.songsMove.saveElapsed * FreeplayState.instance.songsMove.lerpSmooth));
         else chooseX = chooseTar;
         
         x = FlxG.width - fixWidth * 0.85 + startX + chooseX;
@@ -193,7 +197,7 @@ class DiffRect extends FlxSpriteGroup {
     public var startTarY:Float = 0;
     public var startY:Float = 0;
     public function calcY() {
-        if (Math.abs(startY - startTarY) > 0.000005)
+        if (Math.abs(startY - startTarY) > 0.01)
             startY = FlxMath.lerp(startTarY, startY, Math.exp(-FreeplayState.instance.songsMove.saveElapsed * FreeplayState.instance.songsMove.lerpSmooth));
         else
             startY = startTarY;

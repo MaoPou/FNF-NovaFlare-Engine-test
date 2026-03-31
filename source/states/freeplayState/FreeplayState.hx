@@ -3,7 +3,6 @@
 import haxe.Json;
 import haxe.ds.ArraySort;
 
-import sys.thread.Thread;
 import sys.thread.Mutex;
 
 import openfl.system.System;
@@ -41,6 +40,8 @@ class FreeplayState extends MusicBeatState
 	static public var curDifficulty:Int = -1;
 
 	///////////////////////////////////////////////////////////////////////////////////////////////
+
+	var backendMutex:Mutex;
 
 	var songsData:Array<SongMetadata> = [];
 
@@ -114,6 +115,8 @@ class FreeplayState extends MusicBeatState
 		FlxG.mouse.visible = true;
 		#end
 
+		backendMutex = new Mutex();
+
 		mouseEvent = new MouseEvent();
 		add(mouseEvent);
 
@@ -165,7 +168,6 @@ class FreeplayState extends MusicBeatState
 		camAfter = new FlxCamera();
 		camAfter.bgColor = 0x00000000;
 		FlxG.cameras.add(camAfter);
-		if (mouseEvent != null) mouseEvent.targetCamera = camSongs;
 
 		background = new ChangeSprite(0, 0).load(Paths.image('menuDesat'), 1.05);
 		background.antialiasing = ClientPrefs.data.antialiasing;
@@ -385,9 +387,9 @@ class FreeplayState extends MusicBeatState
 		if (songGroup.length <= 0) return;
 		for (i in 0...songGroup.length) {
 			songGroup[i].moveY(songPosiData + (songGroup[i].id) * SongRect.fixHeight * rectInter);
-			songGroup[i].calcX();
+			updateSongVisibility(songGroup[i]);
+			if (songGroup[i].visible) songGroup[i].calcX();
 		}
-		updateSongVisibility();
 	}
 
 	var holdTime:Float = 0;
@@ -493,21 +495,25 @@ class FreeplayState extends MusicBeatState
 	}
 
 	public function initSongsData() {
-		var songLowercase:String;
-		var poop:String;
-		try
-		{
-			songLowercase = Paths.formatToSongPath(songsData[curSelected].songName);
-			poop = Highscore.formatSong(songLowercase, curDifficulty);
-			PlayState.SONG = Song.loadFromJson(poop, songLowercase);
-		} catch (e:Dynamic) {
-			trace(e);
-			return;
-		}
+		BackendThread.run(() -> {
+			//backendMutex.acquire();
+			var songLowercase:String;
+			var poop:String;
+			try
+			{
+				songLowercase = Paths.formatToSongPath(songsData[curSelected].songName);
+				poop = Highscore.formatSong(songLowercase, curDifficulty);
+				PlayState.SONG = Song.loadFromJson(poop, songLowercase);
+			} catch (e:Dynamic) {
+				trace(e);
+				return;
+			}
 
-		Conductor.bpm = PlayState.SONG.bpm;
+			Conductor.bpm = PlayState.SONG.bpm;
 
-		updateAudio();
+			updateAudio();
+			//backendMutex.release();
+		});
 	}
 
 	var allowPlayMusic:Bool = true;
@@ -633,9 +639,8 @@ class FreeplayState extends MusicBeatState
 		return ry + rh > cy && ry < cy + ch;
 	}
 
-	public function updateSongVisibility():Void {
-		if (songGroup.length == 0) return;
-		for (r in songGroup) {
+	public function updateSongVisibility(r:SongRect):Void {
+		if (r != null) {
 			var ons:Bool = rectOnScreen(r);
 			r.visible = ons;
 			r.active = ons;

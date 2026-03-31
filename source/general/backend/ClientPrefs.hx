@@ -470,12 +470,12 @@ class ClientPrefs
 		if (data.framerate > FlxG.drawFramerate)
 		{
 			FlxG.updateFramerate = data.framerate;
-			FlxG.drawFramerate = data.framerate;
+			FlxG.drawFramerate = data.drawFramerate;
 		}
 		else
 		{
 			FlxG.drawFramerate = data.framerate;
-			FlxG.updateFramerate = data.framerate;
+			FlxG.updateFramerate = data.drawFramerate;
 		}
 
 		if (FlxG.save.data.gameplaySettings != null)

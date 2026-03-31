@@ -53,23 +53,7 @@ class MouseEvent extends FlxBasic
         super.update(elapsed);
     }
 
-    public function overlaps(tar:FlxBasic, ?camera:FlxCamera):Bool {
-        var cam = camera != null ? camera : targetCamera;
-        var obj:FlxObject = cast tar;
-        if (obj != null) {
-            var mx:Float;
-            var my:Float;
-            if (cam == null || cam == targetCamera) {
-                mx = worldPos.x;
-                my = worldPos.y;
-            } else {
-                if (tmpWorldPos == null) tmpWorldPos = new FlxPoint();
-                FlxG.mouse.getWorldPosition(cam, tmpWorldPos);
-                mx = tmpWorldPos.x;
-                my = tmpWorldPos.y;
-            }
-            return mx >= obj.x && mx <= obj.x + obj.width && my >= obj.y && my <= obj.y + obj.height;
-        }
-        return FlxG.mouse.overlaps(tar, cam);
+    public function overlaps(tar:FlxBasic):Bool {
+        return FlxG.mouse.overlaps(tar);
     }
 }
