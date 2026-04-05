@@ -522,7 +522,6 @@ class FreeplayState extends MusicBeatState
 	function updateDetail() {
 		detailSongName.text = songGroup[curSelected].songNameSt;
 		detailMusican.text = songGroup[curSelected].songMusican;
-		//detailTimeText.text = FlxG.sound.music.length;
 		detailBpmText.text = Std.string(Conductor.bpm);
 	}
 
@@ -558,9 +557,16 @@ class FreeplayState extends MusicBeatState
 				FlxG.sound.music.volume = 0;
 				FlxG.sound.music.play();
 				FlxG.sound.music.fadeIn(audioFadeInTime, 0, instTargetVolume);
+				
+				MainLoop.runInMainThread(function():Void
+				{
+					FlxTimer.wait(0.05, () -> {
+						detailTimeText.text = DateTools.format(Date.fromTime(FlxG.sound.music.length), "%M:%S");
+					});
+				});
 			};
 
-			backendMutex.acquire();
+			//backendMutex.acquire();
 			try
 			{
 				FlxG.sound.music.stop();
@@ -612,10 +618,10 @@ class FreeplayState extends MusicBeatState
 			}
 			catch (e:Dynamic)
 			{
-				backendMutex.release();
+				//backendMutex.release();
 				throw e;
 			}
-			backendMutex.release();
+			//backendMutex.release();
 		};
 
 		if (FlxG.sound.music != null && FlxG.sound.music.playing && FlxG.sound.music.volume > 0)

@@ -31,7 +31,7 @@ class AudioGroup extends OptionCata
         }
 
         var option:Option = new Option(this, 'optionMusic', STRING, OptionMusicArray);
-        addOption(option, true);
+        addOption(option);
 
         var PauseMusicArray:Array<String> = ['None', 'Breakfast', 'Tea Time'];
         for (folder in Mods.directoriesWithFile(Paths.getSharedPath(), 'music/Pause', true)) {
@@ -56,7 +56,7 @@ class AudioGroup extends OptionCata
         }
 
         var option:Option = new Option(this, 'hitsoundType', STRING, hitsoundArray);
-        addOption(option, true);
+        addOption(option);
         option.onChange = function() {
         if (ClientPrefs.data.hitsoundType == ClientPrefs.defaultData.hitsoundType)
             {

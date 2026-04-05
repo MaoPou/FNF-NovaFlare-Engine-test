@@ -13,26 +13,26 @@ class GamePlayGroup extends OptionCata
         addOption(option);
 
         var option:Option = new Option(this, 'middleScroll', BOOL);
-        addOption(option, true);
+        addOption(option);
 
         var option:Option = new Option(this, 'flipChart', BOOL);
         addOption(option);
 
         var option:Option = new Option(this, 'ghostTapping', BOOL);
-        addOption(option, true);
+        addOption(option);
 
         var option:Option = new Option(this, 'guitarHeroSustains', BOOL);
         addOption(option);
 
         var option:Option = new Option(this, 'noReset', BOOL);
-        addOption(option, true);
+        addOption(option);
 
         var option:Option = new Option(this, 'showKeybinds', BOOL);
         addOption(option);
         
         var option:Option = new Option(this, 'NoteOffsetState', STATE); //NoteOffsetState
         option.onChange = function() { changeState(1); };
-		addOption(option, true);
+		addOption(option);
 
         /////--Opponent--\\\\\
 
@@ -43,13 +43,13 @@ class GamePlayGroup extends OptionCata
         addOption(option);
         
         var option:Option = new Option(this, 'opponentCodeFix', BOOL);
-        addOption(option, true);
+        addOption(option);
         
         var option:Option = new Option(this, 'botOpponentFix', BOOL);
         addOption(option);
 
         var option:Option = new Option(this, 'HealthDrainOPPO', BOOL);
-        addOption(option, true);
+        addOption(option);
 
         var option:Option = new Option(this, 'HealthDrainOPPOMult', FLOAT, [0, 5, 1]);
         addOption(option);
@@ -62,7 +62,7 @@ class GamePlayGroup extends OptionCata
 		addOption(option);
 
 		var option:Option = new Option(this, 'marvelousSprite', BOOL);
-		addOption(option, true);
+		addOption(option);
 
 		var option:Option = new Option(this, 'ratingOffset', INT, [-1000, 1000, 'MS']);
 		addOption(option);
@@ -87,11 +87,8 @@ class GamePlayGroup extends OptionCata
         var option:Option = new Option(this, 'Gameplaybackend', TEXT);
 		addOption(option);
 
-        var option:Option = new Option(this, 'replayBot', BOOL);
-        addOption(option);
-
         var option:Option = new Option(this, 'fixLNL', BOOL);
-        addOption(option, true);
+        addOption(option);
 
         var group:Array<String> = ['Score', 'Accuracy', 'Misses', 'highestCombo'];
         var option:Option = new Option(this, 'saveScoreBase', STRING, group);

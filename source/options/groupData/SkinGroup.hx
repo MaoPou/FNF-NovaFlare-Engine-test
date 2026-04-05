@@ -25,9 +25,9 @@ class SkinGroup extends OptionCata
 		var option:Option = new Option(this, 'noteRGB', BOOL);
 		if (noteSkins.length > 0)
 		{
-			addOption(option, true);
+			addOption(option);
 		} else {
-			addOption(option, true);
+			addOption(option);
 		}
 
 
@@ -38,9 +38,9 @@ class SkinGroup extends OptionCata
 		var option:Option = new Option(this, 'noteColorSwap', BOOL);
 		if (noteSkins.length > 0)
 		{
-			addOption(option, true);
+			addOption(option);
 		} else {
-			addOption(option, true);
+			addOption(option);
 		}
 
 		var option:Option = new Option(this, 'NotesSubStateLegacy', STATE);
@@ -61,7 +61,7 @@ class SkinGroup extends OptionCata
 			noteSplashes.insert(0, ClientPrefs.defaultData.splashSkin);
 
 			var option:Option = new Option(this, 'splashSkin', STRING, noteSplashes);
-			addOption(option, true);
+			addOption(option);
 		}
 
 		var option:Option = new Option(this, 'splashRGB', BOOL);
@@ -69,7 +69,7 @@ class SkinGroup extends OptionCata
 		{
 			addOption(option);
 		} else {
-			addOption(option, true);
+			addOption(option);
 		}
 
 		var option:Option = new Option(this, 'splashAlpha', FLOAT, [0, 1, 1]);

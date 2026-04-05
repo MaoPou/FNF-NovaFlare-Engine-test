@@ -14,7 +14,7 @@ class InterfaceGroup extends OptionCata
 		addOption(option);
 
 		var option:Option = new Option(this, 'CustomFadeText', BOOL);
-		addOption(option, true);
+		addOption(option);
 
 		var option:Option = new Option(this, 'CustomFadeSound', FLOAT, [0, 1, 1]);
 		addOption(option);
@@ -30,7 +30,7 @@ class InterfaceGroup extends OptionCata
 		addOption(option);
 
 		var option:Option = new Option(this, 'resultsScreen', BOOL);
-		addOption(option, true);
+		addOption(option);
 
 		var option:Option = new Option(this, 'loadingScreen', BOOL);
 		addOption(option);

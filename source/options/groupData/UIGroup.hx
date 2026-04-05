@@ -18,19 +18,19 @@ class UIGroup extends OptionCata
 		addOption(option);
 
 		var option:Option = new Option(this, 'showComboNum', BOOL);
-		addOption(option, true);
+		addOption(option);
 
 		var option:Option = new Option(this, 'showRating', BOOL);
 		addOption(option);
 
 		var option:Option = new Option(this, 'opponentStrums', BOOL);
-		addOption(option, true);
+		addOption(option);
 
 		var option:Option = new Option(this, 'judgementCounter', BOOL);
 		addOption(option);
 
 		var option:Option = new Option(this, 'KeyboardViewer', BOOL);
-		addOption(option, true);
+		addOption(option);
 
 		/////--TimeBar--\\\\\
 
@@ -61,7 +61,7 @@ class UIGroup extends OptionCata
 		addOption(option);
 
 		var option:Option = new Option(this, 'comboOffsetFix', BOOL);
-		addOption(option, true);
+		addOption(option);
 		
 		/////--KeyBoard--\\\\\
 		
@@ -85,7 +85,7 @@ class UIGroup extends OptionCata
 		addOption(option);
 
 		var option:Option = new Option(this, 'keyboardTextColor', STRING, colorStingArray);
-		addOption(option, true);
+		addOption(option);
 		
 		/////--Camera--\\\\\
 		
@@ -96,7 +96,7 @@ class UIGroup extends OptionCata
 		addOption(option);
 
 		var option:Option = new Option(this, 'scoreZoom', BOOL);
-		addOption(option, true);
+		addOption(option);
 
 		/////--PauseButton--\\\\\
 
@@ -104,7 +104,7 @@ class UIGroup extends OptionCata
 		addOption(option);
 
 		var option:Option = new Option(this, 'CompulsionPause', BOOL);
-		addOption(option, true);
+		addOption(option);
 
 		var option:Option = new Option(this, 'CompulsionPauseNumber', INT, [1, 10]);
 		addOption(option);

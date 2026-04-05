@@ -94,7 +94,7 @@ class LoadingState extends MusicBeatState
 
 		if (curPercent == 1)
 		{
-			 FlxTimer.wait(0.1, () -> {
+			FlxTimer.wait(0.1, () -> {
 				onLoad();
 			});
 		}

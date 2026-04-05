@@ -34,9 +34,10 @@ class OptionCata extends FlxSpriteGroup
 		add(bg);
 	}
 
-	public function addOption(tar:Option, sameY:Bool = false) {
+	public function addOption(tar:Option) {
 		var putX:Float = this.width / 2 / 50;
 		var putY:Float = heightSet;
+		var sameY = posCheck(tar);
 		if (sameY) {
 			putX += (this.width - this.width / 2 / 50) / 2;
 			putY -= optionArray[optionArray.length - 1].saveHeight;
@@ -60,6 +61,25 @@ class OptionCata extends FlxSpriteGroup
 		saveArray.push(tar);
 
 		if (!sameY) heightSet += tar.saveHeight;
+	}
+
+	var lastAdd:Option;
+	var shouldSame:Bool = false;
+	function posCheck(tar):Bool 
+	{
+		var output:Bool;
+
+		if (lastAdd != null && (lastAdd.type == TEXT || lastAdd.type == TITLE || lastAdd.type == INT || lastAdd.type == FLOAT || lastAdd.type == PERCENT)) {
+			output = false;
+		} else if (tar.type == TEXT || tar.type == TITLE || tar.type == INT || tar.type == FLOAT || tar.type == PERCENT){
+			output = false;
+		} else {
+			output = !lastAdd.sameY;
+		}
+
+		lastAdd = tar;
+		
+		return output;
 	}
 
 	override function update(elapsed:Float)

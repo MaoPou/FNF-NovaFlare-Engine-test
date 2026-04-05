@@ -45,7 +45,6 @@ import games.funkin_legacy.backend.ExtraKeysHandler.EKNoteColor;
 
 	// Backend
 	// Gameplay backend s
-	public var replayBot:Bool = false;
 	public var fixLNL:Int = 0; // fix long note length
 	public var saveScoreBase:String = 'Score';
 	public var mainMusic:String = 'None';

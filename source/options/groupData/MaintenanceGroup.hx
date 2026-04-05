@@ -28,14 +28,14 @@ class MaintenanceGroup extends OptionCata
 		addOption(option);
 
 		var option:Option = new Option(this, 'checkForUpdates', BOOL);
-		addOption(option, true);
+		addOption(option);
 
 		#if mobile
 		var option:Option = new Option(this, 'screensaver', BOOL);
 		addOption(option);
 
 		var option:Option = new Option(this, 'filesCheck', BOOL);
-		addOption(option, true);
+		addOption(option);
 
 		var option:Option = new Option(this, 'filesCheckNew', STATE); //copystate
 		option.onChange = function() { changeState(6); };

@@ -20,6 +20,8 @@ enum OptionType
 	TEXT;
 	
 	COLOR;
+
+	NONE;
 }
 
 class Option extends FlxSpriteGroup

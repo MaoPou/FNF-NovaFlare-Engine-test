@@ -25,7 +25,7 @@ class GeneralGroup extends OptionCata
 		option.onChange = onChangelockRender;
 
 		var option:Option = new Option(this, 'renderThread', BOOL);
-		addOption(option, true);
+		addOption(option);
 		option.onChange = onChangerenderThread;
 
 		var langArray:Array<String> = languageArray();
@@ -34,7 +34,7 @@ class GeneralGroup extends OptionCata
 		option.onChange = onChangeLanguage;
 
 		var option:Option = new Option(this, 'lowQuality', BOOL);
-		addOption(option, true);
+		addOption(option);
 
 		var option:Option = new Option(this, 'gameQuality', INT, [0, 3]);
 		addOption(option);
@@ -55,20 +55,20 @@ class GeneralGroup extends OptionCata
 		addOption(option);
 
 		var option:Option = new Option(this, 'flashing', BOOL);
-		addOption(option, true);
+		addOption(option);
 
 		var option:Option = new Option(this, 'shaders', BOOL);
 		addOption(option);
 
 		var option:Option = new Option(this, 'cacheOnGPU', BOOL);
-		addOption(option, true);
+		addOption(option);
 
 		var option:Option = new Option(this, 'autoPause', BOOL);
 		addOption(option);
 		option.onChange = onChangePause;
 
 		var option:Option = new Option(this, 'colorblindMode', STRING, colorblindFilterArray);
-		addOption(option, true);
+		addOption(option);
 		option.onChange = onChangeFilter;
 
 		changeHeight(0); //初始化真正的height

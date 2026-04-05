@@ -32,7 +32,6 @@ NoteOffsetState => Note Offset
 
 Gameplaybackend => Gameplay Backend
 
-replayBot => Replay Bot
 fixLNL => Fix Long Notes
 saveScoreBase => playback record storage basis
 gameOverVibration => Game Over Vibration
