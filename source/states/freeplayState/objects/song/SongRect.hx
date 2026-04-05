@@ -13,6 +13,9 @@ class SongRect extends FlxSpriteGroup {
 
     public var bgPath:String;
 
+    public var songNameSt:String = '';
+    public var songMusican:String = '';
+
     /////////////////////////////////////////////////////////////////////
 
     public var haveDiffDis:Bool = false;
@@ -35,6 +38,9 @@ class SongRect extends FlxSpriteGroup {
     public function new(songNameSt:String, songIcon:String, songMusican:String, songCharter:Array<String>, songColor:Array<Int>) {
         super(0, 0);
 
+        this.songNameSt = songNameSt;
+        this.songMusican = songMusican;
+        
         diffRectGroup = new FlxSpriteGroup();
         add(diffRectGroup);
 
@@ -276,6 +282,7 @@ class SongRect extends FlxSpriteGroup {
                 diffRect.onFocus = diffRect.id == FreeplayState.curDifficulty;
             }
         }
+        FreeplayState.instance.initSongsData();
     }
 
     //////////////////////////////////////////////////////////////////////////////////////////////

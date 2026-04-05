@@ -288,7 +288,7 @@ class PlayState extends MusicBeatState
 	var timeTxt:FlxText;
 	var scoreTxtTween:FlxTween;
 
-	public var pauseButton_menu:FlxSprite;
+	public var pauseButton_menu:TouchSpriteButton;
 
 	public static var campaignScore:Int = 0;
 	public static var campaignMisses:Int = 0;
@@ -707,7 +707,8 @@ class PlayState extends MusicBeatState
 
 		if (ClientPrefs.data.pauseButton)
 		{
-			pauseButton_menu = new FlxSprite(2, 2).loadGraphic(Paths.image('menuExtend/PlayState/pauseButton'));
+			pauseButton_menu = new TouchSpriteButton(2, 2);
+			pauseButton_menu.loadGraphic(Paths.image('menuExtend/PlayState/pauseButton'));
 			pauseButton_menu.setGraphicSize(100, 100);
 			pauseButton_menu.alpha = 0.5;
 			pauseButton_menu.visible = false;
@@ -2386,17 +2387,7 @@ class PlayState extends MusicBeatState
 	{
 		if (ClientPrefs.data.pauseButton)
 		{
-			var Pressed:Bool = false;
-			for (touch in FlxG.touches.list)
-			{
-				var realTouch = touch.getScreenPosition(camPause);
-				if (realTouch.y >= pauseButton_menu.y
-					&& realTouch.y <= pauseButton_menu.y + pauseButton_menu.height
-					&& realTouch.x >= pauseButton_menu.x
-					&& realTouch.x <= pauseButton_menu.x + pauseButton_menu.width
-					&& touch.justPressed)
-					Pressed = true;
-			}
+			var Pressed:Bool = (pauseButton_menu != null && pauseButton_menu.touchJustPressed(camPause));
 
 			if (Pressed && (startedCountdown && canPause))
 			{
@@ -2656,9 +2647,20 @@ class PlayState extends MusicBeatState
 		}
 		#end
 
-		// reverse iterate to remove oldest notes first and not invalidate the iteration
-		// stop iteration as soon as a note is not removed
-		// all notes should be kept in the correct order and this is optimal, safe to do every frame/update
+		setOnScripts('cameraX', camFollow.x);
+		setOnScripts('cameraY', camFollow.y);
+		setOnScripts('botPlay', cpuControlled);
+		#if CUSTOM_SHADERS_ALLOWED
+		for (shaderUpdate in shaderUpdates)
+			shaderUpdate(elapsed);
+		#end
+
+		onUpdatePostArgs[0] = elapsed;
+		callOnScripts('onUpdatePost', onUpdatePostArgs);
+	}
+
+	override function drawUpdate(elapsed:Float) {
+
 		{
 			var balls = notesHitArray.length - 1;
 			while (balls >= 0)
@@ -2684,43 +2686,13 @@ class PlayState extends MusicBeatState
 			}
 		}
 
-		setOnScripts('cameraX', camFollow.x);
-		setOnScripts('cameraY', camFollow.y);
-		setOnScripts('botPlay', cpuControlled);
-		#if CUSTOM_SHADERS_ALLOWED
-		for (shaderUpdate in shaderUpdates)
-			shaderUpdate(elapsed);
-		#end
-
-		onUpdatePostArgs[0] = elapsed;
-		callOnScripts('onUpdatePost', onUpdatePostArgs);
-	}
-
-	override function draw() {
-	    /*
 		if (camZooming)
 		{
-			if (FlxG.camera.zoom - defaultCamZoom > 5e-4)
-				FlxG.camera.zoom = FlxMath.lerp(defaultCamZoom, FlxG.camera.zoom, Math.exp(-FlxG.drawElapsed * 3.125 * camZoomingDecay * playbackRate));
-			else {
-				FlxG.camera.zoom = defaultCamZoom;
-			}
-
-			if (camHUD.zoom - 1 > 5e-4)
-				camHUD.zoom = FlxMath.lerp(1, camHUD.zoom, Math.exp(-FlxG.drawElapsed * 3.125 * camZoomingDecay * playbackRate));
-			else {
-				camHUD.zoom = 1;
-			}
+			FlxG.camera.zoom = FlxMath.lerp(defaultCamZoom, FlxG.camera.zoom, Math.exp(-elapsed * 3.125 * camZoomingDecay * playbackRate));
+			camHUD.zoom = FlxMath.lerp(1, camHUD.zoom, Math.exp(-elapsed * 3.125 * camZoomingDecay * playbackRate));
 		}
-		*/
 		
-		if (camZooming)
-		{
-			FlxG.camera.zoom = FlxMath.lerp(defaultCamZoom, FlxG.camera.zoom, Math.exp(-FlxG.drawElapsed * 3.125 * camZoomingDecay * playbackRate));
-			camHUD.zoom = FlxMath.lerp(1, camHUD.zoom, Math.exp(-FlxG.drawElapsed * 3.125 * camZoomingDecay * playbackRate));
-		}
-
-		super.draw();
+		super.drawUpdate(elapsed);
 	}
 
 	#if debug

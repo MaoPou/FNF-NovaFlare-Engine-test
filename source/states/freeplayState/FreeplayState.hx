@@ -41,7 +41,7 @@ class FreeplayState extends MusicBeatState
 
 	///////////////////////////////////////////////////////////////////////////////////////////////
 
-	var backendMutex:Mutex;
+	var backendMutex:Mutex = new Mutex();
 
 	var songsData:Array<SongMetadata> = [];
 
@@ -114,8 +114,6 @@ class FreeplayState extends MusicBeatState
 		#if !mobile
 		FlxG.mouse.visible = true;
 		#end
-
-		backendMutex = new Mutex();
 
 		mouseEvent = new MouseEvent();
 		add(mouseEvent);
@@ -496,7 +494,6 @@ class FreeplayState extends MusicBeatState
 
 	public function initSongsData() {
 		BackendThread.run(() -> {
-			//backendMutex.acquire();
 			var songLowercase:String;
 			var poop:String;
 			try
@@ -505,44 +502,133 @@ class FreeplayState extends MusicBeatState
 				poop = Highscore.formatSong(songLowercase, curDifficulty);
 				PlayState.SONG = Song.loadFromJson(poop, songLowercase);
 			} catch (e:Dynamic) {
-				trace(e);
+				MainLoop.runInMainThread(function():Void
+				{
+					trace(e);
+				});
 				return;
 			}
 
 			Conductor.bpm = PlayState.SONG.bpm;
-
-			updateAudio();
-			//backendMutex.release();
+			
+			MainLoop.runInMainThread(function():Void
+			{
+				updateDetail();
+				updateAudio();
+			});
 		});
 	}
 
+	function updateDetail() {
+		detailSongName.text = songGroup[curSelected].songNameSt;
+		detailMusican.text = songGroup[curSelected].songMusican;
+		//detailTimeText.text = FlxG.sound.music.length;
+		detailBpmText.text = Std.string(Conductor.bpm);
+	}
+
 	var allowPlayMusic:Bool = true;
-	public var alreadyLoadSongPath:String = '';
+	var alreadyLoadSongPath:String = '';
+	var audioSwitchId:Int = 0;
+	
+	var audioFadeOutTime:Float = 0.5;
+	var audioFadeInTime:Float = 0.35;
+
 	public function updateAudio() {
-		if (FlxG.sound.music != null) FlxG.sound.music.stop();
-		allowPlayMusic = false;
+		if (FlxG.sound.music == null) return;
+		var requestId:Int = ++audioSwitchId;
+		var instTargetVolume:Float = 1;
+		var songName:String = PlayState.SONG.song;
+		var instPath:String = Paths.songPath('${songName}/Inst');
+		var voicesPath:String = Paths.songPath('${songName}/Voices');
 
-		if (FileSystem.exists(Paths.songPath('${PlayState.SONG.song}/Inst'))) {
-			FlxG.sound.music.loadStream(Paths.songPath('${PlayState.SONG.song}/Inst'), true, false);
-			allowPlayMusic = true;
-		}
+		if (alreadyLoadSongPath == instPath) return;
 
-		if (PlayState.SONG.needsVoices)
-		{
-			if (FileSystem.exists(Paths.songPath('${PlayState.SONG.song}/Voices'))) {
-				FlxG.sound.music.addTrack(Paths.songPath('${PlayState.SONG.song}/Voices'), [":group-volume=0.8"], 2);
-			} else {
-				var playerVocals:String = getVocalFromCharacter(PlayState.SONG.player1);
-				FlxG.sound.music.addTrack(Paths.songPath('${PlayState.SONG.song}/Voices${playerVocals}'), [":group-volume=0.8"], 2);
+		alreadyLoadSongPath = '';
 
-				var playerVocals:String = getVocalFromCharacter(PlayState.SONG.player2);
-				FlxG.sound.music.addTrack(Paths.songPath('${PlayState.SONG.song}/Voices${playerVocals}'), [":group-volume=0.8"], 3);
+		var swapToNew:Void->Void = function() {
+			if (requestId != audioSwitchId) return;
+			allowPlayMusic = false;
+			var instLoaded:Bool = false;
+			var pendingStart:Bool = false;
+			var started:Bool = false;
+			var startPlayback:Void->Void = function() {
+				if (started) return;
+				if (requestId != audioSwitchId) return;
+				started = true;
+				FlxG.sound.music.volume = 0;
+				FlxG.sound.music.play();
+				FlxG.sound.music.fadeIn(audioFadeInTime, 0, instTargetVolume);
+			};
+
+			backendMutex.acquire();
+			try
+			{
+				FlxG.sound.music.stop();
+				FlxG.sound.music.releaseMedia(1);
+				FlxG.sound.music.releaseMedia(2);
+				FlxG.sound.music.releaseMedia(3);
+
+				if (FileSystem.exists(instPath))
+				{
+					FlxG.sound.music.loadStream(instPath, true, false, null, function()
+					{
+						instLoaded = true;
+						if (pendingStart) startPlayback();
+					});
+					allowPlayMusic = true;
+					alreadyLoadSongPath = instPath;
+				}
+				else
+				{
+					alreadyLoadSongPath = '';
+				}
+
+				if (PlayState.SONG.needsVoices)
+				{
+					if (FileSystem.exists(voicesPath))
+					{
+						FlxG.sound.music.addTrack(voicesPath, [":group-volume=0.8"], 2);
+					}
+					else
+					{
+						var playerVocals:String = getVocalFromCharacter(PlayState.SONG.player1, 'Player');
+						FlxG.sound.music.addTrack(Paths.songPath('${songName}/Voices${playerVocals}'), [":group-volume=0.8"], 2);
+
+						var playerVocals:String = getVocalFromCharacter(PlayState.SONG.player2, 'Opponent');
+						FlxG.sound.music.addTrack(Paths.songPath('${songName}/Voices${playerVocals}'), [":group-volume=0.8"], 3);
+					}
+				}
+				else
+				{
+					FlxG.sound.music.releaseMedia(2);
+					FlxG.sound.music.releaseMedia(3);
+				}
+
+				if (allowPlayMusic)
+				{
+					pendingStart = true;
+					if (instLoaded) startPlayback();
+				}
 			}
-		} else {
-			FlxG.sound.music.releaseMedia(2);
-			FlxG.sound.music.releaseMedia(3);
+			catch (e:Dynamic)
+			{
+				backendMutex.release();
+				throw e;
+			}
+			backendMutex.release();
+		};
+
+		if (FlxG.sound.music != null && FlxG.sound.music.playing && FlxG.sound.music.volume > 0)
+		{
+			FlxG.sound.music.fadeOut(audioFadeOutTime, 0, function(_)
+			{
+				swapToNew();
+			});
 		}
-		if (allowPlayMusic) FlxG.sound.music.play();
+		else
+		{
+			swapToNew();
+		}
 	}
 
 	public function startGame() {
@@ -662,7 +748,7 @@ class FreeplayState extends MusicBeatState
 		
 	}
 
-	function getVocalFromCharacter(char:String)
+	function getVocalFromCharacter(char:String, fixName:String)
 	{
 		try
 		{
@@ -675,7 +761,7 @@ class FreeplayState extends MusicBeatState
 			if (character.vocals_file != null && character.vocals_file != "" && character.vocals_file.length > 0)
 			return '-'+ character.vocals_file;
 		}
-		return '';
+		return '-'+fixName;
 	}
 }
 
