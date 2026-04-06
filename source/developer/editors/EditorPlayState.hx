@@ -77,10 +77,14 @@ class EditorPlayState extends MusicBeatSubstate
 		super();
 
 		keysArray = [];
-		for (i in 0...PlayState.SONG.mania + 1)
+		if (PlayState.SONG.mania != 3)
 		{
-			keysArray.push(PlayState.SONG.mania + '_key_$i');
+			for (i in 0...PlayState.SONG.mania + 1)
+			{
+				keysArray.push(PlayState.SONG.mania + '_key_$i');
+			}
 		}
+		else keysArray = ['note_left', 'note_down', 'note_up', 'note_right'];
 
 		/* setting up some important data */
 		this.playbackRate = playbackRate;
@@ -543,8 +547,8 @@ class EditorPlayState extends MusicBeatSubstate
 		{
 			for (i in 0...playerStrums.members.length)
 			{
-				var keyShowcase = new KeybindShowcase(playerStrums.members[i].x,
-					ClientPrefs.data.downScroll ? playerStrums.members[i].y - 30 : playerStrums.members[i].y + playerStrums.members[i].height + 5,
+				var keyShowcase = new KeybindShowcase(playerStrums.members[i].x - 280,
+					ClientPrefs.data.downScroll ? playerStrums.members[i].y - 390 : playerStrums.members[i].y + playerStrums.members[i].height - 350,
 					ClientPrefs.keyBinds.get(keysArray[i]), FlxG.camera, playerStrums.members[i].width / 2, PlayState.SONG.mania);
 				keyShowcase.onComplete = function()
 				{

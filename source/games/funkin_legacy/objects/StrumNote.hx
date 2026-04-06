@@ -289,7 +289,14 @@ class KeybindShowcase extends FlxTypedGroup<FlxBasic>
 {
 	public var background:FlxSprite;
 	public var keyText:FlxText;
-	public var keyCodes:Array<Int>;
+	public var keyCodes:Array<Int> = [];
+
+	public var keystart1Timer:FlxTimer;
+	public var keystart2Timer:FlxTimer;
+
+	public var keytween1:FlxTween;
+	public var keytween2:FlxTween;
+	public var keytween3:FlxTween;
 
 	public dynamic function onComplete():Void
 	{
@@ -320,12 +327,26 @@ class KeybindShowcase extends FlxTypedGroup<FlxBasic>
 		background.cameras = [camera];
 		keyText.cameras = [camera];
 
-		new FlxTimer().start(2, function(tmr:FlxTimer)
+		if (keystart1Timer != null)
+			keystart1Timer.cancel();
+		if (keystart2Timer != null)
+			keystart2Timer.cancel();
+
+		if (keytween1 != null)
+			keytween1.cancel();
+		if (keytween2 != null)
+			keytween2.cancel();
+		if (keytween3 != null)
+			keytween3.cancel();
+
+		keystart1Timer = new FlxTimer().start(2, function(tmr:FlxTimer)
 		{
-			FlxTween.tween(keyText, {alpha: 0}, 0.5, {
+			keytween1 = FlxTween.tween(keyText, {alpha: 0}, 0.5, {
 				ease: FlxEase.linear,
 				onComplete: function(t)
 				{
+					keytween1 = null;
+
 					if (keyCodes.length > 1)
 					{
 						keyText.text = InputFormatter.getKeyName(keyCodes[1]);
@@ -335,23 +356,28 @@ class KeybindShowcase extends FlxTypedGroup<FlxBasic>
 						keyText.text = '---';
 					}
 
-					FlxTween.tween(keyText, {alpha: 1}, 0.5);
+					keytween2 = FlxTween.tween(keyText, {alpha: 1}, 0.5);
 
-					keyText.x = x + strumHalved + 4;
-					keyText.x -= keyText.width / 2;
-					xOffset = keyText.x;
-					background.x = xOffset - 4;
-					background.makeGraphic(Std.int(keyText.width + 8), Std.int(keyText.height + 8), 0xFF000000);
-					new FlxTimer().start(2.5, function(tmr:FlxTimer)
+					if (background.velocity != null)
 					{
-						FlxTween.tween(keyText, {alpha: 0}, 0.5, {
-							ease: FlxEase.linear,
-							onComplete: function(t)
-							{
-								onComplete();
-							}
+						keyText.x = x + strumHalved + 4;
+						keyText.x -= keyText.width / 2;
+						xOffset = keyText.x;
+						background.x = xOffset - 4;
+						background.makeGraphic(Std.int(keyText.width + 8), Std.int(keyText.height + 8), 0xFF000000);
+						keystart2Timer = new FlxTimer().start(2.5, function(tmr:FlxTimer)
+						{
+							keytween3 = FlxTween.tween(keyText, {alpha: 0}, 0.5, {
+								ease: FlxEase.linear,
+								onComplete: function(t)
+								{
+									onComplete();
+
+									keytween3 = null;
+								}
+							});
 						});
-					});
+					}
 				}
 			});
 		});
