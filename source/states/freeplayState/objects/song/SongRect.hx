@@ -1,6 +1,6 @@
 package states.freeplayState.objects.song;
 
-import games.funkin_legacy.objects.HealthIcon;
+import games.objects.HealthIcon;
 
 class SongRect extends FlxSpriteGroup {
 
@@ -19,7 +19,7 @@ class SongRect extends FlxSpriteGroup {
     /////////////////////////////////////////////////////////////////////
 
     public var haveDiffDis:Bool = false;
-    private var _songCharter:Array<String>;
+    public var _songCharter:Array<String>;
     private var _songColor:FlxColor;
 
     public var diffRectGroup:FlxSpriteGroup;
@@ -172,7 +172,13 @@ class SongRect extends FlxSpriteGroup {
         selectLight.alpha = 0.6;
 	    FreeplayState.curSelected = this.id;
         FreeplayState.instance.changeSelection();
-        createDiff(imme);
+
+        Difficulty.loadFromWeek();
+        FreeplayState.curDifficulty = 0;
+
+        FlxTimer.wait(0.001, () -> {
+            createDiff(imme);
+        });
         FreeplayState.instance.songsMove.tweenData = FlxG.height * 0.5 - SongRect.fixHeight * 0.5 - FreeplayState.curSelected * SongRect.fixHeight * FreeplayState.instance.rectInter - (FreeplayState.curDifficulty+1) * DiffRect.fixHeight * 1.05;
         FreeplayState.instance.initSongsData();
     }
@@ -192,15 +198,12 @@ class SongRect extends FlxSpriteGroup {
     public var diffAdded:Bool = false;
     public function createDiff(imme:Bool = false) {
         if (diffAdded) return;
-        Difficulty.loadFromWeek();
-
-        FreeplayState.curDifficulty = 0;
 
         for (mem in FreeplayState.instance.songGroup) {
-            if (mem.id >= openRect.id) mem.addInterY(fixHeight * 0.1);
-            else mem.addInterY(0);
-            if (mem.id > openRect.id) mem.addDiffY();
-            else mem.addDiffY(false);
+            if (mem.id >= openRect.id) mem.addInterY(fixHeight * 0.1, imme);
+            else mem.addInterY(0, imme);
+            if (mem.id > openRect.id) mem.addDiffY(true, imme);
+            else mem.addDiffY(false, imme);
             if (mem != openRect) mem.signDesDiff();
             mem.diffAdded = false;
         }
@@ -343,12 +346,14 @@ class SongRect extends FlxSpriteGroup {
     }
     
     private var interYTar:Float = 0;
-    public function addInterY(target:Float) {
+    public function addInterY(target:Float, imme:Bool = false) {
         interYTar = target;
+        if (imme) interY = target;
     }
     
     private var diffYTar:Float = 0;
-    public function addDiffY(isAdd:Bool = true) {
+    public function addDiffY(isAdd:Bool = true, imme:Bool = false) {
         diffYTar = isAdd ? fixHeight / 10 * 2 + Difficulty.list.length * DiffRect.fixHeight * 1.05 : 0;
+        if (imme) diffY = diffYTar;
     }
 }

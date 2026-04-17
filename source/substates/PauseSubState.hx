@@ -11,9 +11,9 @@ import states.StoryMenuState;
 
 import options.OptionsState;
 
-import games.funkin_legacy.backend.WeekData;
-import games.funkin_legacy.backend.Highscore;
-import games.funkin_legacy.backend.Song;
+import games.backend.WeekData;
+import games.backend.Highscore;
+import games.backend.Song;
 
 /*
 	PauseSubState made by TieGuo, code optimized by Beihu.

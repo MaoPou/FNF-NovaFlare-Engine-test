@@ -16,8 +16,8 @@ import flixel.ui.FlxButton;
 
 import general.objects.TypedAlphabet;
 
-import games.funkin_legacy.cutscenes.DialogueBoxPsych;
-import games.funkin_legacy.cutscenes.DialogueCharacter;
+import games.cutscenes.DialogueBoxPsych;
+import games.cutscenes.DialogueCharacter;
 
 class DialogueEditorState extends MusicBeatState
 {

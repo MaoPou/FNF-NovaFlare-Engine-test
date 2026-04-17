@@ -53,21 +53,21 @@ class InitScriptData {
 
         //Iris.proxyImports.set("backend.Discord", general.backend.Discord);    //Psych 073有这个，但编译出错)
 
-        Iris.proxyImports.set("backend.BaseStage", games.funkin_legacy.stages.base.BaseStage);
-        Iris.proxyImports.set("backend.Difficulty", games.funkin_legacy.backend.Difficulty);
-        Iris.proxyImports.set("backend.Highscore", games.funkin_legacy.backend.Highscore);
-        Iris.proxyImports.set("backend.NoteTypesConfig", games.funkin_legacy.backend.NoteTypesConfig);
-        Iris.proxyImports.set("backend.Rating", games.funkin_legacy.backend.Rating);
-        Iris.proxyImports.set("backend.Section", games.funkin_legacy.backend.Section);
-        Iris.proxyImports.set("backend.Song", games.funkin_legacy.backend.Song);
-        Iris.proxyImports.set("backend.StageData", games.funkin_legacy.backend.StageData);
-        Iris.proxyImports.set("backend.WeekData", games.funkin_legacy.backend.WeekData);
+        Iris.proxyImports.set("backend.BaseStage", games.stages.base.BaseStage);
+        Iris.proxyImports.set("backend.Difficulty", games.backend.Difficulty);
+        Iris.proxyImports.set("backend.Highscore", games.backend.Highscore);
+        Iris.proxyImports.set("backend.NoteTypesConfig", games.backend.NoteTypesConfig);
+        Iris.proxyImports.set("backend.Rating", games.backend.Rating);
+        Iris.proxyImports.set("backend.Section", games.backend.Section);
+        Iris.proxyImports.set("backend.Song", games.backend.Song);
+        Iris.proxyImports.set("backend.StageData", games.backend.StageData);
+        Iris.proxyImports.set("backend.WeekData", games.backend.WeekData);
 
         //cutscenes
-        Iris.proxyImports.set("cutscenes.CutsceneHandler", games.funkin_legacy.cutscenes.CutsceneHandler);
-        Iris.proxyImports.set("cutscenes.DialogueBox", games.funkin_legacy.cutscenes.DialogueBox);
-        Iris.proxyImports.set("cutscenes.DialogueBoxPsych", games.funkin_legacy.cutscenes.DialogueBoxPsych);
-        Iris.proxyImports.set("cutscenes.DialogueCharacter", games.funkin_legacy.cutscenes.DialogueCharacter);
+        Iris.proxyImports.set("cutscenes.CutsceneHandler", games.cutscenes.CutsceneHandler);
+        Iris.proxyImports.set("cutscenes.DialogueBox", games.cutscenes.DialogueBox);
+        Iris.proxyImports.set("cutscenes.DialogueBoxPsych", games.cutscenes.DialogueBoxPsych);
+        Iris.proxyImports.set("cutscenes.DialogueCharacter", games.cutscenes.DialogueCharacter);
 
         //debug
         Iris.proxyImports.set("debug.FPSCounter", developer.display.FPSCounter);
@@ -82,12 +82,12 @@ class InitScriptData {
         Iris.proxyImports.set("objects.MenuCharacter", general.objects.MenuCharacter);
         Iris.proxyImports.set("objects.MenuItem", general.objects.MenuItem);
         Iris.proxyImports.set("objects.TypedAlphabet", general.objects.TypedAlphabet);
-        Iris.proxyImports.set("objects.Bar", games.funkin_legacy.objects.Bar);
-        Iris.proxyImports.set("objects.Character", games.funkin_legacy.objects.Character);
-        Iris.proxyImports.set("objects.HealthIcon", games.funkin_legacy.objects.HealthIcon);
-        Iris.proxyImports.set("objects.Note", games.funkin_legacy.objects.Note);
-        Iris.proxyImports.set("objects.NoteSplash", games.funkin_legacy.objects.NoteSplash);
-        Iris.proxyImports.set("objects.StrumNote", games.funkin_legacy.objects.StrumNote);
+        Iris.proxyImports.set("objects.Bar", games.objects.Bar);
+        Iris.proxyImports.set("objects.Character", games.objects.Character);
+        Iris.proxyImports.set("objects.HealthIcon", games.objects.HealthIcon);
+        Iris.proxyImports.set("objects.Note", games.objects.Note);
+        Iris.proxyImports.set("objects.NoteSplash", games.objects.NoteSplash);
+        Iris.proxyImports.set("objects.StrumNote", games.objects.StrumNote);
 
         //options
         Iris.proxyImports.set("options.BaseOptionsMenu", options.base.BaseOptionsMenu);
@@ -124,7 +124,7 @@ class InitScriptData {
         Iris.proxyImports.set("states.ScaleSimulationState", states.backend.ScaleSimulationState);
         Iris.proxyImports.set("states.StoryMenuState", states.StoryMenuState);
         Iris.proxyImports.set("states.TitleState", states.TitleState);
-        Iris.proxyImports.set("states.PlayState", games.funkin_legacy.PlayState);
+        Iris.proxyImports.set("states.PlayState", games.PlayState);
 
         //states.editors
         Iris.proxyImports.set("editors.CharacterEditorState", developer.editors.CharacterEditorState);
@@ -138,26 +138,26 @@ class InitScriptData {
         Iris.proxyImports.set("editors.WeekEditorState", developer.editors.WeekEditorState);
     
         //states.stages            //呃呃我不知道这个应不应该加上————牢喵233
-        Iris.proxyImports.set("stages.Limo", games.funkin_legacy.stages.Limo);
-        Iris.proxyImports.set("stages.Mall", games.funkin_legacy.stages.Mall);
-        Iris.proxyImports.set("stages.MallEvil", games.funkin_legacy.stages.MallEvil);
-        Iris.proxyImports.set("stages.Philly", games.funkin_legacy.stages.Philly);
-        Iris.proxyImports.set("stages.School", games.funkin_legacy.stages.School);
-        Iris.proxyImports.set("stages.SchoolEvil", games.funkin_legacy.stages.SchoolEvil);
-        Iris.proxyImports.set("stages.Spooky", games.funkin_legacy.stages.Spooky);
-        Iris.proxyImports.set("stages.StageWeek1", games.funkin_legacy.stages.StageWeek1);
-        Iris.proxyImports.set("stages.Tank", games.funkin_legacy.stages.Tank);
-        //Iris.proxyImports.set("stages.Template", games.funkin_legacy.stages.Template); //加上这个会提示找不到"Note"，报错指向Template第137行
-        //games.funkin_legacy.stages.objects
-        Iris.proxyImports.set("stages.objects.BackgroundDancer", games.funkin_legacy.stages.objects.BackgroundDancer);
-        Iris.proxyImports.set("stages.objects.BackgroundGirls", games.funkin_legacy.stages.objects.BackgroundGirls);
-        Iris.proxyImports.set("stages.objects.BackgroundTank", games.funkin_legacy.stages.objects.BackgroundTank);
-        Iris.proxyImports.set("stages.objects.DadBattleFog", games.funkin_legacy.stages.objects.DadBattleFog);
-        Iris.proxyImports.set("stages.objects.MallCrowd", games.funkin_legacy.stages.objects.MallCrowd);
-        Iris.proxyImports.set("stages.objects.PhillyGlowGradient", games.funkin_legacy.stages.objects.PhillyGlowGradient);
-        Iris.proxyImports.set("stages.objects.PhillyGlowParticle", games.funkin_legacy.stages.objects.PhillyGlowParticle);
-        Iris.proxyImports.set("stages.objects.PhillyTrain", games.funkin_legacy.stages.objects.PhillyTrain);
-        Iris.proxyImports.set("stages.objects.TankmenBG", games.funkin_legacy.stages.objects.TankmenBG);
+        Iris.proxyImports.set("stages.Limo", games.stages.Limo);
+        Iris.proxyImports.set("stages.Mall", games.stages.Mall);
+        Iris.proxyImports.set("stages.MallEvil", games.stages.MallEvil);
+        Iris.proxyImports.set("stages.Philly", games.stages.Philly);
+        Iris.proxyImports.set("stages.School", games.stages.School);
+        Iris.proxyImports.set("stages.SchoolEvil", games.stages.SchoolEvil);
+        Iris.proxyImports.set("stages.Spooky", games.stages.Spooky);
+        Iris.proxyImports.set("stages.StageWeek1", games.stages.StageWeek1);
+        Iris.proxyImports.set("stages.Tank", games.stages.Tank);
+        //Iris.proxyImports.set("stages.Template", games.stages.Template); //加上这个会提示找不到"Note"，报错指向Template第137行
+        //games.stages.objects
+        Iris.proxyImports.set("stages.objects.BackgroundDancer", games.stages.objects.BackgroundDancer);
+        Iris.proxyImports.set("stages.objects.BackgroundGirls", games.stages.objects.BackgroundGirls);
+        Iris.proxyImports.set("stages.objects.BackgroundTank", games.stages.objects.BackgroundTank);
+        Iris.proxyImports.set("stages.objects.DadBattleFog", games.stages.objects.DadBattleFog);
+        Iris.proxyImports.set("stages.objects.MallCrowd", games.stages.objects.MallCrowd);
+        Iris.proxyImports.set("stages.objects.PhillyGlowGradient", games.stages.objects.PhillyGlowGradient);
+        Iris.proxyImports.set("stages.objects.PhillyGlowParticle", games.stages.objects.PhillyGlowParticle);
+        Iris.proxyImports.set("stages.objects.PhillyTrain", games.stages.objects.PhillyTrain);
+        Iris.proxyImports.set("stages.objects.TankmenBG", games.stages.objects.TankmenBG);
 
 
         //substates
@@ -180,18 +180,18 @@ class InitScriptData {
         Iris.proxyImports.set("MusicBeatSubstate", general.backend.MusicBeatSubstate);
         Iris.proxyImports.set("Paths", general.backend.Paths);
         Iris.proxyImports.set("PlayerSettings", general.backend.ClientPrefs);  // PlayerSettings可能合并到ClientPrefs
-        Iris.proxyImports.set("Highscore", games.funkin_legacy.backend.Highscore);
-        Iris.proxyImports.set("Section", games.funkin_legacy.backend.Section);
-        Iris.proxyImports.set("Song", games.funkin_legacy.backend.Song);
-        Iris.proxyImports.set("StageData", games.funkin_legacy.backend.StageData);
-        Iris.proxyImports.set("WeekData", games.funkin_legacy.backend.WeekData);
+        Iris.proxyImports.set("Highscore", games.backend.Highscore);
+        Iris.proxyImports.set("Section", games.backend.Section);
+        Iris.proxyImports.set("Song", games.backend.Song);
+        Iris.proxyImports.set("StageData", games.backend.StageData);
+        Iris.proxyImports.set("WeekData", games.backend.WeekData);
         //new (会出错吗，应该不会吧。 --dmmchh
         Iris.proxyImports.set("Mods", general.backend.Mods);
 
         //cutscenes
-        Iris.proxyImports.set("CutsceneHandler", games.funkin_legacy.cutscenes.CutsceneHandler);
-        Iris.proxyImports.set("DialogueBox", games.funkin_legacy.cutscenes.DialogueBox);
-        Iris.proxyImports.set("DialogueBoxPsych", games.funkin_legacy.cutscenes.DialogueBoxPsych);
+        Iris.proxyImports.set("CutsceneHandler", games.cutscenes.CutsceneHandler);
+        Iris.proxyImports.set("DialogueBox", games.cutscenes.DialogueBox);
+        Iris.proxyImports.set("DialogueBoxPsych", games.cutscenes.DialogueBoxPsych);
 
         //objects
         Iris.proxyImports.set("Alphabet", general.objects.Alphabet);
@@ -204,15 +204,15 @@ class InitScriptData {
         Iris.proxyImports.set("MenuCharacter", general.objects.MenuCharacter);
         Iris.proxyImports.set("MenuItem", general.objects.MenuItem);
         Iris.proxyImports.set("TypedAlphabet", general.objects.TypedAlphabet);
-        Iris.proxyImports.set("Boyfriend", games.funkin_legacy.objects.Character);  // Boyfriend在0.6.3独立，现在合并到Character
-        Iris.proxyImports.set("Character", games.funkin_legacy.objects.Character);
-        Iris.proxyImports.set("HealthIcon", games.funkin_legacy.objects.HealthIcon);
-        Iris.proxyImports.set("Note", games.funkin_legacy.objects.Note);
-        Iris.proxyImports.set("NoteSplash", games.funkin_legacy.objects.NoteSplash);
-        Iris.proxyImports.set("StrumNote", games.funkin_legacy.objects.StrumNote);
-        Iris.proxyImports.set("TankmenBG", games.funkin_legacy.stages.objects.TankmenBG);
-        Iris.proxyImports.set("BackgroundDancer", games.funkin_legacy.stages.objects.BackgroundDancer);
-        Iris.proxyImports.set("BackgroundGirls", games.funkin_legacy.stages.objects.BackgroundGirls);
+        Iris.proxyImports.set("Boyfriend", games.objects.Character);  // Boyfriend在0.6.3独立，现在合并到Character
+        Iris.proxyImports.set("Character", games.objects.Character);
+        Iris.proxyImports.set("HealthIcon", games.objects.HealthIcon);
+        Iris.proxyImports.set("Note", games.objects.Note);
+        Iris.proxyImports.set("NoteSplash", games.objects.NoteSplash);
+        Iris.proxyImports.set("StrumNote", games.objects.StrumNote);
+        Iris.proxyImports.set("TankmenBG", games.stages.objects.TankmenBG);
+        Iris.proxyImports.set("BackgroundDancer", games.stages.objects.BackgroundDancer);
+        Iris.proxyImports.set("BackgroundGirls", games.stages.objects.BackgroundGirls);
 
         //options
         Iris.proxyImports.set("BaseOptionsMenu", options.base.BaseOptionsMenu);
@@ -244,7 +244,7 @@ class InitScriptData {
         Iris.proxyImports.set("OutdatedState", states.backend.OutdatedState);
         Iris.proxyImports.set("StoryMenuState", states.StoryMenuState);
         Iris.proxyImports.set("TitleState", states.TitleState);
-        Iris.proxyImports.set("PlayState", games.funkin_legacy.PlayState);
+        Iris.proxyImports.set("PlayState", games.PlayState);
 
         //states.editors
         Iris.proxyImports.set("editors.CharacterEditorState", developer.editors.CharacterEditorState);

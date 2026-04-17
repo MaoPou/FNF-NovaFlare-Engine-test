@@ -15,9 +15,9 @@ import flixel.ui.FlxButton;
 
 import mobile.flixel.FlxButton as MobileButton;
 
-import games.funkin_legacy.objects.Character;
-import games.funkin_legacy.objects.HealthIcon;
-import games.funkin_legacy.objects.Bar;
+import games.objects.Character;
+import games.objects.HealthIcon;
+import games.objects.Bar;
 
 // flixel 5.7.0+ fix
 #if (FLX_DEBUG || flixel < version("5.7.0"))

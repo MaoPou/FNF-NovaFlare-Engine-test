@@ -10,14 +10,14 @@ import flixel.util.FlxStringUtil;
 import flixel.animation.FlxAnimationController;
 import flixel.input.keyboard.FlxKey;
 
-import games.funkin_legacy.objects.Character;
-import games.funkin_legacy.backend.Song;
-import games.funkin_legacy.backend.Section;
-import games.funkin_legacy.backend.Rating;
-import games.funkin_legacy.objects.Note;
-import games.funkin_legacy.objects.NoteSplash;
-import games.funkin_legacy.objects.StrumNote;
-import games.funkin_legacy.backend.TimingSystem;
+import games.objects.Character;
+import games.backend.Song;
+import games.backend.Section;
+import games.backend.Rating;
+import games.objects.Note;
+import games.objects.NoteSplash;
+import games.objects.StrumNote;
+import games.backend.TimingSystem;
 
 class EditorPlayState extends MusicBeatSubstate
 {

@@ -6,7 +6,7 @@ import flixel.util.FlxSave;
 import flixel.FlxBasic;
 import flixel.FlxObject;
 
-import games.funkin_legacy.backend.ExtraKeysHandler.EKNoteColor;
+import games.backend.ExtraKeysHandler.EKNoteColor;
 
 #if cpp
 @:cppFileCode('#include <thread>')

@@ -21,7 +21,7 @@ import developer.editors.MasterEditorMenu;
 
 import options.OptionsState;
 
-import games.funkin_legacy.backend.WeekData;
+import games.backend.WeekData;
 import states.ServerConnectState;
 
 import cpp.Lib;
@@ -366,8 +366,6 @@ class MainMenuState extends MusicBeatState
 		if (FlxG.sound.music.volume < 0.8)
 		{
 			FlxG.sound.music.volume += 0.5 * FlxG.elapsed;
-			if (FreeplayState.vocalsPlayer1 != null)
-				FreeplayState.vocalsPlayer1.volume += 0.5 * elapsed;
 		}
 
 		FlxG.camera.followLerp = FlxMath.bound(elapsed * 9 / (FlxG.updateFramerate / 60), 0, 1);

@@ -24,12 +24,11 @@ import substates.GameplayChangersSubstate;
 import substates.ResetScoreSubState;
 import substates.ErrorSubState;
 
-import games.funkin_legacy.backend.WeekData;
-import games.funkin_legacy.backend.Highscore;
-import games.funkin_legacy.backend.Song;
-import games.funkin_legacy.backend.diffCalc.DiffCalc;
-import games.funkin_legacy.backend.Replay;
-import games.funkin_legacy.backend.diffCalc.StarRating;
+import games.backend.WeekData;
+import games.backend.Highscore;
+import games.backend.Song;
+import games.backend.Replay;
+import games.backend.diffCalc.DiffRating;
 
 class FreeplayState extends MusicBeatState
 {
@@ -76,7 +75,7 @@ class FreeplayState extends MusicBeatState
 	var detailBpmSign:FlxSprite;
 	var detailBpmText:FlxText;
 
-	var detailStar:StarRect;
+	var detailRate:StarRect;
 	var detailMapper:FlxText;
 
 	var noteData:DataDis;
@@ -95,7 +94,6 @@ class FreeplayState extends MusicBeatState
 	var downBG:Rect;
 	var backRect:BackButton;
 	var funcGroup:Array<FuncButton> = [];
-	var playButton:PlayButton;
 
 	///////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -252,35 +250,38 @@ class FreeplayState extends MusicBeatState
 		detailBpmText.camera = camAfter;
 		add(detailBpmText);
 
-		detailStar = new StarRect(detailSongName.x, detailRect.bg2.y, 80, (detailRect.bg2.height - detailRect.bg3.height) * 0.7);
-		detailStar.y += (detailRect.bg2.height - detailRect.bg3.height) * 0.5 - detailStar.height * 0.5;
-		add(detailStar);
+		detailRate = new StarRect(detailSongName.x, detailRect.bg2.y, 80, (detailRect.bg2.height - detailRect.bg3.height) * 0.7);
+		detailRate.y += (detailRect.bg2.height - detailRect.bg3.height) * 0.5 - detailRate.height * 0.5;
+		add(detailRate);
 
-		detailMapper = new FlxText(0, 0, 0, '0.99 eazy mapped by test', Std.int(detailRect.bg1.height * 0.25));
+		detailMapper = new FlxText(0, 0, 0, 'Rate 0.99 mapped by test', Std.int(detailRect.bg1.height * 0.25));
 		detailMapper.setFormat(Paths.font(Language.get('fontName', 'ma') + '.ttf'), Std.int((detailRect.bg2.height - detailRect.bg3.height) * 0.7 * 0.6), 0xFFFFFFFF, LEFT, FlxTextBorderStyle.OUTLINE, 0xFFFFFFFF);
         detailMapper.borderStyle = NONE;
 		detailMapper.antialiasing = ClientPrefs.data.antialiasing;
-		detailMapper.x = detailStar.x + detailStar.width + 10;
+		detailMapper.x = detailRate.x + detailRate.width + 10;
 		detailMapper.y = detailRect.bg2.y + (detailRect.bg2.height - detailRect.bg3.height) * 0.5 - detailMapper.height * 0.5;
 		detailMapper.camera = camAfter;
 		detailMapper.color = 0x9bff7a;
 		add(detailMapper);
 
 
-		noteData = new DataDis(10, detailRect.bg3.y + 5, 120, 5, 'Notes');
+		noteData = new DataDis(10, detailRect.bg3.y + 5, 120, 5, 'Notes', 0, 100, 0);
 		noteData.camera = camAfter;
+		noteData.allowTweenDecimal = noteData.allowDecimal = false;
 		add(noteData);
 
-		holdNoteData = new DataDis(noteData.x + noteData.lineDis.width * 1.2, detailRect.bg3.y + 8, 120, 5, 'Hold Notes');
+		holdNoteData = new DataDis(noteData.x + noteData.lineDis.width * 1.2, detailRect.bg3.y + 8, 120, 5, 'Hold Notes', 0, 100, 0);
 		holdNoteData.camera = camAfter;
+		holdNoteData.allowTweenDecimal = holdNoteData.allowDecimal = false;
 		add(holdNoteData);
 
-		speedData = new DataDis(holdNoteData.x + holdNoteData.lineDis.width * 1.2, detailRect.bg3.y + 8, 120, 5, 'Speed');
+		speedData = new DataDis(holdNoteData.x + holdNoteData.lineDis.width * 1.2, detailRect.bg3.y + 8, 120, 5, 'Speed', 0, 4, 0);
 		speedData.camera = camAfter;
 		add(speedData);
 
-		keyCountData = new DataDis(speedData.x + speedData.lineDis.width * 1.2, detailRect.bg3.y + 8, 120, 5, 'Key count');
+		keyCountData = new DataDis(speedData.x + speedData.lineDis.width * 1.2, detailRect.bg3.y + 8, 120, 5, 'Key count', 0, 9, 0);
 		keyCountData.camera = camAfter;
+		keyCountData.allowTweenDecimal = keyCountData.allowDecimal = false;
 		add(keyCountData);
 
 		//////////////////////////////////////////////////////////////////////////////////////////
@@ -334,7 +335,7 @@ class FreeplayState extends MusicBeatState
 
 		//////////////////////////////////////////////////////////////////////////////////////////
 
-		downBG = new Rect(0, FlxG.height - 49, FlxG.width, 51, 0, 0); //嗯卧槽怎么全屏会漏
+		downBG = new Rect(0, FlxG.height - 49, FlxG.width + 10, 51, 0, 0); //嗯卧槽怎么全屏会漏
 		downBG.color = 0x242A2E;
 		add(downBG);
 		downBG.cameras = [camAfter];
@@ -350,10 +351,6 @@ class FreeplayState extends MusicBeatState
 			funcGroup.push(button);
 			button.cameras = [camAfter];
 		}
-
-		playButton = new PlayButton(1100, 560);
-		add(playButton);
-		playButton.cameras = [camAfter];
 
 		//////////////////////////////////////////////////////////////////////////////////////////
 
@@ -505,24 +502,80 @@ class FreeplayState extends MusicBeatState
 				MainLoop.runInMainThread(function():Void
 				{
 					trace(e);
+					seedError(e);
 				});
 				return;
 			}
-
-			Conductor.bpm = PlayState.SONG.bpm;
 			
 			MainLoop.runInMainThread(function():Void
 			{
-				updateDetail();
-				updateAudio();
+				var diffCalc = DiffRating.calcForSong(PlayState.SONG);
+
+				Conductor.bpm = PlayState.SONG.bpm;
+
+				updateDetail(diffCalc);
 			});
 		});
 	}
 
-	function updateDetail() {
+	function updateDetail(diffCalc:Float) {
+		diffCalc = Math.floor(diffCalc * 100) / 100;
 		detailSongName.text = songGroup[curSelected].songNameSt;
 		detailMusican.text = songGroup[curSelected].songMusican;
+		detailPlayText.text = Std.string(Highscore.getPlayCount(songGroup[curSelected].songNameSt, curDifficulty));
 		detailBpmText.text = Std.string(Conductor.bpm);
+		detailMapper.text = 'Rate ' + Std.string(diffCalc) + ' mapped by ' + songGroup[curSelected]._songCharter[curDifficulty];
+		detailMapper.color = detailRate.getColorByValue(diffCalc / 10);
+		detailRate.setRate(diffCalc);
+
+		BackendThread.run(() -> {
+			var noteCount:Int = 0;
+			var holdNoteCount:Int = 0;
+			var opponentNoteCount:Int = 0;
+			var opponentHoldNoteCount:Int = 0;
+			if (PlayState.SONG != null && PlayState.SONG.notes != null) {
+				for (sec in PlayState.SONG.notes) {
+					if (sec == null || sec.sectionNotes == null) continue;
+					for (n in sec.sectionNotes) {
+						if (n == null || !Std.isOfType(n, Array)) continue;
+						var arr:Array<Dynamic> = cast n;
+						if (arr == null || arr.length < 2) continue;
+						if (arr[1] == null) continue;
+						var rawLane:Int = Std.int(arr[1]);
+						if (rawLane < 0) continue;
+
+						var gottaHitNote:Bool = sec.mustHitSection;
+						if (Song.isNewVersion) {
+							gottaHitNote = (rawLane < 4);
+						} else if (rawLane > PlayState.SONG.mania) {
+							gottaHitNote = !sec.mustHitSection;
+						}
+
+						var isPlayerSide:Bool = ((gottaHitNote && !ClientPrefs.data.playOpponent) || (!gottaHitNote && ClientPrefs.data.playOpponent));
+						var isHold:Bool = (arr.length > 2 && arr[2] != null && arr[2] > 0);
+						if (isPlayerSide) {
+							noteCount++;
+							if (isHold) holdNoteCount++;
+						} else {
+							opponentNoteCount++;
+							if (isHold) opponentHoldNoteCount++;
+						}
+					}
+				}
+			}
+			var speedValue:Float = (PlayState.SONG != null) ? PlayState.SONG.speed : 0;
+			var keyCountValue:Float = (PlayState.SONG != null) ? (PlayState.SONG.mania + 1) : 0;
+
+			MainLoop.runInMainThread(function():Void
+			{
+				noteData.chanegData(noteCount);
+				holdNoteData.chanegData(holdNoteCount);
+				speedData.chanegData(speedValue);
+				keyCountData.chanegData(keyCountValue);
+			});
+		});
+
+		updateAudio();
 	}
 
 	var allowPlayMusic:Bool = true;
@@ -566,7 +619,6 @@ class FreeplayState extends MusicBeatState
 				});
 			};
 
-			//backendMutex.acquire();
 			try
 			{
 				FlxG.sound.music.stop();
@@ -618,10 +670,8 @@ class FreeplayState extends MusicBeatState
 			}
 			catch (e:Dynamic)
 			{
-				//backendMutex.release();
 				throw e;
 			}
-			//backendMutex.release();
 		};
 
 		if (FlxG.sound.music != null && FlxG.sound.music.playing && FlxG.sound.music.volume > 0)
@@ -635,6 +685,22 @@ class FreeplayState extends MusicBeatState
 		{
 			swapToNew();
 		}
+	}
+
+
+	function seedError(e:Dynamic) {
+		detailPlayText.text = 'N/A';
+		detailSongName.text = 'N/A';
+		detailMusican.text = 'N/A';
+		detailBpmText.text = 'N/A';
+		detailMapper.text = 'No Chart Found';
+		noteData.chanegData(0);
+		holdNoteData.chanegData(0);
+		speedData.chanegData(0);
+		keyCountData.chanegData(0);
+		detailRate.setRate(0);
+		detailMapper.color = detailRate.getColorByValue(0);
+		updateAudio();
 	}
 
 	public function startGame() {
@@ -663,6 +729,8 @@ class FreeplayState extends MusicBeatState
 				return;
 			}
 
+			Highscore.savePlayCount(songLowercase, curDifficulty);
+
 			LoadingState.prepareToSong();
 			if (ClientPrefs.data.loadingScreen)
 			{
@@ -670,7 +738,7 @@ class FreeplayState extends MusicBeatState
 				FlxTransitionableState.skipNextTransOut = true;
 			}
 			LoadingState.loadAndSwitchState(new PlayState());
-			destroyFreeplayVocals();
+			//destroyFreeplayVocals();
 			#if (MODS_ALLOWED && DISCORD_ALLOWED)
 			DiscordClient.loadModRPC();
 			#end
@@ -751,7 +819,10 @@ class FreeplayState extends MusicBeatState
 	}
 	
 	public static function destroyFreeplayVocals() {
-		
+		FlxG.sound.music.releaseMedia(1);
+		FlxG.sound.music.releaseMedia(2);
+		FlxG.sound.music.releaseMedia(3);
+		FlxG.sound.music.stop();
 	}
 
 	function getVocalFromCharacter(char:String, fixName:String)
@@ -759,12 +830,15 @@ class FreeplayState extends MusicBeatState
 		try
 		{
 			var path:String = Paths.getPath('characters/$char.json', TEXT);
+
+			var character:Dynamic = null;
 			#if MODS_ALLOWED
-			var character:Dynamic = Json.parse(File.getContent(path));
+			if (FileSystem.exists(path))
+			character = Json.parse(File.getContent(path));
 			#else
-			var character:Dynamic = Json.parse(Assets.getText(path));
+			character = Json.parse(Assets.getText(path));
 			#end
-			if (character.vocals_file != null && character.vocals_file != "" && character.vocals_file.length > 0)
+			if (character != null && character.vocals_file != null && character.vocals_file != "" && character.vocals_file.length > 0)
 			return '-'+ character.vocals_file;
 		}
 		return '-'+fixName;

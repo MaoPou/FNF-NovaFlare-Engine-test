@@ -13,4 +13,4 @@ import flixel.graphics.FlxGraphic;
 
 import states.freeplayState.backend.*;
 
-import games.funkin_legacy.backend.Song.*;
+import games.backend.Song.*;

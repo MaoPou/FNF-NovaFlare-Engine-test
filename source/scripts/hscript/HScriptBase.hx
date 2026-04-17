@@ -9,7 +9,7 @@ import scripts.lua.FunkinLua;
 import scripts.lua.LuaUtils;
 import scripts.lua.CustomSubstate;
 
-import games.funkin_legacy.objects.Character;
+import games.objects.Character;
 
 #if HSCRIPT_ALLOWED
 import haxe.Exception;

@@ -18,8 +18,8 @@ import states.MainMenuState;
 import states.backend.FlashingState;
 import states.backend.OutdatedState;
 
-import games.funkin_legacy.backend.WeekData;
-import games.funkin_legacy.backend.Highscore;
+import games.backend.WeekData;
+import games.backend.Highscore;
 
 typedef TitleData =
 {

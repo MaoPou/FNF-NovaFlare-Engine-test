@@ -32,9 +32,9 @@ import general.objects.state.ResultShape;
 import states.freeplayState.FreeplayState;
 import states.MainMenuState;
 
-import games.funkin_legacy.backend.Highscore;
-import games.funkin_legacy.backend.diffCalc.DiffCalc;
-import games.funkin_legacy.backend.Song;
+import games.backend.Highscore;
+import games.backend.diffCalc.DiffRating;
+import games.backend.Song;
 
 class ResultsScreen extends MusicBeatSubstate
 {
@@ -189,7 +189,7 @@ class ResultsScreen extends MusicBeatSubstate
 
 		if (FileSystem.exists(Paths.modsJson(formattedFolder + '/' + formattedSong)))
 		{
-			var rate:Float = DiffCalc.CalculateDiff(Song.loadFromJson(poop, game.songName.toLowerCase())) / 5;
+			var rate:Float = DiffRating.calcForSong(Song.loadFromJson(poop, game.songName.toLowerCase())) / 5;
 			mesTextAdd('Difficult: ' + Math.ceil(rate * 100) / 100);
 		}
 		else

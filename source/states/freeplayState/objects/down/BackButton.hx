@@ -20,4 +20,31 @@ class BackButton extends FlxSpriteGroup {
 
         this.event = onClick;
     }
+
+    override function update(elapsed:Float)
+	{
+        var mouse = FreeplayState.instance.mouseEvent;
+
+        var overlaps = mouse.overlaps(this.pressRect);
+
+        if (overlaps) {
+            if (mouse.justReleased) {
+                back2MainMenu();
+                               
+            }
+        }
+
+        if (Controls.instance.justPressed('back')) {
+            back2MainMenu();
+        }
+
+        super.update(elapsed);
+    }
+
+    function back2MainMenu() {
+        FreeplayState.destroyFreeplayVocals();
+        Mods.loadTopMod();
+        FlxG.sound.playMusic(Paths.music('freakyMenu'), 0);
+        MusicBeatState.switchState(new MainMenuState());
+    }
 }
