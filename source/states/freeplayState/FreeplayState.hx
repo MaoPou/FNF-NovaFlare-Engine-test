@@ -38,6 +38,8 @@ class FreeplayState extends MusicBeatState
 	static public var curSelected:Int = 0;
 	static public var curDifficulty:Int = -1;
 
+	public var stopAll:Bool = false;
+
 	///////////////////////////////////////////////////////////////////////////////////////////////
 
 	var backendMutex:Mutex = new Mutex();
@@ -97,11 +99,8 @@ class FreeplayState extends MusicBeatState
 
 	///////////////////////////////////////////////////////////////////////////////////////////////
 
-	var selectedBG:FlxSprite;
+	var selectedBG:SkewRoundRect;
 	var searchButton:SearchButton;
-	var diffSelect:DiffSelect;
-	var sortButton:SortButton;
-	var collectionButton:CollectionButton;
 
 	override function create()
 	{
@@ -310,10 +309,9 @@ class FreeplayState extends MusicBeatState
 
 		////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 		
-		selectedBG = new FlxSprite(FlxG.width, 0).loadGraphic(Paths.image(FreeplayState.filePath + 'selectBG'));
+		selectedBG = new SkewRoundRect(0, -20, 680, 90, 20, 20, -10, 0, 0x000000, 0.4);
         selectedBG.antialiasing = ClientPrefs.data.antialiasing;
-		selectedBG.x -= selectedBG.width;
-		selectedBG.alpha = 0.6;
+		selectedBG.x += FlxG.width - selectedBG.width + 95;
         add(selectedBG);
 		selectedBG.cameras = [camAfter];
 
@@ -321,21 +319,9 @@ class FreeplayState extends MusicBeatState
 		add(searchButton);
 		searchButton.cameras = [camAfter];
 
-		diffSelect = new DiffSelect(688, 65);
-		add(diffSelect);
-		diffSelect.cameras = [camAfter];
-
-		sortButton = new SortButton(682, 105);
-		add(sortButton);
-		sortButton.cameras = [camAfter];
-
-		collectionButton = new CollectionButton(977, 105);
-		add(collectionButton);
-		collectionButton.cameras = [camAfter];
-
 		//////////////////////////////////////////////////////////////////////////////////////////
 
-		downBG = new Rect(0, FlxG.height - 49, FlxG.width + 10, 51, 0, 0); //嗯卧槽怎么全屏会漏
+		downBG = new Rect(0, FlxG.height - 49, FlxG.width + 10, 51, 0, 0, 0.8); //嗯卧槽怎么全屏会漏
 		downBG.color = 0x242A2E;
 		add(downBG);
 		downBG.cameras = [camAfter];
@@ -346,10 +332,11 @@ class FreeplayState extends MusicBeatState
 
 		for (data in 0...funcData.length)
 		{
-			var button = new FuncButton(backRect.x + backRect.width + 15 + 140 * data, backRect.y, funcData[data], funcColors[data]);
+			var button = new FuncButton(backRect.x + backRect.width + 10 + (140 + 20) * data, backRect.y, funcData[data], funcColors[data]);
 			add(button);
 			funcGroup.push(button);
 			button.cameras = [camAfter];
+			button.event = outputEvent(funcData[data]);
 		}
 
 		//////////////////////////////////////////////////////////////////////////////////////////
@@ -371,6 +358,24 @@ class FreeplayState extends MusicBeatState
 		return (!leWeek.startUnlocked
 			&& leWeek.weekBefore.length > 0
 			&& (!StoryMenuState.weekCompleted.exists(leWeek.weekBefore) || !StoryMenuState.weekCompleted.get(leWeek.weekBefore)));
+	}
+
+	function outputEvent(name:String):() -> Void {
+		switch (name) {
+			case 'option':
+				return function() { stopAll = true; OptionsState.stateType = 1; MusicBeatState.switchState(new OptionsState()); };
+			case 'mod':
+				return function() { stopAll = true; MusicBeatState.switchState(new ModsMenuState()); };
+			case 'changer':
+				return function() { stopAll = true; openSubState(new GameplayChangersSubstate()); };
+			case 'editor':
+				return function() { stopAll = true; MusicBeatState.switchState(new ChartingState()); };
+			case 'reset':
+				return function() { stopAll = true; openSubState(new ResetScoreSubState(songsData[curSelected].songName, curDifficulty, songsData[curSelected].songCharacter, -1)); };
+			case 'random':
+				return function() { curSelected = FlxG.random.int(0, songGroup.length - 1); changeSelection(); songGroup[curSelected].changeSelectAll();};
+		}
+		return null;
 	}
 
 	///////////////////////////////////////////////////////////////////////////////////
@@ -424,6 +429,7 @@ class FreeplayState extends MusicBeatState
 						songGroup[newCurSelected].diffFouceUpdate();
 						curSelected = newCurSelected;
 						FlxG.sound.play(Paths.sound('scrollMenu'), 0.4);
+						changeSelection();
 						songsMove.tweenData = FlxG.height * 0.5 - SongRect.fixHeight * 0.5 - curSelected * SongRect.fixHeight * rectInter - (curDifficulty+1) * DiffRect.fixHeight * 1.05;
 					} else {
 						curDifficulty = -1;
@@ -481,7 +487,7 @@ class FreeplayState extends MusicBeatState
 			{
 				if (curSelected != SongRect.openRect.id) {
 			   		songGroup[curSelected].changeSelectAll();
-					initSongsData();
+					//initSongsData();
 				} else {
 					startGame();
 				}
@@ -490,6 +496,8 @@ class FreeplayState extends MusicBeatState
 	}
 
 	public function initSongsData() {
+		if (curDifficulty < 0) return;
+
 		BackendThread.run(() -> {
 			var songLowercase:String;
 			var poop:String;
@@ -790,7 +798,7 @@ class FreeplayState extends MusicBeatState
 	function rectOnScreen(r:SongRect):Bool {
 		var cy:Float = camSongs.scroll.y;
 		var ch:Float = camSongs.height;
-		var ry:Float = r.y;
+		var ry:Float = r.realY;
 		var rh:Float = r.selectShow.height;
 
 		if (r == SongRect.openRect) {
@@ -802,8 +810,7 @@ class FreeplayState extends MusicBeatState
 	public function updateSongVisibility(r:SongRect):Void {
 		if (r != null) {
 			var ons:Bool = rectOnScreen(r);
-			r.visible = ons;
-			r.active = ons;
+			r.visible = r.active = ons;
 		}
 	}
 	

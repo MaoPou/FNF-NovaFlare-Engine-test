@@ -150,7 +150,7 @@ class MainMenuState extends MusicBeatState
 		logoBl.animation.play('bump');
 		logoBl.offset.x = 0;
 		logoBl.offset.y = 0;
-		trace(logoBl.frameWidth);
+		//trace(logoBl.frameWidth);
 		logoBl.scale.x = (640 / logoBl.frameWidth);
 		logoBl.scale.y = logoBl.scale.x;
 		logoBl.updateHitbox();
@@ -334,13 +334,14 @@ class MainMenuState extends MusicBeatState
 		addVirtualPad(MainMenuStateC, A_B_E);
 		virtualPad.cameras = [camHUD];
 
+		/*
 		var soundBuffer = FlxG.sound.music;
 
-		// 实例化并检测
 		var detector = new MusicBPMDetector();
 		var result = detector.detect(soundBuffer._sound.__buffer);
 
 		trace("BPM Result: " + result.bpm);
+		*/
 		
 		super.create();
 	}

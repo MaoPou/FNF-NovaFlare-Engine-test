@@ -2573,7 +2573,9 @@ class PlayState extends MusicBeatState
 								{
 									if (!ClientPrefs.data.playOpponent)
 									{
-										if (cpuControlled && !daNote.blockHit && daNote.canBeHit && (daNote.isSustainNote || daNote.strumTime <= songPosForNotes))
+										var canBeHitAt:Bool = replayMode ? (daNote.strumTime > songPosForNotes - (Conductor.safeZoneOffset * daNote.lateHitMult)
+											&& daNote.strumTime < songPosForNotes + (Conductor.safeZoneOffset * daNote.earlyHitMult)) : daNote.canBeHit;
+										if (cpuControlled && !daNote.blockHit && canBeHitAt && (daNote.isSustainNote || daNote.strumTime <= songPosForNotes))
 											goodNoteHit(daNote);
 									}
 									else
@@ -2591,7 +2593,9 @@ class PlayState extends MusicBeatState
 									}
 									else
 									{
-										if (cpuControlled_opponent && !daNote.blockHit && daNote.canBeHit && (daNote.isSustainNote || daNote.strumTime <= songPosForNotes))
+										var canBeHitAt:Bool = replayMode ? (daNote.strumTime > songPosForNotes - (Conductor.safeZoneOffset * daNote.lateHitMult)
+											&& daNote.strumTime < songPosForNotes + (Conductor.safeZoneOffset * daNote.earlyHitMult)) : daNote.canBeHit;
+										if (cpuControlled_opponent && !daNote.blockHit && canBeHitAt && (daNote.isSustainNote || daNote.strumTime <= songPosForNotes))
 											opponentNoteHitForOpponent(daNote);
 									}
 								}

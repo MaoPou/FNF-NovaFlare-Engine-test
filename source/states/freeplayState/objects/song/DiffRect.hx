@@ -86,16 +86,16 @@ class DiffRect extends FlxSpriteGroup {
         if (allowSelect) {
             var mouse = FreeplayState.instance.mouseEvent;
 
-            var overlaps = mouse.overlaps(this.background);
-
-            if (overlaps) {
-                if (!onFocus) selectLight.alpha = 0.1;
-                if (mouse.justReleased) {
-                    if (!this.onFocus) {
-                        changeSelectAll();
-                        selectLight.alpha = 0.6;
-                    } else {
-                        FreeplayState.instance.startGame();
+            if (FlxG.mouse.y < FlxG.height - 65 && FlxG.mouse.y > 70) {
+                if (mouse.overlaps(this.background)) {
+                    if (!onFocus) selectLight.alpha = 0.1;
+                    if (mouse.justReleased) {
+                        if (!this.onFocus) {
+                            changeSelectAll();
+                            selectLight.alpha = 0.6;
+                        } else {
+                            FreeplayState.instance.startGame();
+                        }
                     }
                 }
             }
@@ -180,19 +180,21 @@ class DiffRect extends FlxSpriteGroup {
 
     ////////////////////////////////////////////////////////////////////////////////////
 
-    
+    public var realX:Float = 0;
     public var startX:Float = 0;
     public var chooseX:Float = 0;
 
     public function calcX() {
-        startX = Math.pow(Math.abs(this.y + this.background.height / 2 - FlxG.height / 2) / (FlxG.height / 2) * 10, 1.8);
+        startX = Math.pow(Math.abs(realY + this.background.height / 2 - FlxG.height / 2) / (FlxG.height / 2) * 10, 1.8);
 
         var chooseTar = onFocus ? -fixWidth * 0.125 : 0;
         if (Math.abs(chooseX - chooseTar) > 0.01) chooseX = FlxMath.lerp(chooseTar, chooseX, Math.exp(-FreeplayState.instance.songsMove.saveElapsed * FreeplayState.instance.songsMove.lerpSmooth));
         else chooseX = chooseTar;
         
-        x = FlxG.width - fixWidth * 0.85 + startX + chooseX;
+        realX = FlxG.width - fixWidth * 0.85 + startX + chooseX;
     }
+
+    public var realY:Float = 0;
 
     public var startTarY:Float = 0;
     public var startY:Float = 0;
@@ -202,6 +204,13 @@ class DiffRect extends FlxSpriteGroup {
         else
             startY = startTarY;
 
-        y = follow.selectShow.y + startY;
+        realY = follow.realY + startY;
+    }
+
+    override function draw() {
+        this.x = realX;
+        this.y = realY;
+
+        super.draw();
     }
 }

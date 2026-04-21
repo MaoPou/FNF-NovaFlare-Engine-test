@@ -46,7 +46,7 @@ class ExtraCounter extends Sprite
 		graphMonitor.graphLineAlpha = 1.0;
 		graphMonitor.tabSelectorAlpha = 0.3;
 
-        graphMonitor.addMonitor("Update Frame", "FPS", function() return DataCalc.updateFPS, 0, function() return ClientPrefs.data.framerate, 0xFFFF005D, 0xFF00FF91);
+        graphMonitor.addMonitor("Update Frame", "TPS", function() return DataCalc.updateFPS, 0, function() return ClientPrefs.data.framerate, 0xFFFF005D, 0xFF00FF91);
         graphMonitor.addMonitor("Draw Frame", "FPS", function() return DataCalc.drawFPS, 0, function() return (ClientPrefs.data.lockRender ? ClientPrefs.data.drawFramerate : ClientPrefs.data.framerate), 0xFFFF005D, 0xFF00FF91);
 		graphMonitor.addMonitor("App Mem", "MB", function() return DataCalc.appMem, 0, 4096, 0xFF00FF91, 0xFFFF005D);
 		graphMonitor.addMonitor("GC Mem", "MB", function() return DataCalc.gcMem, 0, 10, 0xFF00FF91, 0xFFFF005D);
@@ -80,7 +80,7 @@ class ExtraCounter extends Sprite
 
 		var outputText:String = '';
 		var showTime:Float = Math.floor((DataCalc.updateFrameTime) * 100) / 100;
-		outputText += DataCalc.updateFPS + " / " + ClientPrefs.data.framerate + "fps (" + Display.fix(showTime, 2) + " ms) \n";
+		outputText += DataCalc.updateFPS + " / " + ClientPrefs.data.framerate + "tps (" + Display.fix(showTime, 2) + " ms) \n";
 		showTime = Math.floor((DataCalc.drawFrameTime) * 100) / 100;
 		outputText += DataCalc.drawFPS + " / " + (ClientPrefs.data.lockRender ? ClientPrefs.data.drawFramerate : ClientPrefs.data.framerate) + "fps (" + Display.fix(showTime, 2) + " ms) \n";
 		outputText += "APP:" + Display.fix(DataCalc.appMem, 2) + " GC:" + Display.fix(DataCalc.gcMem, 2) + " MB \n";

@@ -21,6 +21,7 @@ class MouseMove extends FlxBasic
     public var useLerp:Bool = true; //是否使用lerp而不是tween
     public var lerpSmooth:Float = 15; //lerp平滑度
 
+    public var forceUpdateEvent:Bool = false; //是否强制更新事件
     public var event:Void->Void = null;
 
     ////////////////////////////////////////////////////////////////////////////////////////////////
@@ -174,7 +175,7 @@ class MouseMove extends FlxBasic
 
         Reflect.setProperty(follow, followData, target);
         
-        if (event!= null && state != 'stop') {
+        if (event!= null && state != 'stop' || forceUpdateEvent) {
             event();
         }
     }

@@ -415,6 +415,13 @@ class CoolUtil
 		return result;
 	}
 
+	public static function brightenColor(color:FlxColor, mult:Float):FlxColor {
+        var r = Std.int(Math.min(255, color.red * mult));
+        var g = Std.int(Math.min(255, color.green * mult));
+        var b = Std.int(Math.min(255, color.blue * mult));
+        return FlxColor.fromRGB(r, g, b, color.alpha);
+    }
+
 	public static function getTweenEaseByString(?ease:String = '')
 	{
 		switch (ease.toLowerCase().trim())
