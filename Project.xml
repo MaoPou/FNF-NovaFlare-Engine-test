@@ -245,7 +245,7 @@
 	<!-- _________________________________ Custom _______________________________ -->
 
 	<assets path='art/icon16.png' rename='icon.png' if="linux" />
-	<section if="mobile">
+	<section if="android">
 		<icon path="art/iconOG.png" size="36" />
 		<icon path="art/iconOG.png" size="48" />
 		<icon path="art/iconOG.png" size="72" />
@@ -253,6 +253,12 @@
 		<icon path="art/iconOG.png" size="144" />
 		<icon path="art/iconOG.png" size="192" />
 	</section>
+	<section if="ios">
+    	<icon path="art/iconOG.png" size='16'/>
+    	<icon path="art/iconOG.png" size='32'/>
+    	<icon path="art/iconOG.png" size='64'/>
+    	<icon path="art/iconOG.png"/>
+    </section>
     <section if="desktop">
     	<icon path="art/icon16-PC.png" size='16'/>
     	<icon path="art/icon32-PC.png" size='32'/>
