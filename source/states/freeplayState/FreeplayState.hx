@@ -22,7 +22,6 @@ import states.freeplayState.objects.song.*;
 
 import substates.GameplayChangersSubstate;
 import substates.ResetScoreSubState;
-import substates.ErrorSubState;
 
 import games.backend.WeekData;
 import games.backend.Highscore;
@@ -37,6 +36,10 @@ class FreeplayState extends MusicBeatState
 	
 	static public var curSelected:Int = 0;
 	static public var curDifficulty:Int = -1;
+	public var curFunc:Int = -1;
+	static public var curFuncBack:Int = 0;
+
+	public var keyboardState:Int = 0;
 
 	public var stopAll:Bool = false;
 
@@ -87,7 +90,7 @@ class FreeplayState extends MusicBeatState
 
 	///////////////////////////////////////////////////////////////////////////////////////////////
 
-	var historyGroup:Array<HistoryRect> = [];
+	//var replayGroup:Array<HistoryRect> = [];
 
 	///////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -335,6 +338,7 @@ class FreeplayState extends MusicBeatState
 			var button = new FuncButton(backRect.x + backRect.width + 10 + (140 + 20) * data, backRect.y, funcData[data], funcColors[data]);
 			add(button);
 			funcGroup.push(button);
+			button.id = data;
 			button.cameras = [camAfter];
 			button.event = outputEvent(funcData[data]);
 		}
@@ -363,17 +367,37 @@ class FreeplayState extends MusicBeatState
 	function outputEvent(name:String):() -> Void {
 		switch (name) {
 			case 'option':
-				return function() { stopAll = true; OptionsState.stateType = 1; MusicBeatState.switchState(new OptionsState()); };
+				return function() { 
+				stopAll = true; 
+				OptionsState.stateType = 1; 
+				MusicBeatState.switchState(new OptionsState()); 
+			};
 			case 'mod':
-				return function() { stopAll = true; MusicBeatState.switchState(new ModsMenuState()); };
+				return function() { 
+				stopAll = true; 
+				ModsMenuState.isFreePlay = true;
+				MusicBeatState.switchState(new ModsMenuState()); 			
+			};
 			case 'changer':
-				return function() { stopAll = true; openSubState(new GameplayChangersSubstate()); };
+				return function() { 
+				persistentUpdate = false;
+				openSubState(new GameplayChangersSubstate()); 
+			};
 			case 'editor':
-				return function() { stopAll = true; MusicBeatState.switchState(new ChartingState()); };
+				return function() { 
+				stopAll = true; 
+				MusicBeatState.switchState(new ChartingState()); 
+			};
 			case 'reset':
-				return function() { stopAll = true; openSubState(new ResetScoreSubState(songsData[curSelected].songName, curDifficulty, songsData[curSelected].songCharacter, -1)); };
+				return function() { 
+				persistentUpdate = false;
+				openSubState(new ResetScoreSubState(songsData[curSelected].songName, curDifficulty, songsData[curSelected].songCharacter, -1)); };
 			case 'random':
-				return function() { curSelected = FlxG.random.int(0, songGroup.length - 1); changeSelection(); songGroup[curSelected].changeSelectAll();};
+				return function() { 
+				curSelected = FlxG.random.int(0, songGroup.length - 1); 
+				changeSelection(); 
+				songGroup[curSelected].changeSelectAll();
+			};
 		}
 		return null;
 	}
@@ -400,96 +424,139 @@ class FreeplayState extends MusicBeatState
 		if (FlxG.sound.music != null)
 			Conductor.songPosition = FlxG.sound.music.time;
 		super.update(elapsed);
+		
+		if (stopAll) return;
 
-		var shiftMult:Int = 1;
-		if (FlxG.keys.pressed.SHIFT)
-			shiftMult = 3;
-
-		if (songGroup.length > 1)
+		if (keyboardState == 0) 
 		{
-			if (FlxG.keys.justPressed.HOME)
+			if (FlxG.keys.justPressed.M)
 			{
-				curSelected = 0;
-				changeSelection();
-				holdTime = 0;
+				keyboardState = 2;
+				curFunc = curFuncBack;
+				FlxG.sound.play(Paths.sound('scrollMenu'));
+				return;
 			}
-			else if (FlxG.keys.justPressed.END)
+
+			var shiftMult:Int = 1;
+			if (FlxG.keys.pressed.SHIFT)
+				shiftMult = 3;
+
+			if (songGroup.length > 1)
 			{
-				curSelected = songGroup.length - 1;
-				changeSelection();
-				holdTime = 0;
-			}
-			if (controls.UI_UP_P)
-			{
-				holdTime = 0;
-				if (curSelected != SongRect.openRect.id) {
-					var newCurSelected:Int = FlxMath.wrap(curSelected - shiftMult, 0, songGroup.length - 1);
-					if (newCurSelected == SongRect.openRect.id) {
-						curDifficulty = Difficulty.list.length - 1;
-						songGroup[newCurSelected].diffFouceUpdate();
-						curSelected = newCurSelected;
-						FlxG.sound.play(Paths.sound('scrollMenu'), 0.4);
-						changeSelection();
-						songsMove.tweenData = FlxG.height * 0.5 - SongRect.fixHeight * 0.5 - curSelected * SongRect.fixHeight * rectInter - (curDifficulty+1) * DiffRect.fixHeight * 1.05;
+				if (FlxG.keys.justPressed.HOME)
+				{
+					curSelected = 0;
+					changeSelection();
+					holdTime = 0;
+				}
+				else if (FlxG.keys.justPressed.END)
+				{
+					curSelected = songGroup.length - 1;
+					changeSelection();
+					holdTime = 0;
+				}
+				if (controls.UI_UP_P)
+				{
+					holdTime = 0;
+					if (curSelected != SongRect.openRect.id) {
+						var newCurSelected:Int = FlxMath.wrap(curSelected - shiftMult, 0, songGroup.length - 1);
+						if (newCurSelected == SongRect.openRect.id) {
+							curDifficulty = Difficulty.list.length - 1;
+							songGroup[newCurSelected].diffFouceUpdate();
+							curSelected = newCurSelected;
+							FlxG.sound.play(Paths.sound('scrollMenu'), 0.4);
+							changeSelection();
+							songsMove.tweenData = FlxG.height * 0.5 - SongRect.fixHeight * 0.5 - curSelected * SongRect.fixHeight * rectInter - (curDifficulty+1) * DiffRect.fixHeight * 1.05;
+						} else {
+							curDifficulty = -1;
+							songGroup[curSelected].diffFouceUpdate();
+							changeSelection(-shiftMult);
+						}
 					} else {
-						curDifficulty = -1;
-						songGroup[curSelected].diffFouceUpdate();
-						changeSelection(-shiftMult);
-					}
-				} else {
-					if (curDifficulty >= 0) {
-						curDifficulty--;
-						songGroup[curSelected].diffFouceUpdate();
-						FlxG.sound.play(Paths.sound('scrollMenu'), 0.4);
-						if (curDifficulty >= 0) songsMove.tweenData = FlxG.height * 0.5 - SongRect.fixHeight * 0.5 - curSelected * SongRect.fixHeight * rectInter - (curDifficulty+1) * DiffRect.fixHeight * 1.05;
-						else songsMove.tweenData = FlxG.height * 0.5 - SongRect.fixHeight * 0.5 - curSelected * SongRect.fixHeight * rectInter;
-					} else {
-						curDifficulty = -1;
-						songGroup[curSelected].diffFouceUpdate();
-						changeSelection(-shiftMult);
+						if (curDifficulty >= 0) {
+							curDifficulty--;
+							songGroup[curSelected].diffFouceUpdate();
+							FlxG.sound.play(Paths.sound('scrollMenu'), 0.4);
+							if (curDifficulty >= 0) songsMove.tweenData = FlxG.height * 0.5 - SongRect.fixHeight * 0.5 - curSelected * SongRect.fixHeight * rectInter - (curDifficulty+1) * DiffRect.fixHeight * 1.05;
+							else songsMove.tweenData = FlxG.height * 0.5 - SongRect.fixHeight * 0.5 - curSelected * SongRect.fixHeight * rectInter;
+						} else {
+							curDifficulty = -1;
+							songGroup[curSelected].diffFouceUpdate();
+							changeSelection(-shiftMult);
+						}
 					}
 				}
-			}
-			if (controls.UI_DOWN_P)
-			{
-				holdTime = 0;
-				if (curSelected != SongRect.openRect.id)
-					changeSelection(shiftMult);
-				else {
-					if (curDifficulty < Difficulty.list.length - 1) {
-						curDifficulty++;
-						songGroup[curSelected].diffFouceUpdate();
-						FlxG.sound.play(Paths.sound('scrollMenu'), 0.4);
-						songsMove.tweenData = FlxG.height * 0.5 - SongRect.fixHeight * 0.5 - curSelected * SongRect.fixHeight * rectInter - (curDifficulty+1) * DiffRect.fixHeight * 1.05;
-					} else {
-						curDifficulty = -1;
-						songGroup[curSelected].diffFouceUpdate();
+				if (controls.UI_DOWN_P)
+				{
+					holdTime = 0;
+					if (curSelected != SongRect.openRect.id)
 						changeSelection(shiftMult);
+					else {
+						if (curDifficulty < Difficulty.list.length - 1) {
+							curDifficulty++;
+							songGroup[curSelected].diffFouceUpdate();
+							FlxG.sound.play(Paths.sound('scrollMenu'), 0.4);
+							songsMove.tweenData = FlxG.height * 0.5 - SongRect.fixHeight * 0.5 - curSelected * SongRect.fixHeight * rectInter - (curDifficulty+1) * DiffRect.fixHeight * 1.05;
+						} else {
+							curDifficulty = -1;
+							songGroup[curSelected].diffFouceUpdate();
+							changeSelection(shiftMult);
+						}
+					}
+				}
+
+				if (controls.UI_DOWN || controls.UI_UP)
+				{
+					var checkLastHold:Int = Math.floor((holdTime - 0.5) * 30);
+					holdTime += elapsed;
+					var checkNewHold:Int = Math.floor((holdTime - 0.5) * 30);
+
+					if (holdTime > 0.5 && checkNewHold - checkLastHold > 0) {
+						curDifficulty = -1;
+						SongRect.openRect.diffFouceUpdate();
+						changeSelection((checkNewHold - checkLastHold) * (controls.UI_UP ? -shiftMult : shiftMult));
 					}
 				}
 				
-			}
-
-			if (controls.UI_DOWN || controls.UI_UP)
-			{
-				var checkLastHold:Int = Math.floor((holdTime - 0.5) * 30);
-				holdTime += elapsed;
-				var checkNewHold:Int = Math.floor((holdTime - 0.5) * 30);
-
-				if (holdTime > 0.5 && checkNewHold - checkLastHold > 0) {
-					curDifficulty = -1;
-					SongRect.openRect.diffFouceUpdate();
-					changeSelection((checkNewHold - checkLastHold) * (controls.UI_UP ? -shiftMult : shiftMult));
+				if (controls.ACCEPT) 			
+				{
+					if (curSelected != SongRect.openRect.id) {
+						songGroup[curSelected].changeSelectAll();
+						//initSongsData();
+					} else {
+						startGame();
+					}
 				}
 			}
-			
+		} else if (keyboardState == 1) {
+		
+		} else {
+			if (FlxG.keys.justPressed.M)
+			{
+				keyboardState = 0;
+				curFunc = -1;
+				FlxG.sound.play(Paths.sound('cancelMenu'));
+				return;
+			}
+
+			if (controls.UI_RIGHT_P)
+			{
+				curFunc = FlxMath.wrap(curFunc + 1, 0, funcGroup.length - 1);
+				FlxG.sound.play(Paths.sound('scrollMenu'));
+				curFuncBack = curFunc;
+			}
+
+			if (controls.UI_LEFT_P)
+			{
+				curFunc = FlxMath.wrap(curFunc - 1, 0, funcGroup.length - 1);
+				FlxG.sound.play(Paths.sound('scrollMenu'));
+				curFuncBack = curFunc;
+			}
+
 			if (controls.ACCEPT) 			
 			{
-				if (curSelected != SongRect.openRect.id) {
-			   		songGroup[curSelected].changeSelectAll();
-					//initSongsData();
-				} else {
-					startGame();
+				if (curFunc >= 0) {
+					funcGroup[curFunc].event();
 				}
 			}
 		}
@@ -746,7 +813,7 @@ class FreeplayState extends MusicBeatState
 				FlxTransitionableState.skipNextTransOut = true;
 			}
 			LoadingState.loadAndSwitchState(new PlayState());
-			//destroyFreeplayVocals();
+		    stopAll = true;
 			#if (MODS_ALLOWED && DISCORD_ALLOWED)
 			DiscordClient.loadModRPC();
 			#end
@@ -823,6 +890,12 @@ class FreeplayState extends MusicBeatState
 	{
 		super.beatHit();
 		if (Std.int(Conductor.getBeat(Conductor.songPosition)) % 2 == 0 && SongRect.openRect != null) SongRect.openRect.beatHit();
+	}
+	
+	override function closeSubState()
+	{
+		super.closeSubState();
+		persistentUpdate = true;
 	}
 	
 	public static function destroyFreeplayVocals() {

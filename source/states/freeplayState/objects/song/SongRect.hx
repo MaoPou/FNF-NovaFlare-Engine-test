@@ -139,7 +139,7 @@ class SongRect extends FlxSpriteGroup {
 
         selectLight.alpha -= elapsed;
 
-        if (FlxG.mouse.y < FlxG.height - 65 && FlxG.mouse.y > 70) {
+        if (FlxG.mouse.y < FlxG.height - 65 && FlxG.mouse.y > 70 && !FreeplayState.instance.stopAll) {
             var mouse = FreeplayState.instance.mouseEvent;
 
             if (mouse.overlaps(this.black)) {

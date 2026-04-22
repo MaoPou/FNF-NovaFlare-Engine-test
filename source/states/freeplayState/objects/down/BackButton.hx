@@ -47,17 +47,27 @@ class BackButton extends FlxSpriteGroup {
             }
         }
 
+        
         if (Controls.instance.justPressed('back')) {
-            back2MainMenu();
+            if (FreeplayState.instance.keyboardState == 0) {
+                back2MainMenu();
+            } else {
+                FreeplayState.instance.keyboardState = 0;
+                FreeplayState.instance.curFunc = -1;
+                FlxG.sound.play(Paths.sound('cancelMenu'));
+            }
         }
 
         super.update(elapsed);
     }
 
     function back2MainMenu() {
-        FreeplayState.destroyFreeplayVocals();
+        FreeplayState.instance.stopAll = true;
         Mods.loadTopMod();
-        FlxG.sound.playMusic(Paths.music('freakyMenu'), 0);
+        BackendThread.run(() -> {
+            FreeplayState.destroyFreeplayVocals();
+            FlxG.sound.playMusic(Paths.music('freakyMenu'), 0);
+        });
         MusicBeatState.switchState(new MainMenuState());
     }
 }

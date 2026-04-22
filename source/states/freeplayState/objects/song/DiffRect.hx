@@ -83,7 +83,7 @@ class DiffRect extends FlxSpriteGroup {
     }
 
     override function update(elapsed:Float) {
-        if (allowSelect) {
+        if (allowSelect && !FreeplayState.instance.stopAll) {
             var mouse = FreeplayState.instance.mouseEvent;
 
             if (FlxG.mouse.y < FlxG.height - 65 && FlxG.mouse.y > 70) {

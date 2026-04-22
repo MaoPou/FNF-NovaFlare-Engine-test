@@ -4,6 +4,8 @@ class FuncButton extends FlxSpriteGroup {
 
     static public var filePath:String = 'function/';
 
+    public var id:Int;
+
     var rect:SkewRoundRect;
     var light:SkewSegmentGradientRoundRect;
     var downRect:Rect;
@@ -59,7 +61,14 @@ class FuncButton extends FlxSpriteGroup {
         var mouse = FreeplayState.instance.mouseEvent;
 
         var overlaps = mouse.overlapsPixel(this.rect, rect.camera);
-        rect.color = overlaps ? hoverColor : normalColor;
+        if (overlaps || id == FreeplayState.instance.curFunc)
+        {
+            rect.color = hoverColor;
+        }
+        else
+        {
+            rect.color = normalColor;
+        }
 
         if (overlaps) {
             if (mouse.justReleased) {
