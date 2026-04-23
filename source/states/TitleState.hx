@@ -83,7 +83,7 @@ class TitleState extends MusicBeatState
 
 		curWacky = FlxG.random.getObject(getIntroTextShit());
 
-		ClientPrefs.loadPrefs();
+		//ClientPrefs.loadPrefs();
 
 		if (ExtraKeysHandler.instance.data.scales == null)
 			MusicBeatState.switchState(new states.backend.ScaleSimulationState());

@@ -234,10 +234,10 @@ class InitState extends MusicBeatState
 		#elseif CHARTING
 		MusicBeatState.switchState(new ChartingState());
 		#else
-		if (!ClientPrefs.data.openedFlash)
+		if (FlxG.save.data.openedFlash == null)
 		{
-			ClientPrefs.data.openedFlash = true;
-			ClientPrefs.saveSettings();
+			FlxG.save.data.openedFlash = true;
+			//ClientPrefs.saveSettings();
 			FlxTransitionableState.skipNextTransIn = true;
 			FlxTransitionableState.skipNextTransOut = true;
 			MusicBeatState.switchState(new FlashingState());

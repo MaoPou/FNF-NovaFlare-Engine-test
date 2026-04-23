@@ -70,7 +70,6 @@ import games.backend.ExtraKeysHandler.EKNoteColor;
 	// App backend s
 	public var discordRPC:Bool = true;
 	public var checkForUpdates:Bool = true;
-	public var openedFlash:Bool = false;
 	public var screensaver:Bool = false;
 	public var githubCheck:Bool = false;
 	public var filesCheck:Bool = #if ios false #else true #end;
@@ -339,7 +338,7 @@ class ClientPrefs
 
 		// Placing this in a separate save so that it can be manually deleted without removing your Score and stuff
 		var save:FlxSave = new FlxSave();
-		save.bind('controls_v3', CoolUtil.getSavePath());
+		save.bind('controls_v4', CoolUtil.getSavePath());
 		save.data.keyboard = keyBinds;
 
 		save.flush();
@@ -473,8 +472,8 @@ class ClientPrefs
 		}
 		else
 		{
-			FlxG.drawFramerate = data.framerate;
-			FlxG.updateFramerate = data.drawFramerate;
+			FlxG.drawFramerate = data.drawFramerate;
+			FlxG.updateFramerate = data.framerate;
 		}
 
 		if (FlxG.save.data.gameplaySettings != null)
@@ -496,7 +495,7 @@ class ClientPrefs
 
 		// controls on a separate save file
 		var save:FlxSave = new FlxSave();
-		save.bind('controls_v3', CoolUtil.getSavePath());
+		save.bind('controls_v4', CoolUtil.getSavePath());
 		if (save != null)
 		{
 			if (save.data.keyboard != null)
