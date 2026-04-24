@@ -6,8 +6,8 @@ import flixel.FlxSubState;
 import states.StoryMenuState;
 import states.freeplayState.FreeplayState;
 
-import games.funkin_legacy.backend.WeekData;
-import games.funkin_legacy.objects.Character;
+import games.backend.WeekData;
+import games.objects.Character;
 
 class GameOverSubstate extends MusicBeatSubstate
 {

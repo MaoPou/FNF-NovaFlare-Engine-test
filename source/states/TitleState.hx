@@ -18,8 +18,8 @@ import states.MainMenuState;
 import states.backend.FlashingState;
 import states.backend.OutdatedState;
 
-import games.funkin_legacy.backend.WeekData;
-import games.funkin_legacy.backend.Highscore;
+import games.backend.WeekData;
+import games.backend.Highscore;
 
 typedef TitleData =
 {
@@ -83,7 +83,7 @@ class TitleState extends MusicBeatState
 
 		curWacky = FlxG.random.getObject(getIntroTextShit());
 
-		ClientPrefs.loadPrefs();
+		//ClientPrefs.loadPrefs();
 
 		if (ExtraKeysHandler.instance.data.scales == null)
 			MusicBeatState.switchState(new states.backend.ScaleSimulationState());

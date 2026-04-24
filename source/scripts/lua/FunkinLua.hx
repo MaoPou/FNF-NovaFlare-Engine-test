@@ -31,14 +31,14 @@ import scripts.lua.LuaUtils.LuaTweenOptions;
 import scripts.lua.DebugLuaText;
 import scripts.lua.ModchartSprite;
 
-import games.funkin_legacy.backend.WeekData;
-import games.funkin_legacy.backend.Highscore;
-import games.funkin_legacy.backend.Song;
-import games.funkin_legacy.cutscenes.DialogueBoxPsych;
-import games.funkin_legacy.objects.StrumNote;
-import games.funkin_legacy.objects.Note;
-import games.funkin_legacy.objects.NoteSplash;
-import games.funkin_legacy.objects.Character;
+import games.backend.WeekData;
+import games.backend.Highscore;
+import games.backend.Song;
+import games.cutscenes.DialogueBoxPsych;
+import games.objects.StrumNote;
+import games.objects.Note;
+import games.objects.NoteSplash;
+import games.objects.Character;
 
 class FunkinLua
 {

@@ -13,8 +13,8 @@ import flixel.addons.ui.FlxUIInputText;
 import general.shaders.RGBPalette;
 import general.shaders.RGBPalette.RGBShaderReference;
 
-import games.funkin_legacy.objects.StrumNote;
-import games.funkin_legacy.objects.Note;
+import games.objects.StrumNote;
+import games.objects.Note;
 
 class NotesSubState extends MusicBeatSubstate
 {

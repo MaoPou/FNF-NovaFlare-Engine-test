@@ -21,7 +21,7 @@ import developer.editors.MasterEditorMenu;
 
 import options.OptionsState;
 
-import games.funkin_legacy.backend.WeekData;
+import games.backend.WeekData;
 import states.ServerConnectState;
 
 import cpp.Lib;
@@ -150,7 +150,7 @@ class MainMenuState extends MusicBeatState
 		logoBl.animation.play('bump');
 		logoBl.offset.x = 0;
 		logoBl.offset.y = 0;
-		trace(logoBl.frameWidth);
+		//trace(logoBl.frameWidth);
 		logoBl.scale.x = (640 / logoBl.frameWidth);
 		logoBl.scale.y = logoBl.scale.x;
 		logoBl.updateHitbox();
@@ -334,13 +334,14 @@ class MainMenuState extends MusicBeatState
 		addVirtualPad(MainMenuStateC, A_B_E);
 		virtualPad.cameras = [camHUD];
 
+		/*
 		var soundBuffer = FlxG.sound.music;
 
-		// 实例化并检测
 		var detector = new MusicBPMDetector();
 		var result = detector.detect(soundBuffer._sound.__buffer);
 
 		trace("BPM Result: " + result.bpm);
+		*/
 		
 		super.create();
 	}
@@ -366,8 +367,6 @@ class MainMenuState extends MusicBeatState
 		if (FlxG.sound.music.volume < 0.8)
 		{
 			FlxG.sound.music.volume += 0.5 * FlxG.elapsed;
-			if (FreeplayState.vocalsPlayer1 != null)
-				FreeplayState.vocalsPlayer1.volume += 0.5 * elapsed;
 		}
 
 		FlxG.camera.followLerp = FlxMath.bound(elapsed * 9 / (FlxG.updateFramerate / 60), 0, 1);

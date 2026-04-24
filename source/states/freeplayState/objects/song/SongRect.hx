@@ -1,6 +1,6 @@
 package states.freeplayState.objects.song;
 
-import games.funkin_legacy.objects.HealthIcon;
+import games.objects.HealthIcon;
 
 class SongRect extends FlxSpriteGroup {
 
@@ -19,7 +19,7 @@ class SongRect extends FlxSpriteGroup {
     /////////////////////////////////////////////////////////////////////
 
     public var haveDiffDis:Bool = false;
-    private var _songCharter:Array<String>;
+    public var _songCharter:Array<String>;
     private var _songColor:FlxColor;
 
     public var diffRectGroup:FlxSpriteGroup;
@@ -137,19 +137,19 @@ class SongRect extends FlxSpriteGroup {
             }
         }
 
-        var mouse = FreeplayState.instance.mouseEvent;
-
-		var overlaps = mouse.overlaps(this.black);
-
         selectLight.alpha -= elapsed;
 
-        if (overlaps) {
-            if (FreeplayState.curSelected != this.id) selectLight.alpha = 0.1;
-            if (mouse.justReleased) {
-                changeSelectAll();
+        if (FlxG.mouse.y < FlxG.height - 65 && FlxG.mouse.y > 70 && !FreeplayState.instance.stopAll) {
+            var mouse = FreeplayState.instance.mouseEvent;
+
+            if (mouse.overlaps(this.black)) {
+                if (FreeplayState.curSelected != this.id) selectLight.alpha = 0.1;
+                if (mouse.justReleased) {
+                    changeSelectAll();
+                }
             }
         }
-
+        
         if (onFocus) selectLight.alpha = 0.1;
 
         super.update(elapsed);
@@ -172,7 +172,13 @@ class SongRect extends FlxSpriteGroup {
         selectLight.alpha = 0.6;
 	    FreeplayState.curSelected = this.id;
         FreeplayState.instance.changeSelection();
-        createDiff(imme);
+
+        Difficulty.loadFromWeek();
+        FreeplayState.curDifficulty = 0;
+
+        FlxTimer.wait(0.001, () -> {
+            createDiff(imme);
+        });
         FreeplayState.instance.songsMove.tweenData = FlxG.height * 0.5 - SongRect.fixHeight * 0.5 - FreeplayState.curSelected * SongRect.fixHeight * FreeplayState.instance.rectInter - (FreeplayState.curDifficulty+1) * DiffRect.fixHeight * 1.05;
         FreeplayState.instance.initSongsData();
     }
@@ -192,15 +198,12 @@ class SongRect extends FlxSpriteGroup {
     public var diffAdded:Bool = false;
     public function createDiff(imme:Bool = false) {
         if (diffAdded) return;
-        Difficulty.loadFromWeek();
-
-        FreeplayState.curDifficulty = 0;
 
         for (mem in FreeplayState.instance.songGroup) {
-            if (mem.id >= openRect.id) mem.addInterY(fixHeight * 0.1);
-            else mem.addInterY(0);
-            if (mem.id > openRect.id) mem.addDiffY();
-            else mem.addDiffY(false);
+            if (mem.id >= openRect.id) mem.addInterY(fixHeight * 0.1, imme);
+            else mem.addInterY(0, imme);
+            if (mem.id > openRect.id) mem.addDiffY(true, imme);
+            else mem.addDiffY(false, imme);
             if (mem != openRect) mem.signDesDiff();
             mem.diffAdded = false;
         }
@@ -287,11 +290,13 @@ class SongRect extends FlxSpriteGroup {
 
     //////////////////////////////////////////////////////////////////////////////////////////////
 
+    public var realX:Float = 0;
+    
     public var moveX:Float = 0;
     public var chooseX:Float = 0;
     public var diffX:Float = 0;
     public function calcX() {
-        moveX = Math.pow(Math.abs(this.y + this.selectShow.height / 2 - FlxG.height / 2) / (FlxG.height / 2) * 10, 1.8);
+        moveX = Math.pow(Math.abs(realY + this.selectShow.height / 2 - FlxG.height / 2) / (FlxG.height / 2) * 10, 1.8);
 
         var chooseTar = onFocus ? -20 : 0;
         if (Math.abs(chooseX - chooseTar) > 1) chooseX = FlxMath.lerp(chooseTar, chooseX, Math.exp(-FreeplayState.instance.songsMove.saveElapsed * FreeplayState.instance.songsMove.lerpSmooth));
@@ -301,7 +306,7 @@ class SongRect extends FlxSpriteGroup {
         if (Math.abs(diffX - diffTar) > 1) diffX = FlxMath.lerp(diffTar, diffX, Math.exp(-FreeplayState.instance.songsMove.saveElapsed * FreeplayState.instance.songsMove.lerpSmooth));
         else diffX = diffTar;
         
-        this.x = FlxG.width - this.selectShow.width + 80 + moveX + chooseX + diffX;
+        realX = FlxG.width - this.selectShow.width + 80 + moveX + chooseX + diffX;
         diffCalcX();
     }
 
@@ -314,6 +319,8 @@ class SongRect extends FlxSpriteGroup {
             }
         }
     }
+
+    public var realY:Float = 0;
 
     public var interY:Float = 0;
     public var diffY:Float = 0;    
@@ -328,7 +335,7 @@ class SongRect extends FlxSpriteGroup {
         else 
             diffY = diffYTar;
 
-        this.y = startY + interY + diffY;
+        realY = startY + interY + diffY;
         diffCalcY();
     }
 
@@ -343,12 +350,20 @@ class SongRect extends FlxSpriteGroup {
     }
     
     private var interYTar:Float = 0;
-    public function addInterY(target:Float) {
+    public function addInterY(target:Float, imme:Bool = false) {
         interYTar = target;
+        if (imme) interY = target;
     }
     
     private var diffYTar:Float = 0;
-    public function addDiffY(isAdd:Bool = true) {
+    public function addDiffY(isAdd:Bool = true, imme:Bool = false) {
         diffYTar = isAdd ? fixHeight / 10 * 2 + Difficulty.list.length * DiffRect.fixHeight * 1.05 : 0;
+        if (imme) diffY = diffYTar;
+    }
+
+    override function draw() {
+        this.x = realX;
+        this.y = realY;
+        super.draw();
     }
 }

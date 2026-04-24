@@ -250,7 +250,7 @@ class Main extends Sprite
 			"FlxText" => flixel.text.FlxText,
 
 			"MusicBeatState" => general.backend.MusicBeatState,
-			"PlayState" => games.funkin_legacy.PlayState,
+			"PlayState" => games.PlayState,
 			"Application" => lime.app.Application,
 
 			// Engine Something

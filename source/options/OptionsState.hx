@@ -9,7 +9,7 @@ import mobile.substates.MobileControlSelectSubState;
 import mobile.substates.MobileExtraControl;
 import mobile.states.CopyState;
 
-import games.funkin_legacy.backend.StageData;
+import games.backend.StageData;
 
 class OptionsState extends MusicBeatState
 {
@@ -47,8 +47,10 @@ class OptionsState extends MusicBeatState
 
 	override function create()
 	{
-		if (stateType != 2)
+		if (stateType != 2) {
 			Paths.clearStoredMemory();
+			Paths.clearUnusedMemory();
+		}
 		
 		persistentUpdate = persistentDraw = true;
 		instance = this;
@@ -145,6 +147,7 @@ class OptionsState extends MusicBeatState
 								],
 								cataMoveEvent);
 		add(cataMove);
+		cataMove.forceUpdateEvent = true;
 		cataMove.useLerp = false;
 		cataMove.tweenTime = 0.45;
 		cataMove.tweenType = 'expoInOut';

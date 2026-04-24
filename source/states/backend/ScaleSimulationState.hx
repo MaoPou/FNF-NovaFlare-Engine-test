@@ -1,6 +1,6 @@
 ﻿package states.backend;
 
-import games.funkin_legacy.objects.StrumNote;
+import games.objects.StrumNote;
 
 class ScaleSimulationState extends MusicBeatState {
     public var infoText:FlxText;

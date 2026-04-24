@@ -6,7 +6,7 @@ import flixel.util.FlxSave;
 import flixel.FlxBasic;
 import flixel.FlxObject;
 
-import games.funkin_legacy.backend.ExtraKeysHandler.EKNoteColor;
+import games.backend.ExtraKeysHandler.EKNoteColor;
 
 #if cpp
 @:cppFileCode('#include <thread>')
@@ -414,6 +414,13 @@ class CoolUtil
 
 		return result;
 	}
+
+	public static function brightenColor(color:FlxColor, mult:Float):FlxColor {
+        var r = Std.int(Math.min(255, color.red * mult));
+        var g = Std.int(Math.min(255, color.green * mult));
+        var b = Std.int(Math.min(255, color.blue * mult));
+        return FlxColor.fromRGB(r, g, b, color.alpha);
+    }
 
 	public static function getTweenEaseByString(?ease:String = '')
 	{
