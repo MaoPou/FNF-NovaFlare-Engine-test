@@ -403,7 +403,7 @@ class OptionsState extends MusicBeatState
 				openSubState(new NotesSubState());
 			case 3: // ControlsSubState
 				persistentUpdate = false;
-				openSubState(new NewControlsSubState());
+				openSubState(new ControlsSubState()); // 我会想你的，NewControlsSubState -- chh
 			case 4: // MobileControlSelectSubState
 				persistentUpdate = false;
 				openSubState(new MobileControlSelectSubState());
