@@ -2,10 +2,12 @@ package mobile.substates;
 
 import openfl.sensors.Accelerometer;
 import openfl.utils.Assets;
+import openfl.Lib;
 
 import flixel.util.FlxSave;
 import flixel.input.touch.FlxTouch;
 import flixel.ui.FlxButton as UIButton;
+import flixel.FlxCamera;
 
 import mobile.flixel.FlxButton;
 
@@ -13,6 +15,7 @@ class MobileControlSelectSubState extends MusicBeatSubstate
 {
 	public var controlsItems:Array<String> = ['Pad-Right', 'Pad-Left', 'Pad-Custom', 'Pad-Duo', 'Hitbox', 'Keyboard'];
 
+	var camControls:FlxCamera;
 	var virtualPadd:FlxVirtualPad;
 	var hitbox:FlxHitbox;
 	var upPozition:FlxText;
@@ -56,6 +59,17 @@ class MobileControlSelectSubState extends MusicBeatSubstate
 		bg.scrollFactor.set();
 		bg.alpha = 0;
 		add(bg);
+
+		var stage = Lib.current.stage;
+		var scale:Float = Math.min((stage.stageWidth / FlxG.width), (stage.stageHeight / FlxG.height));
+		var newWidth:Int = Std.int(stage.stageWidth / scale);
+		var newHeight:Int = Std.int(stage.stageHeight / scale);
+
+		camControls = new FlxCamera(0, 0, newWidth, newHeight);
+		camControls.x = (FlxG.width - newWidth) / 2;
+		camControls.y = (FlxG.height - newHeight) / 2;
+		camControls.bgColor.alpha = 0;
+		FlxG.cameras.add(camControls, false);
 
 		var exit = new UIButton(FlxG.width - 300, 50, "Exit & Save", () ->
 		{
@@ -113,12 +127,14 @@ class MobileControlSelectSubState extends MusicBeatSubstate
 
 		virtualPadd = new FlxVirtualPad(NONE, NONE);
 		virtualPadd.visible = false;
+		virtualPadd.cameras = [camControls];
 		add(virtualPadd);
 
 		hitbox = new FlxHitbox();
 
 		hitbox.alpha = 0.6;
 		hitbox.visible = false;
+		hitbox.cameras = [camControls];
 		add(hitbox);
 
 		funitext = new FlxText(0, 50, 0, 'No Mobile Controls!', 32);
@@ -296,6 +312,7 @@ class MobileControlSelectSubState extends MusicBeatSubstate
 				virtualPadd = new FlxVirtualPad(RIGHT_FULL, controlExtend);
 				virtualPadd = MobileControls.getExtraCustomMode(virtualPadd);
 				virtualPadd.alpha = ClientPrefs.data.playControlsAlpha;
+				virtualPadd.cameras = [camControls];
 				add(virtualPadd);
 				virtualPadd.buttonLeft.color = buttonLeftColor[0];
 				virtualPadd.buttonDown.color = buttonDownColor[0];
@@ -308,6 +325,7 @@ class MobileControlSelectSubState extends MusicBeatSubstate
 				virtualPadd = new FlxVirtualPad(LEFT_FULL, controlExtend);
 				virtualPadd = MobileControls.getExtraCustomMode(virtualPadd);
 				virtualPadd.alpha = ClientPrefs.data.playControlsAlpha;
+				virtualPadd.cameras = [camControls];
 				add(virtualPadd);
 				virtualPadd.buttonLeft.color = buttonLeftColor[0];
 				virtualPadd.buttonDown.color = buttonDownColor[0];
@@ -320,6 +338,7 @@ class MobileControlSelectSubState extends MusicBeatSubstate
 				virtualPadd = MobileControls.getCustomMode(new FlxVirtualPad(RIGHT_FULL, controlExtend));
 				virtualPadd = MobileControls.getExtraCustomMode(virtualPadd);
 				virtualPadd.alpha = ClientPrefs.data.playControlsAlpha;
+				virtualPadd.cameras = [camControls];
 				add(virtualPadd);
 				virtualPadd.buttonLeft.color = buttonLeftColor[0];
 				virtualPadd.buttonDown.color = buttonDownColor[0];
@@ -332,6 +351,7 @@ class MobileControlSelectSubState extends MusicBeatSubstate
 				virtualPadd = new FlxVirtualPad(BOTH, controlExtend);
 				virtualPadd = MobileControls.getExtraCustomMode(virtualPadd);
 				virtualPadd.alpha = ClientPrefs.data.playControlsAlpha;
+				virtualPadd.cameras = [camControls];
 				add(virtualPadd);
 				virtualPadd.buttonLeft.color = buttonLeftColor[0];
 				virtualPadd.buttonDown.color = buttonDownColor[0];
@@ -346,6 +366,7 @@ class MobileControlSelectSubState extends MusicBeatSubstate
 				hitbox.visible = true;
 				virtualPadd.visible = false;
 				hitbox.alpha = ClientPrefs.data.playControlsAlpha;
+				hitbox.cameras = [camControls];
 
 			case 'Keyboard':
 				hitbox.visible = false;
@@ -370,5 +391,17 @@ class MobileControlSelectSubState extends MusicBeatSubstate
 		bindButton.x = touch.x - Std.int(bindButton.width / 2);
 		bindButton.y = touch.y - Std.int(bindButton.height / 2);
 		buttonBinded = true;
+	}
+
+	override function destroy()
+	{
+		super.destroy();
+
+		if (camControls != null)
+		{
+			FlxG.cameras.remove(camControls, false);
+			camControls.destroy();
+			camControls = null;
+		}
 	}
 }

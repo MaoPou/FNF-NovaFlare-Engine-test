@@ -1991,35 +1991,57 @@ class PlayState extends MusicBeatState
 
 	public function removeShaderFromCamera(cam:String, effect:Dynamic)
 	{
-		var camera:Dynamic;
-		if (cam == '')
-			camera = FlxG.game;
-		else
-			camera = LuaUtils.cameraFromString(cam);
+		var camera:Dynamic = (cam == '' ? FlxG.game : LuaUtils.cameraFromString(cam));
 		if (camera == null)
 		{
 			addTextToDebug('shader remove function: ERROR THE CAMERA $cam DOES NOT EXIST', FlxColor.RED);
 			return;
 		}
 
-		if (camera._filters.contains(effect))
-			camera._filters.remove(effect);
+		var filter:BitmapFilter = null;
+		if (effect != null)
+		{
+			if (Std.isOfType(effect, BitmapFilter))
+				filter = cast effect;
+			else if (Reflect.hasField(effect, 'daShader'))
+			{
+				var daShader = Reflect.field(effect, 'daShader');
+				if (Std.isOfType(daShader, BitmapFilter))
+					filter = cast daShader;
+			}
+		}
+		if (filter == null)
+			return;
+
+		if (cam == '')
+		{
+			@:privateAccess
+			var curCamFilters:Array<BitmapFilter> = FlxG.game._filters;
+			if (curCamFilters != null && curCamFilters.contains(filter))
+			{
+				curCamFilters.remove(filter);
+				FlxG.game.setFilters(curCamFilters);
+				FlxG.game.filtersEnabled = ClientPrefs.data.shaders;
+			}
+			return;
+		}
+
+		var flxCam:FlxCamera = cast camera;
+		var curFilters:Array<BitmapFilter> = flxCam.filters;
+		if (curFilters != null && curFilters.contains(filter))
+		{
+			curFilters.remove(filter);
+			flxCam.filters = curFilters;
+			flxCam.filtersEnabled = ClientPrefs.data.shaders;
+		}
 	}
 
 	public function clearObjectShaders(obj:String)
 	{
 		if (obj == '')
 		{
-			var shadersToRemove = [];
-			@:privateAccess {
-				if (FlxG.game._filters.length > 0)
-				{
-					for (shader in FlxG.game._filters)
-						shadersToRemove.push(shader);
-					for (shader in shadersToRemove)
-						FlxG.game._filters.remove(shader);
-				}
-			}
+			FlxG.game.setFilters([]);
+			FlxG.game.filtersEnabled = ClientPrefs.data.shaders;
 		}
 		else
 		{
@@ -2041,14 +2063,8 @@ class PlayState extends MusicBeatState
 				luaObject.shader = null;
 				return;
 			}
-			var shadersToRemove = [];
-			if (camera.filters.length > 0)
-			{
-				for (shader in camera.filters)
-					shadersToRemove.push(shader);
-				for (shader in shadersToRemove)
-					camera.filters.remove(shader);
-			}
+			camera.filters = [];
+			camera.filtersEnabled = ClientPrefs.data.shaders;
 		}
 	}
 	#end

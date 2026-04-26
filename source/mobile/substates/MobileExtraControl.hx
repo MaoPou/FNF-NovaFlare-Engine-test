@@ -5,19 +5,30 @@ import flixel.effects.FlxFlicker;
 class MobileExtraControl extends MusicBeatSubstate
 {
 	var returnArray:Array<Array<String>> = [
-		['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'G', 'K', 'L', 'M'],
-		['N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z'],
-		['F1', 'F2', 'F3', 'F4', 'F5', 'F6', 'F7', 'F8', 'F9', 'F10', 'F11', 'F12'],
-		['ZERO', 'ONE', 'TWO', 'THREE', 'FOUR', 'FIVE', 'SIX', 'SEVEN', 'EIGHT', 'NINE'],
-		['SPACE', 'BACKSPACE', 'ENTER', 'SHIFT', 'TAB', 'ESCAPE'],
+		['Esc', '', 'F1', 'F2', 'F3', 'F4', '', 'F5', 'F6', 'F7', 'F8', '', 'F9', 'F10', 'F11', 'F12', '', 'PrtScrn', 'ScrLk', 'Break'],
+		['`', '1', '2', '3', '4', '5', '6', '7', '8', '9', '0', '-', '+', 'BckSpc', '', 'Ins', 'Home', 'PgUp', '', 'NumLk', '#/', '#*', '#-'],
+		['Tab', 'Q', 'W', 'E', 'R', 'T', 'Y', 'U', 'I', 'O', 'P', '[', ']', '\\', '', 'Del', 'End', 'PgDown', '', '#7', '#8', '#9', '#+'],
+		['Caps', 'A', 'S', 'D', 'F', 'G', 'H', 'J', 'K', 'L', ';', "'", 'Enter', '', '', '', '', '', '#4', '#5', '#6', ''],
+		['Shift', 'Z', 'X', 'C', 'V', 'B', 'N', 'M', ',', '.', '/', 'Shift', '', '', 'Up', '', '', '#1', '#2', '#3', ''],
+		['Ctrl', 'Win', 'Alt', 'Space', 'Alt', 'Win', 'Menu', 'Ctrl', '', 'Left', 'Down', 'Right', '', '#0', '#.', ''],
 	];
 
 	var displayArray:Array<Array<String>> = [
-		['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'G', 'K', 'L', 'M'],
-		['N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z'],
-		['F1', 'F2', 'F3', 'F4', 'F5', 'F6', 'F7', 'F8', 'F9', 'F10', 'F11', 'F12'],
-		['0', '1', '2', '3', '4', '5', '6', '7', '8', '9'],
-		['SPACE', 'BACK\nSPACE', 'ENTER', 'SHIFT', 'TAB', 'ESCAPE'],
+		['Esc', '', 'F1', 'F2', 'F3', 'F4', '', 'F5', 'F6', 'F7', 'F8', '', 'F9', 'F10', 'F11', 'F12', '', 'Prt\nScrn', 'Scr\nLk', 'Break'],
+		['`', '1', '2', '3', '4', '5', '6', '7', '8', '9', '0', '-', '+', 'Back\nSpace', '', 'Ins', 'Home', 'Pg\nUp', '', 'Num\nLk', '#/', '#*', '#-'],
+		['Tab', 'Q', 'W', 'E', 'R', 'T', 'Y', 'U', 'I', 'O', 'P', '[', ']', '\\', '', 'Del', 'End', 'Pg\nDown', '', '#7', '#8', '#9', '#+'],
+		['Caps', 'A', 'S', 'D', 'F', 'G', 'H', 'J', 'K', 'L', ';', "'", 'Enter', '', '', '', '', '', '#4', '#5', '#6', ''],
+		['Shift', 'Z', 'X', 'C', 'V', 'B', 'N', 'M', ',', '.', '/', 'Shift', '', '', 'Up', '', '', '#1', '#2', '#3', ''],
+		['Ctrl', 'Win', 'Alt', 'Space', 'Alt', 'Win', 'Menu', 'Ctrl', '', 'Left', 'Down', 'Right', '', '#0', '#.', ''],
+	];
+
+	var widthUnits:Array<Array<Float>> = [
+		[1, 1.5, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1.5, 1.25, 1.25, 1.25],
+		[1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 1.5, 1, 1, 1, 1.5, 1, 1, 1, 1],
+		[1.5, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1.5, 1.5, 1, 1, 1, 1.5, 1, 1, 1, 1],
+		[1.75, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2.37, 1.5, 1, 1, 1, 1.5, 1, 1, 1, 1],
+		[2.25, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2.96, 1.5, 1, 1, 1, 1.5, 1, 1, 1, 1],
+		[1.25, 1.25, 1.25, 6.25, 1.25, 1.25, 1.25, 1.9, 1.5, 1, 1, 1, 1.5, 2.2, 1, 1],
 	];
 
 	var titleTeam:FlxTypedGroup<ChooseButton>;
@@ -26,9 +37,12 @@ class MobileExtraControl extends MusicBeatSubstate
 	var isMain:Bool = true;
 
 	var titleNum:Int = 0;
-	var percent:Float = 0;
 	var typeNum:Int = 0;
 	var chooseNum:Int = 0;
+
+	var rowSelectableIndices:Array<Array<Int>> = [];
+	var selectableButtons:Array<ChooseButton> = [];
+	var selectableReturnKeys:Array<String> = [];
 
 	var titleWidth:Int = 200;
 	var titleHeight:Int = 100;
@@ -59,14 +73,58 @@ class MobileExtraControl extends MusicBeatSubstate
 		optionTeam = new FlxTypedGroup<ChooseButton>();
 		add(optionTeam);
 
-		for (type in 0...returnArray.length)
+		var gap:Float = 6;
+		var margin:Float = 20;
+		var unit:Float = 99999;
+		for (row in 0...widthUnits.length)
 		{
-			var _length:Int = returnArray[type].length;
-			for (number in 0..._length)
+			var totalUnits:Float = 0;
+			for (u in widthUnits[row])
+				totalUnits += u;
+			var available:Float = FlxG.width - margin * 2 - gap * (widthUnits[row].length - 1);
+			unit = Math.min(unit, available / totalUnits);
+		}
+		unit = Math.max(18, Math.min(60, unit));
+		var maxRowWidth:Float = 0;
+		for (row in 0...widthUnits.length)
+		{
+			var totalUnits:Float = 0;
+			for (u in widthUnits[row])
+				totalUnits += u;
+			var rowWidth:Float = totalUnits * unit + gap * (widthUnits[row].length - 1);
+			maxRowWidth = Math.max(maxRowWidth, rowWidth);
+		}
+		var keyHeight:Int = Std.int(Math.max(24, Math.min(44, unit * 0.85)));
+		var rowGap:Float = 8;
+		var startY:Float = 285;
+		var startX:Float = (FlxG.width - maxRowWidth) / 2;
+
+		rowSelectableIndices = [];
+		selectableButtons = [];
+		selectableReturnKeys = [];
+
+		for (row in 0...returnArray.length)
+		{
+			rowSelectableIndices.push([]);
+			var x:Float = startX;
+			var y:Float = startY + (keyHeight + rowGap) * row;
+
+			for (col in 0...returnArray[row].length)
 			{
-				var _x = FlxG.width / 2 + optionWidth * (number - _length / 2);
-				var titleObject = new ChooseButton(_x, 300 + (optionHeight + 20) * type, optionWidth, optionHeight, displayArray[type][number]);
-				optionTeam.add(titleObject);
+				var w:Int = Std.int(unit * widthUnits[row][col]);
+				var returnKey:String = returnArray[row][col];
+				if (returnKey != null && returnKey != '')
+				{
+					var h:Int = keyHeight;
+					if (returnKey == '#+')
+						h = keyHeight * 2 + Std.int(rowGap);
+					var titleObject = new ChooseButton(x, y, w, h, displayArray[row][col]);
+					optionTeam.add(titleObject);
+					rowSelectableIndices[row].push(selectableButtons.length);
+					selectableButtons.push(titleObject);
+					selectableReturnKeys.push(returnKey);
+				}
+				x += w + gap;
 			}
 		}
 
@@ -104,10 +162,16 @@ class MobileExtraControl extends MusicBeatSubstate
 			else
 			{
 				chooseNum += left ? -1 : 1;
-				if (chooseNum > displayArray[typeNum].length - 1)
+				var rowLen = rowSelectableIndices[typeNum].length;
+				if (rowLen <= 0)
 					chooseNum = 0;
-				if (chooseNum < 0)
-					chooseNum = displayArray[typeNum].length - 1;
+				else
+				{
+					if (chooseNum > rowLen - 1)
+						chooseNum = 0;
+					if (chooseNum < 0)
+						chooseNum = rowLen - 1;
+				}
 				updateChoose();
 			}
 		}
@@ -116,13 +180,51 @@ class MobileExtraControl extends MusicBeatSubstate
 		{
 			if (!isMain)
 			{
-				percent = chooseNum / (displayArray[typeNum].length - 1);
+				var curRow = typeNum;
+				var curPos = chooseNum;
+				var curIndex:Int = 0;
+				if (rowSelectableIndices[curRow].length > 0)
+					curIndex = rowSelectableIndices[curRow][curPos];
+
+				var curX:Float = 0;
+				if (selectableButtons.length > 0 && curIndex >= 0 && curIndex < selectableButtons.length)
+				{
+					var btn = selectableButtons[curIndex];
+					curX = btn.x + btn.bg.width / 2;
+				}
+
 				typeNum += up ? -1 : 1;
-				if (typeNum > displayArray.length - 1)
+				if (typeNum > rowSelectableIndices.length - 1)
 					typeNum = 0;
 				if (typeNum < 0)
-					typeNum = displayArray.length - 1;
-				chooseNum = Std.int(percent * (displayArray[typeNum].length - 1));
+					typeNum = rowSelectableIndices.length - 1;
+
+				var safety:Int = 0;
+				while (rowSelectableIndices[typeNum].length <= 0 && safety < rowSelectableIndices.length + 1)
+				{
+					typeNum += up ? -1 : 1;
+					if (typeNum > rowSelectableIndices.length - 1)
+						typeNum = 0;
+					if (typeNum < 0)
+						typeNum = rowSelectableIndices.length - 1;
+					safety++;
+				}
+
+				var best:Int = 0;
+				var bestDist:Float = 999999;
+				for (i in 0...rowSelectableIndices[typeNum].length)
+				{
+					var idx = rowSelectableIndices[typeNum][i];
+					var b = selectableButtons[idx];
+					var bx = b.x + b.bg.width / 2;
+					var d = Math.abs(bx - curX);
+					if (d < bestDist)
+					{
+						bestDist = d;
+						best = i;
+					}
+				}
+				chooseNum = best;
 				updateChoose();
 			}
 		}
@@ -136,16 +238,25 @@ class MobileExtraControl extends MusicBeatSubstate
 			}
 			else
 			{
+				var rowLen = rowSelectableIndices[typeNum].length;
+				if (rowLen <= 0)
+					return;
+				if (chooseNum < 0)
+					chooseNum = 0;
+				if (chooseNum > rowLen - 1)
+					chooseNum = rowLen - 1;
+				var realIndex = rowSelectableIndices[typeNum][chooseNum];
+				var chosenKey = selectableReturnKeys[realIndex];
 				switch (titleNum + 1)
 				{
 					case 1:
-						ClientPrefs.data.extraKeyReturn1 = returnArray[typeNum][chooseNum];
+						ClientPrefs.data.extraKeyReturn1 = chosenKey;
 					case 2:
-						ClientPrefs.data.extraKeyReturn2 = returnArray[typeNum][chooseNum];
+						ClientPrefs.data.extraKeyReturn2 = chosenKey;
 					case 3:
-						ClientPrefs.data.extraKeyReturn3 = returnArray[typeNum][chooseNum];
+						ClientPrefs.data.extraKeyReturn3 = chosenKey;
 					case 4:
-						ClientPrefs.data.extraKeyReturn4 = returnArray[typeNum][chooseNum];
+						ClientPrefs.data.extraKeyReturn4 = chosenKey;
 				}
 				ClientPrefs.saveSettings();
 				updateTitle(titleNum + 1, false, 2, true);
@@ -164,7 +275,7 @@ class MobileExtraControl extends MusicBeatSubstate
 			else
 			{
 				isMain = true;
-				percent = chooseNum = typeNum = 0;
+				chooseNum = typeNum = 0;
 				updateChoose();
 			}
 		}
@@ -182,25 +293,23 @@ class MobileExtraControl extends MusicBeatSubstate
 	function updateChoose(soundsType:Int = 0)
 	{
 		FlxG.sound.play(Paths.sound('scrollMenu'));
+		for (i in 0...selectableButtons.length)
+			selectableButtons[i].changeColor(FlxColor.BLACK);
 
-		var realNum = 0;
+		if (isMain)
+			return;
 
-		for (type in 0...displayArray.length)
-		{
-			if (type < typeNum)
-				realNum += displayArray[type].length;
-		}
-		realNum += chooseNum;
+		if (typeNum < 0 || typeNum > rowSelectableIndices.length - 1)
+			return;
+		if (rowSelectableIndices[typeNum].length <= 0)
+			return;
+		if (chooseNum < 0)
+			chooseNum = 0;
+		if (chooseNum > rowSelectableIndices[typeNum].length - 1)
+			chooseNum = rowSelectableIndices[typeNum].length - 1;
 
-		for (i in 0...optionTeam.length)
-		{
-			var option:ChooseButton = optionTeam.members[i];
-
-			if (i == realNum && !isMain)
-				option.changeColor(FlxColor.WHITE);
-			else
-				option.changeColor(FlxColor.BLACK);
-		}
+		var idx = rowSelectableIndices[typeNum][chooseNum];
+		selectableButtons[idx].changeColor(FlxColor.WHITE);
 	}
 
 	function updateTitle(number:Int = 0, changeBG:Bool = false, soundsType:Int = 0, needFlicker:Bool = false)

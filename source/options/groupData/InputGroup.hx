@@ -35,10 +35,6 @@ class InputGroup extends OptionCata
 		option.onChange = function() { changeState(4); };
 		addOption(option);
 
-		var hitboxLocationArray:Array<String> = ['Bottom', 'Top', 'Middle'];
-		var option:Option = new Option(this, 'hitboxLocation', STRING, hitboxLocationArray);
-		addOption(option);
-
 		var option:Option = new Option(this, 'dynamicColors', BOOL);
 		addOption(option);
 
@@ -46,6 +42,10 @@ class InputGroup extends OptionCata
 		addOption(option);
 
 		var option:Option = new Option(this, 'extraKey', INT, [0, 4]);
+		addOption(option);
+
+		var hitboxLocationArray:Array<String> = ['Bottom', 'Top', 'Middle'];
+		var option:Option = new Option(this, 'hitboxLocation', STRING, hitboxLocationArray);
 		addOption(option);
 
 		var option:Option = new Option(this, 'MobileExtraControl', STATE, 'MobileExtraControl');

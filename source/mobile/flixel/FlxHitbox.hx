@@ -8,6 +8,8 @@ import flixel.input.keyboard.FlxKey;
 import mobile.flixel.input.FlxMobileInputManager;
 import mobile.flixel.FlxButton;
 
+import general.backend.InputFormatter;
+
 /**
  * A zone with dynamic hint's based on mania.
  * 
@@ -87,10 +89,14 @@ class FlxHitbox extends FlxMobileInputManager
 			}
 		}
 
-		// Assign input IDs to main keys
 		for (i in 0...buttonNotes.length)
 		{
 			buttonNotes[i].IDs = getInputID(mania, i);
+		}
+
+		for (i in 0...buttonExtra.length)
+		{
+			buttonExtra[i].IDs = getExtraID(i);
 		}
 
 		scrollFactor.set();
@@ -118,6 +124,18 @@ class FlxHitbox extends FlxMobileInputManager
 			return ClientPrefs.keyBinds.get(key);
 
 		return [];
+	}
+
+	/**
+	 * Get extra key ID based on index
+	 */
+	private function getExtraID(index:Int):Array<FlxKey>
+	{
+		var groupData = [];
+		index = Std.int(index + 1);
+		groupData.push(InputFormatter.getFlxKey(Reflect.getProperty(ClientPrefs.data, 'extraKeyReturn' + index)));
+
+		return groupData;
 	}
 
 	/**

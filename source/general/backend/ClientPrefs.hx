@@ -122,10 +122,10 @@ import games.backend.ExtraKeysHandler.EKNoteColor;
 	public var hideHitboxHints:Bool = false;
 
 	public var extraKey:Int = 4;
-	public var extraKeyReturn1:String = 'SPACE';
-	public var extraKeyReturn2:String = 'SPACE';
-	public var extraKeyReturn3:String = 'SHIFT';
-	public var extraKeyReturn4:String = 'SHIFT';
+	public var extraKeyReturn1:String = 'Space';
+	public var extraKeyReturn2:String = 'Space';
+	public var extraKeyReturn3:String = 'Shift';
+	public var extraKeyReturn4:String = 'Shift';
 
 	// User Interface
 	public var uiScale:Float = 1;

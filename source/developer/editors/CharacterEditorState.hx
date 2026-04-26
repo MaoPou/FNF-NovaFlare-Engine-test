@@ -54,7 +54,7 @@ class CharacterEditorState extends MusicBeatState
 
 	var copiedOffset:Array<Float> = [0, 0];
 	var _char:String = null;
-	var _goToPlayState:Bool = true;
+	var _goToPlayState:Bool = false;
 
 	var anims = null;
 	var animsTxtGroup:FlxTypedGroup<FlxText>;
@@ -66,7 +66,7 @@ class CharacterEditorState extends MusicBeatState
 	var UI_box:FlxUITabMenu;
 	var UI_characterbox:FlxUITabMenu;
 
-	public function new(char:String = null, goToPlayState:Bool = true)
+	public function new(char:String = null, goToPlayState:Bool = false)
 	{
 		this._char = char;
 		this._goToPlayState = goToPlayState;
