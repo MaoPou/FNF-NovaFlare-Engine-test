@@ -47,6 +47,11 @@ class FlxButton extends FlxTypedButton<FlxText>
 	public var bounds:FlxSprite = new FlxSprite();
 
 	/**
+	 * The color of the button when it is not pressed.
+	 */
+	public var saveColor:Int = 0xFFFFFF;
+
+	/**
 	 * Creates a new `FlxButton` object with a gray background
 	 * and a callback function on the UI thread.
 	 *

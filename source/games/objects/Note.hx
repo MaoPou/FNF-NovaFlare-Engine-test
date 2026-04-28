@@ -52,6 +52,8 @@ class Note extends FlxSprite
 		'No Animation'
 	];
 
+	static var follow:Dynamic = null;
+
 	public var extraData:Map<String, Dynamic> = new Map<String, Dynamic>();
 
 	public var strumTime:Float = 0;
@@ -722,9 +724,9 @@ class Note extends FlxSprite
 			var swagRect:FlxRect = clipRect;
 			if (swagRect == null) swagRect = FlxRect.get(0, 0, frameWidth, frameHeight);
 			
-			var time:Float = FlxMath.bound((Conductor.songPosition - strumTime) / (swagRect.height * scale.y / (0.45 * FlxMath.roundDecimal(PlayState.instance.songSpeed, 2))), 0, 1);
+			var time:Float = FlxMath.bound((Conductor.songPosition - strumTime) / (swagRect.height * scale.y / (0.45 * FlxMath.roundDecimal(follow.songSpeed, 2))), 0, 1);
 			if (time >= 1) {
-				PlayState.instance.invalidateNote(this);
+				follow.invalidateNote(this);
 				return;
 			}
 
@@ -768,7 +770,7 @@ class Note extends FlxSprite
 		return rect;
 	}
 
-	public static function init()
+	public static function init(target:Dynamic = null)
 	{
 		loadedNote = new Map<String, {texture:String, postfix:String, skin:String, skinPostfix:String}>();
 
@@ -783,6 +785,10 @@ class Note extends FlxSprite
 		}
 
 		addSkinCache(skin + skinPostfix);
+
+		if (target != null) {
+			follow = target;
+		}
 	}
 
 	static function addSkinCache(skin:String)

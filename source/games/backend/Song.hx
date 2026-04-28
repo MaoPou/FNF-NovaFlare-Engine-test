@@ -149,7 +149,7 @@ class Song
 		return rawData != null ? parseJSON(rawData, jsonInput) : null;
 	}
 
-	public static function parseJSON(rawData:String, ?nameForError:String = null, ?convertTo:String = 'psych_v1'):SwagSong
+	public static function parseJSON(rawData:String, ?nameForError:String = null, convertTo:String = 'psych_v1'):SwagSong
 	{
 		var songJson:SwagSong = cast Json.parse(rawData);
 		isNewVersion = true;
@@ -161,6 +161,8 @@ class Song
 				songJson = subSong;
 				if (songJson.format == null)
 					isNewVersion = false; // it build with old
+				if (songJson.format != null && songJson.format != convertTo)
+					isNewVersion = false;
 			}
 		}
 

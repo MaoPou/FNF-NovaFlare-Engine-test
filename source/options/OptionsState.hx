@@ -400,7 +400,7 @@ class OptionsState extends MusicBeatState
 		switch (type)
 		{
 			case 1: // NoteOffsetState
-				LoadingState.loadAndSwitchState(new NoteOffsetState());
+				MusicBeatState.switchState(new NoteOffsetState());
 			case 2: // NotesSubState
 				persistentUpdate = false;
 				openSubState(new NotesSubState());
@@ -414,7 +414,7 @@ class OptionsState extends MusicBeatState
 				persistentUpdate = false;
 				openSubState(new MobileExtraControl());
 			case 6: // CopyStates
-				LoadingState.loadAndSwitchState(new CopyState(true));
+				MusicBeatState.switchState(new CopyState(true));
 			case 7: // NotesSubStateLegacy
 				persistentUpdate = false;
 				openSubState(new NotesSubStateLegacy());

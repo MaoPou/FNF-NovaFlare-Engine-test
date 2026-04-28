@@ -163,7 +163,7 @@
 	<!--haxedef name="openfl_enable_experimental_update_queue"/-->
 
 	<haxedef name="HXCPP_ALIGN_ALLOC"/>
-	<!--<haxedef name="HXCPP_GC_GENERATIONAL" />-->
+	<haxedef name="HXCPP_GC_GENERATIONAL" />
 
 	<!-- _______________________________ TRACY ______________________________ -->
 

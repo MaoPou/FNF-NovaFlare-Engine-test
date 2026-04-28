@@ -456,25 +456,15 @@ class ClientPrefs
 		if (FlxG.save.data.drawFramerate == null)
 		{
 			final refreshRate:Int = FlxG.stage.application.window.displayMode.refreshRate;
-			data.drawFramerate = Std.int(FlxMath.bound(refreshRate, 60, 360));
+			data.drawFramerate = Std.int(FlxMath.bound(refreshRate, 60, 1000));
 		}
 		#end
 
 		lime.graphics.opengl.GL.setMultiThreaded(data.renderThread);
 
+		FlxG.updateFramerate = data.framerate;
+		FlxG.drawFramerate = data.drawFramerate;
 		FlxG.stage.application.window.lockRender = data.lockRender;
-		FlxG.stage.application.window.drawFrameRate = data.drawFramerate;
-
-		if (data.framerate > FlxG.drawFramerate)
-		{
-			FlxG.updateFramerate = data.framerate;
-			FlxG.drawFramerate = data.drawFramerate;
-		}
-		else
-		{
-			FlxG.drawFramerate = data.drawFramerate;
-			FlxG.updateFramerate = data.framerate;
-		}
 
 		if (FlxG.save.data.gameplaySettings != null)
 		{

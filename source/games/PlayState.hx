@@ -1741,7 +1741,7 @@ class PlayState extends MusicBeatState
 		{
 		}
 
-		Note.init();
+		Note.init(instance);
 
 		for (section in songData.notes)
 		{

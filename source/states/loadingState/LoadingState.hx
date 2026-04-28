@@ -102,7 +102,7 @@ class LoadingState extends MusicBeatState
 		return v;
 	}
 
-	static function getNextState(target:FlxState, stopMusic = false, intrusive:Bool = false):FlxState
+	static function getNextState(target:FlxState, stopMusic = false, intrusive:Bool = true):FlxState
 	{
 		var directory:String = 'shared';
 		var weekDir:String = StageData.forceNextDirectory;
