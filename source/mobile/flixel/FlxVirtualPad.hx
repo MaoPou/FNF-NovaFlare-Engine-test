@@ -205,8 +205,8 @@ class FlxVirtualPad extends FlxMobileInputManager
 					extraKeys.push(createButton(0, 0, BTN, BTN, '1', null, 0xFFFFFF));
 				
 			case OptionStateC:
-				add(buttonLeft = createButton(rx(2), by(2), BTN, BTN, "left", null, 0xFF00FF));
-				add(buttonRight = createButton(rx(1), by(2), BTN, BTN, "right", null, 0xFF0000));
+				add(buttonLeft = createButton(rx(2), by(2), BTN, BTN, "left", keybindSet('ui_left'), 0xFF00FF));
+				add(buttonRight = createButton(rx(1), by(2), BTN, BTN, "right", keybindSet('ui_right'), 0xFF0000));
 				add(buttonC = createButton(rx(3), by(1), BTN, BTN, 'c', null, 0x44FF00));
 				add(buttonB = createButton(rx(2), by(1), BTN, BTN, 'b', keybindSet('back'), 0xFFCB00));
 				add(buttonA = createButton(rx(1), by(1), BTN, BTN, 'a', keybindSet('accept'), 0xFF0000));
