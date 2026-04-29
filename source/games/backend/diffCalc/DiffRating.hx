@@ -103,13 +103,11 @@ class DiffRating {
     static function resolvePlayableLane(sec:SwagSection, rawLane:Int, song:SwagSong):Int {
         var playOpp = ClientPrefs.data.playOpponent == true;
         var gottaHit:Bool = sec.mustHitSection;
-        if (Song.isNewVersion) {
-            gottaHit = (rawLane < 4);
-        } else {
-            if (rawLane > song.mania) {
-                gottaHit = !sec.mustHitSection;
-            }
+
+        if (rawLane > song.mania) {
+            gottaHit = !sec.mustHitSection;
         }
+        
         var mustPress = playOpp ? !gottaHit : gottaHit;
         if (!mustPress) return -1;
         var columns:Int = song.mania + 1;

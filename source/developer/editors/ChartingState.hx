@@ -203,14 +203,7 @@ class ChartingState extends MusicBeatState
 	{
 		if (PlayState.SONG != null)
 		{
-			if (!Song.isNewVersion)
-			{
-				_song = PlayState.SONG;
-			}
-			else
-			{
-				_song = Song.castVersion(PlayState.SONG);
-			}
+			_song = PlayState.SONG;
 		}
 		else
 		{

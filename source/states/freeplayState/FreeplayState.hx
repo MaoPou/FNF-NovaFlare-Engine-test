@@ -619,9 +619,7 @@ class FreeplayState extends MusicBeatState
 						if (rawLane < 0) continue;
 
 						var gottaHitNote:Bool = sec.mustHitSection;
-						if (Song.isNewVersion) {
-							gottaHitNote = (rawLane < 4);
-						} else if (rawLane > PlayState.SONG.mania) {
+						if (rawLane > PlayState.SONG.mania) {
 							gottaHitNote = !sec.mustHitSection;
 						}
 

@@ -90,9 +90,30 @@ class FlxButton extends FlxTypedButton<FlxText>
 	{
 		if (Text != null)
 		{
-			label = new FlxText(x + labelOffsets[NORMAL].x, y + labelOffsets[NORMAL].y, 80, Text);
-			label.setFormat(null, 8, 0x333333, 'center');
-			label.alpha = labelAlphas[status];
+			label = new FlxText(x, y, 80, Text);
+			label.antialiasing = true;
+			label.setFormat(Paths.font(Language.get('fontName', 'ma') + '.ttf'), Std.int(8), 0xFFFFFF, CENTER, FlxTextBorderStyle.OUTLINE, 0x00FFFFFF);
+			label.borderStyle = NONE;
+			label.alpha = 1;
+			label.drawFrame(true);
+		}
+	}
+
+	/**
+	 * Updates the size of the text field to match the button.
+	 */
+	override public function updateLabelSize(owidth:Int, oheight:Int):Void
+	{
+		saveWidth = owidth;
+		saveHeight = oheight;
+
+		if (label != null)
+		{
+			label.setFormat(Paths.font(Language.get('fontName', 'ma') + '.ttf'), Std.int(owidth / 4), 0xFFFFFF, CENTER, FlxTextBorderStyle.OUTLINE, 0x00FFFFFF);
+			label.borderStyle = NONE;
+			label.fieldWidth = owidth;
+			label.x += owidth / 2 - label.fieldWidth / 2;
+			label.y += oheight / 2 - label.height / 2;
 			label.drawFrame(true);
 		}
 	}
@@ -174,6 +195,10 @@ class FlxTypedButton<T:FlxSprite> extends FlxSprite implements IFlxInput
 	 * Defaults to `Math.POSITIVE_INFINITY` (i.e. no limit).
 	 */
 	public var maxInputMovement:Float = Math.POSITIVE_INFINITY;
+
+	var saveWidth:Int = 0;
+
+	var saveHeight:Int = 0;
 
 	/**
 	 * Shows the current state of the button, either `FlxButton.NORMAL`,
@@ -501,7 +526,12 @@ class FlxTypedButton<T:FlxSprite> extends FlxSprite implements IFlxInput
 			_spriteLabel.x = (pixelPerfectPosition ? Math.floor(x) : x) + labelOffsets[status].x;
 			_spriteLabel.y = (pixelPerfectPosition ? Math.floor(y) : y) + labelOffsets[status].y;
 		}
+
+		if (saveWidth != 0 && saveHeight != 0)
+			updateLabelSize(saveWidth, saveHeight);
 	}
+
+	function updateLabelSize(owidth:Int, oheight:Int):Void {}
 
 	function updateLabelAlpha()
 	{

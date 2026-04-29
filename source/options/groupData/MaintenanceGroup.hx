@@ -50,8 +50,8 @@ class MaintenanceGroup extends OptionCata
 	}
 	
 	function updateText(){
-	    if(Console != null) {
-	        Console.consoleInstance.scaleX = Console.consoleInstance.scaleY = ClientPrefs.data.DevConScale;
+	    if(Console.consoleInstance != null) {
+	        Console.consoleInstance.updateScale(ClientPrefs.data.DevConScale);
 	    }
 	}
 }

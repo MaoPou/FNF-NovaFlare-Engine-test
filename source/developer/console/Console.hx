@@ -40,6 +40,7 @@ class Console extends Sprite {
     private var maxBatchSize:Int = 100; // 每批处理的最大日志数
     private var maxLogLines:Int = 1000; // 最大日志行数
     private var renderDelay:Int = 100; // 渲染延迟(毫秒)
+    private var outputLineCount:Int = 0;
     
     private static var _consoleInstance:Console = null;
     
@@ -376,6 +377,7 @@ class Console extends Sprite {
         output.htmlText = "";
         output.y = 0;
         buffer = [];
+        outputLineCount = 0;
     }
     
     private function closeConsole():Void {
@@ -396,9 +398,7 @@ class Console extends Sprite {
     }
     
     public static function log(message:String):Void {
-        if (consoleInstance != null) {
-            consoleInstance.addLog(message);
-        }
+        consoleInstance.addLog(message);
     }
     
     private function addLog(message:String):Void {
@@ -409,11 +409,8 @@ class Console extends Sprite {
     }
     
     public static function show():Void {
-        if (consoleInstance.parent == null) {
-            openfl.Lib.current.stage.addChild(consoleInstance);
-        }
         consoleInstance.visible = true;
-        consoleInstance.scaleX = consoleInstance.scaleY = ClientPrefs.data.uiScale;
+        consoleInstance.updateScale(ClientPrefs.data.DevConScale);
         ConsoleToggleButton.hide();
     }
     
@@ -436,9 +433,7 @@ class Console extends Sprite {
     }
     
     public static function logWithColoredHead(head:String, message:String, color:Int):Void {
-        if (consoleInstance != null) {
-            consoleInstance.addLogWithColoredHead(head, message, color);
-        }
+        consoleInstance.addLogWithColoredHead(head, message, color);
     }
     
     private function addLogWithColoredHead(head:String, message:String, color:Int):Void {
@@ -463,11 +458,13 @@ class Console extends Sprite {
         
         var hasNewContent = false;
         var batchCount = 0;
+        var newLines:Array<String> = [];
         
         // 处理普通日志
         while (pendingLogs.length > 0 && batchCount < maxBatchSize) {
             var message = pendingLogs.shift();
             buffer.push(message);
+            newLines.push(message);
             hasNewContent = true;
             batchCount++;
         }
@@ -477,17 +474,31 @@ class Console extends Sprite {
             var log = pendingColoredLogs.shift();
             var htmlLine = '<font color="#${StringTools.hex(log.color, 6)}">${StringTools.htmlEscape(log.head)}</font>${StringTools.htmlEscape(log.message)}';
             buffer.push(htmlLine);
+            newLines.push(htmlLine);
             hasNewContent = true;
             batchCount++;
         }
         
         if (hasNewContent) {
-            // 限制日志行数
+            var trimmedCount = 0;
             while (buffer.length > maxLogLines) {
                 buffer.shift();
+                trimmedCount++;
             }
             
-            output.htmlText = buffer.join("<br/>");
+            var newContent = newLines.join("<br/>");
+            
+            if (outputLineCount == 0) {
+                output.htmlText = newContent;
+            } else if (trimmedCount > 0) {
+                // 裁剪后需要全量重建
+                output.htmlText = buffer.join("<br/>");
+            } else {
+                // 增量追加 — 避免全量重建，大幅提升性能
+                output.htmlText += "<br/>" + newContent;
+            }
+            
+            outputLineCount = buffer.length;
             
             if (autoScroll) {
                 scrollToBottom();

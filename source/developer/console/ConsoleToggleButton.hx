@@ -45,9 +45,6 @@ class ConsoleToggleButton extends Sprite {
     }
     
     public static function show():Void {
-        if (instance.parent == null) {
-            openfl.Lib.current.stage.addChild(instance);
-        }
         instance.visible = true;
     }
     

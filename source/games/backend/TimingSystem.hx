@@ -109,6 +109,14 @@ class TimingSystem {
         return getPositionMs() / 1000.0;
     }
 
+    public function onFocus():Void {
+        resume();
+    }
+
+    public function onFocusLost():Void {
+        pause();
+    }
+
     public function getDebugString():String {
         var s:String = '';
         s += 'playing=' + isPlaying + '\n';

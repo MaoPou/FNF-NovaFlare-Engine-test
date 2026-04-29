@@ -283,6 +283,8 @@ class FlxVirtualPad extends FlxMobileInputManager
 		button.ignoreDrawDebug = true;
 		#end
 
+		button.updateLabelSize(Width, Height);
+
 		button.onDown.callback = function()
 		{
 			button.color = 0xFFFFFF;

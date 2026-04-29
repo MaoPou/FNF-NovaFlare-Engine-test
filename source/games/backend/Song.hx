@@ -61,8 +61,6 @@ class Song
 	public var musican:String = 'N/A';
 	public var mania:Int = 3;	//话说这是不是跟下面的重复了
 
-	static public var isNewVersion:Bool = false;
-
 	private static function onLoadJson(songJson:Dynamic) //修复铺面json缺少数据的问题
 	{
 		if (songJson.gfVersion == null)
@@ -152,18 +150,20 @@ class Song
 	public static function parseJSON(rawData:String, ?nameForError:String = null, convertTo:String = 'psych_v1'):SwagSong
 	{
 		var songJson:SwagSong = cast Json.parse(rawData);
-		isNewVersion = true;
-		if (Reflect.hasField(songJson, 'song'))
-		{
+
+		if (Reflect.hasField(songJson, 'format')) {//pe1.0没song包裹
+			if (songJson.format.length > 0 && songJson.format.indexOf(convertTo) != -1)
+				castVersion(songJson);
+		} else {
 			var subSong:SwagSong = Reflect.field(songJson, 'song');
 			if (subSong != null && Type.typeof(subSong) == TObject)
 			{
 				songJson = subSong;
-				if (songJson.format == null)
-					isNewVersion = false; // it build with old
-				if (songJson.format != null && songJson.format != convertTo)
-					isNewVersion = false;
 			}
+
+			if (Reflect.hasField(songJson, 'format'))
+				if (songJson.format.length > 0 && songJson.format.indexOf(convertTo) != -1)
+					castVersion(songJson);
 		}
 
 		onLoadJson(songJson);
@@ -190,7 +190,6 @@ class Song
 				}
 			}
 		}
-		isNewVersion = false;
 		return songJson;
 	}
 }

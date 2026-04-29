@@ -25,10 +25,16 @@ typedef TitleData =
 {
 	titlex:Float,
 	titley:Float,
+	titlescalex:Float,
+	titlescaley:Float,
 	startx:Float,
 	starty:Float,
+	startscalex:Float,
+	startscaley:Float,
 	gfx:Float,
 	gfy:Float,
+	gfxscalex:Float,
+	gfxscaley:Float,
 	backgroundSprite:String,
 	bpm:Float
 }
@@ -178,6 +184,8 @@ class TitleState extends MusicBeatState
 		logoBl = new FlxSprite(titleJSON.titlex, titleJSON.titley);
 		logoBl.frames = Paths.getSparrowAtlas('logoBumpin');
 		logoBl.antialiasing = ClientPrefs.data.antialiasing;
+		if (IsNum(titleJSON.startscalex)) logoBl.scale.x = titleJSON.startscalex;
+		if (IsNum(titleJSON.startscaley)) logoBl.scale.y = titleJSON.startscaley;
 
 		logoBl.animation.addByPrefix('bump', 'logo bumpin', 24, false);
 		logoBl.animation.play('bump');
@@ -188,6 +196,8 @@ class TitleState extends MusicBeatState
 		if(ClientPrefs.data.shaders) swagShader = new ColorSwap();
 		gfDance = new FlxSprite(titleJSON.gfx, titleJSON.gfy);
 		gfDance.antialiasing = ClientPrefs.data.antialiasing;
+		if (IsNum(titleJSON.gfxscalex)) gfDance.scale.x = titleJSON.gfxscalex;
+		if (IsNum(titleJSON.gfxscaley)) gfDance.scale.y = titleJSON.gfxscaley;
 
 		var easterEgg:String = FlxG.save.data.psychDevsEasterEgg;
 		if(easterEgg == null) easterEgg = ''; //html5 fix
@@ -251,6 +261,8 @@ class TitleState extends MusicBeatState
 		titleText.animation.play('idle');
 		titleText.updateHitbox();
 		// titleText.screenCenter(X);
+		if (IsNum(titleJSON.startscalex)) titleText.scale.x = titleJSON.startscalex;
+		if (IsNum(titleJSON.startscaley)) titleText.scale.y = titleJSON.startscaley;
 		add(titleText);
 
 		var logo:FlxSprite = new FlxSprite().loadGraphic(Paths.image('logo'));
@@ -642,6 +654,11 @@ class TitleState extends MusicBeatState
 			}
 			skippedIntro = true;
 		}
+	}
+
+	function IsNum(value:Dynamic):Bool { 
+	    if (Std.isOfType(value, Int)) return true;
+	    return Std.isOfType(value, Float); 
 	}
 }
 

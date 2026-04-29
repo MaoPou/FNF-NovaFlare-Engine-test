@@ -19,6 +19,8 @@ import flixel.FlxGame;
 import developer.display.FPSViewer;
 import developer.display.Graphics;
 import developer.console.TraceInterceptor;
+import developer.console.Console;
+import developer.console.ConsoleToggleButton;
 
 import general.objects.screen.MouseEffect;
 
@@ -160,9 +162,6 @@ class Main extends Sprite
 		ExtraKeysHandler.instance = new ExtraKeysHandler();
 		ClientPrefs.loadDefaultKeys();
 
-		if(ClientPrefs.data.developerMode)
-			TraceInterceptor.init();
-
 		var flxGame:FlxGame = new FlxGame(#if (openfl >= "9.2.0") 1280, 720 #else gameConfig.width, gameConfig.height #end,gameConfig.initialState, #if (flixel < "5.0.0") gameConfig.zoom, #end gameConfig.framerate, gameConfig.framerate, gameConfig.skipSplash, gameConfig.startFullscreen);
 		addChild(flxGame);
 
@@ -206,6 +205,11 @@ class Main extends Sprite
 		LimeSystem.allowScreenTimeout = ClientPrefs.data.screensaver;
 		#end
 		Data.setup();
+
+		TraceInterceptor.init();
+		addChild(ConsoleToggleButton.instance);
+		addChild(Console.consoleInstance);
+		Console.consoleInstance.visible = false;
 
 		#if !debug
 			//cpp.NativeGc.enterGCFreeZone();

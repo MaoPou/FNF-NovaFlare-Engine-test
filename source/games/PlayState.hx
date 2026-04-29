@@ -1754,14 +1754,9 @@ class PlayState extends MusicBeatState
 				if (ClientPrefs.data.flipChart)
 					daNoteData -= Std.int((daNoteData - 1.5) * 2);
 
-				if (Song.isNewVersion)
-					gottaHitNote = (songNotes[1] < 4);
-				else
-				{
 				if (songNotes[1] > SONG.mania)					
-					{
-						gottaHitNote = !section.mustHitSection;
-					}
+				{
+					gottaHitNote = !section.mustHitSection;
 				}
 
 				var oldNote:Note;
@@ -2255,6 +2250,7 @@ class PlayState extends MusicBeatState
 		callOnScripts('onFocus');
 		if (health > 0 && !paused)
 			resetRPC(Conductor.songPosition > 0.0);
+		if (timing != null) timing.onFocus();
 		super.onFocus();
 		callOnScripts('onFocusPost');
 	}
@@ -2277,6 +2273,7 @@ class PlayState extends MusicBeatState
 		}
 		#end
 
+		if (timing != null) timing.onFocusLost();
 		super.onFocusLost();
 		callOnScripts('onFocusLostPost');
 	}
