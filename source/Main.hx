@@ -11,7 +11,6 @@ import openfl.display.StageScaleMode;
 import openfl.events.KeyboardEvent;
 
 import lime.system.System as LimeSystem;
-import lime.app.Application;
 
 import flixel.graphics.FlxGraphic;
 import flixel.FlxGame;
@@ -168,9 +167,10 @@ class Main extends Sprite
 		fpsVar = new FPSViewer(0, 0);
 		FlxG.addChildBelowMouse(fpsVar);
 		FlxG.spriteBelowMouse.push(fpsVar);
-
+		
 		Lib.current.stage.align = "tl";
 		Lib.current.stage.scaleMode = StageScaleMode.NO_SCALE;
+		Lib.current.stage.setLogicalSize(1280, 720);
 
 		var image:String = Paths.modFolders('images/menuExtend/Others/watermark.png');
 
