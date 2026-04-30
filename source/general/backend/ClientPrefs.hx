@@ -8,6 +8,8 @@ import states.TitleState;
 
 import games.backend.ExtraKeysHandler.EKNoteColor;
 
+import lime.system.Display;
+
 // Add a variable here and it will get automatically saved
 @:structInit class SaveVariables
 {
@@ -16,6 +18,7 @@ import games.backend.ExtraKeysHandler.EKNoteColor;
 	public var drawFramerate:Int = 60;
 	public var lockRender:Bool = true;
 	public var renderThread:Bool = true;
+	public var resolution:String = 'Native';
 	public var colorblindMode:String = 'None';
 	public var lowQuality:Bool = false;
 	public var gameQuality:Int = #if mobile 0 #else 1 #end;
@@ -465,6 +468,37 @@ class ClientPrefs
 		FlxG.updateFramerate = data.framerate;
 		FlxG.drawFramerate = data.drawFramerate;
 		FlxG.stage.application.window.lockRender = data.lockRender;
+
+		var output:Array<Float> = [];
+		switch(data.resolution) {
+			case '360P':
+				output = [640, 360];
+			case '480P':
+				output = [854, 480];
+			case '540P':
+				output = [960, 540];
+			case '720P':
+				output = [1280, 720];
+			case '768P':
+				output = [1366, 768];
+			case '900P':
+				output = [1600, 900];
+			case '1080P':
+				output = [1920, 1080];
+			case '1440P (2K)':
+				output = [2560, 1440];
+			case '1600P':	
+				output = [2560, 1600];
+			case '1800P':
+				output = [3200, 1800];
+			case '2160P (4K)':	
+				output = [3840, 2160];
+			default:
+				var display:Display = lime.system.System.getDisplay(0);
+				output = [display.bounds.width, display.bounds.height];
+				data.resolution = "Native: " + display.bounds.width + "x" + display.bounds.height;
+		}
+		openfl.Lib.current.stage.setLogicalSize(Std.int(output[0]), Std.int(output[1]));
 
 		if (FlxG.save.data.gameplaySettings != null)
 		{

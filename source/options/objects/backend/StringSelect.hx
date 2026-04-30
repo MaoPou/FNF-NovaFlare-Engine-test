@@ -46,9 +46,11 @@ class StringSelect extends FlxSpriteGroup
 
         var calcWidth = width * (init - 2) / init;
         optionSprites = [];
+        var displayNames = follow.strDisplayGroup;
         for (i in 0...options.length)
         {
-            var option = new ChooseRect(width / 80, 0, calcWidth, height / 5, options[i], i, this);
+            var disName:String = (displayNames != null && i < displayNames.length) ? displayNames[i] : options[i];
+            var option = new ChooseRect(width / 80, 0, calcWidth, height / 5, options[i], disName, i, this);
             add(option);
             optionSprites.push(option);
             option.y = follow.followY + follow.innerY + mainY + i * height / 5; //初始化在state的y
@@ -167,22 +169,24 @@ class ChooseRect extends FlxSpriteGroup {
     var follow:StringSelect;
 
     var name:String;
+    var displayName:String;
 
     public var setAlpha:Float = 0;
 
     ///////////////////////////////////////////////////////////////////////////////
 
-    public function new(X:Float, Y:Float, width:Float, height:Float, name:String, sort:Int, follow:StringSelect) {
+    public function new(X:Float, Y:Float, width:Float, height:Float, name:String, displayName:String, sort:Int, follow:StringSelect) {
         super(X, Y);
         this.follow = follow;
         this.name = name;
+        this.displayName = displayName;
 
         optionSort = sort;
 
         bg = new Rect(0, 0, width, height, height / 5, height / 5, EngineSet.mainColor, 0);
         add(bg);
 
-        textDis = new FlxText(0, 0, 0, name, Std.int(height * 0.15));
+        textDis = new FlxText(0, 0, 0, displayName, Std.int(height * 0.15));
 		textDis.setFormat(Paths.font(Language.get('fontName', 'ma') + '.ttf'), Std.int(height * 0.45), 0xffffff, LEFT, FlxTextBorderStyle.OUTLINE, 0xFFFFFFFF);
         textDis.borderStyle = NONE;
 		textDis.antialiasing = ClientPrefs.data.antialiasing;

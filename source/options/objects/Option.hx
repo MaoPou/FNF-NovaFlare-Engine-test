@@ -31,6 +31,7 @@ class Option extends FlxSpriteGroup
 
 	//STRING
 	public var strGroup:Array<String> = null;
+	public var strDisplayGroup:Array<String> = null;
 
 	//INT FLOAT PERCENT;
 	public var minValue:Float = 0;
@@ -108,7 +109,12 @@ class Option extends FlxSpriteGroup
 				this.extraDisplay = '%';
 				
 			case STRING:
-				this.strGroup = data;
+				if (Std.isOfType(data, Array) && data.length == 2 && Std.isOfType(data[0], Array)) {
+					this.strGroup = data[0];
+					this.strDisplayGroup = data[1];
+				} else {
+					this.strGroup = data;
+				}
 			default:
 		}
 
@@ -283,7 +289,13 @@ class Option extends FlxSpriteGroup
 	}
 
 	public function updateDisText() {
-		valueText.text = defaultValue + ' ' + extraDisplay;
+		var text:String = Std.string(defaultValue) + ' ' + extraDisplay;
+		if (type == STRING && strDisplayGroup != null) {
+			var index:Int = strGroup.indexOf(defaultValue);
+			if (index != -1 && index < strDisplayGroup.length)
+				text = strDisplayGroup[index] + ' ' + extraDisplay;
+		}
+		valueText.text = text;
 		valueText.x = followX + innerX + baseBG.width - valueText.textField.textWidth - baseBG.mainRound;
 	}
 

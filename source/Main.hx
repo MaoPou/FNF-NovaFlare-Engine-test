@@ -11,6 +11,8 @@ import openfl.display.StageScaleMode;
 import openfl.events.KeyboardEvent;
 
 import lime.system.System as LimeSystem;
+import lime.app.Application;
+
 
 import flixel.graphics.FlxGraphic;
 import flixel.FlxGame;
@@ -170,7 +172,6 @@ class Main extends Sprite
 		
 		Lib.current.stage.align = "tl";
 		Lib.current.stage.scaleMode = StageScaleMode.NO_SCALE;
-		Lib.current.stage.setLogicalSize(1280, 720);
 
 		var image:String = Paths.modFolders('images/menuExtend/Others/watermark.png');
 
