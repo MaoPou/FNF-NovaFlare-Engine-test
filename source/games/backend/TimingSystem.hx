@@ -110,11 +110,11 @@ class TimingSystem {
     }
 
     public function onFocus():Void {
-        resume();
+        if (FlxG.autoPause) resume();
     }
 
     public function onFocusLost():Void {
-        pause();
+        if (FlxG.autoPause) pause();
     }
 
     public function getDebugString():String {
