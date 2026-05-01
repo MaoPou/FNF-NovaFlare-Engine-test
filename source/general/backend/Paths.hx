@@ -323,6 +323,43 @@ class Paths
 		return null;
 	}
 
+	static public function imageEX(key:String, ?library:String = null, ?allowGPU:Bool = true, disposeOnUpload:Bool = false):FlxGraphic
+	{
+		var bitmap:BitmapData = null;
+		var file:String = null;
+
+		#if MODS_ALLOWED
+		file = modFolders(key);
+
+		if (Cache.currentTrackedAssets.exists(file))
+		{
+			Cache.localTrackedAssets.push(file);
+			return Cache.currentTrackedAssets.get(file);
+		}
+		else if (FileSystem.exists(file))
+			bitmap = BitmapData.fromFile(file, disposeOnUpload);
+		else
+		#end
+		{
+			file = getPath('images/$key.png', IMAGE, library);
+			if (Cache.currentTrackedAssets.exists(file))
+			{
+				Cache.localTrackedAssets.push(file);
+				return Cache.currentTrackedAssets.get(file);
+			}
+			else if (Assets.exists(file, IMAGE)) {
+				bitmap = Assets.getBitmapData(file);
+				bitmap.disposeOnUpload = disposeOnUpload;
+			}
+		}
+
+		if (bitmap != null)
+			return cacheBitmap(file, bitmap, allowGPU);
+
+		trace('oh no its returning null NOOOO ($file)');
+		return null;
+	}
+
 	static var bitmapMutex:Mutex = new Mutex();
 	static public function cacheBitmap(file:String, ?bitmap:BitmapData = null, ?allowGPU:Bool = true, ?threadLoad:Bool = false)
 	{

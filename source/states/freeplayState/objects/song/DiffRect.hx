@@ -208,7 +208,7 @@ class DiffRect extends FlxSpriteGroup {
     }
 
     override function draw() {
-        this.x = realX;
+        this.x = realX + follow.filterOffsetX;
         this.y = realY;
 
         super.draw();

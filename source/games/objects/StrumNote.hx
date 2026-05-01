@@ -1,4 +1,4 @@
-﻿package games.objects;
+package games.objects;
 
 import flixel.FlxBasic;
 
@@ -95,6 +95,9 @@ class StrumNote extends FlxSprite
 		if (animation.curAnim != null)
 			lastAnim = animation.curAnim.name;
 
+		var mania = 3;
+		if (PlayState.SONG != null) mania = PlayState.SONG.mania;
+
 		if (PlayState.isPixelStage)
 		{
 			loadGraphic(Paths.image(texture));
@@ -109,10 +112,8 @@ class StrumNote extends FlxSprite
 			initialWidth = width;
 			//trace(initialWidth);
 
-			setGraphicSize(width * PlayState.daPixelZoom);
-
-			var mania = 3;
-			if (PlayState.SONG != null) mania = PlayState.SONG.mania;
+			setGraphicSize((width * (ExtraKeysHandler.instance.data.pixelScales[mania] + 0.3)) * PlayState.daPixelZoom);
+			trackedScale = ExtraKeysHandler.instance.data.pixelScales[mania];
 
 			var noteAnimInt = getAnimSet(getIndex(mania, noteData)).pixel;
 
@@ -139,11 +140,8 @@ class StrumNote extends FlxSprite
 			initialWidth = width;	//我勒个一行造成死循环————卡昔233
 
 			antialiasing = ClientPrefs.data.antialiasing;
+			trackedScale = ExtraKeysHandler.instance.data.scales[mania];
 			setGraphicSize(width * trackedScale);
-
-			var mania = 3;
-			if (PlayState.SONG != null)
-				mania = PlayState.SONG.mania;
 
 			animation.addByPrefix('static', 'arrow${getAnimSet(getIndex(mania, noteData)).strum}');
 			animation.addByPrefix('pressed', '${getAnimSet(getIndex(mania, noteData)).anim} press', 24, false);

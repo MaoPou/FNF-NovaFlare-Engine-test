@@ -3446,7 +3446,7 @@ class PlayState extends MusicBeatState
 					hitMapTime: NoteTime,
 					hitMapMs: NoteMs
 				};
-				replayExam.savePlayRecord(record);
+				//replayExam.savePlayRecord(record);
 			}
 			#end
 			playbackRate = 1;

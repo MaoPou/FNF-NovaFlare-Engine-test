@@ -19,27 +19,27 @@ import openfl.display.BitmapData;
 import openfl.display.Shape;
 import openfl.display.Bitmap;
 import openfl.utils.Assets;
-import openfl.filters.BlurFilter;
 import openfl.filters.ShaderFilter;
 
 import flixel.math.FlxRect;
 import flixel.util.FlxSpriteUtil;
-import flixel.graphics.frames.FlxFilterFrames;
 import flixel.addons.display.FlxRuntimeShader;
 
 import general.objects.state.ResultShape;
 
 import states.freeplayState.FreeplayState;
+import states.freeplayState.shader.BlurFilter;
 import states.MainMenuState;
 
 import games.backend.Highscore;
 import games.backend.diffCalc.DiffRating;
 import games.backend.Song;
+import games.backend.Replay;
+import games.backend.Replay.StateRecord;
 
 class ResultsScreen extends MusicBeatSubstate
 {
 	var background:FlxSprite;
-	var bgFilter:FlxFilterFrames;
 
 	// BG
 	var modsBG:FlxSprite;
@@ -72,8 +72,10 @@ class ResultsScreen extends MusicBeatSubstate
 	var backRect:PressButton;
 	// back
 	var replayRect:PressButton;
+	var saveReplayRect:PressButton;
 
-	public var camBack:FlxCamera;
+	public var camBase:FlxCamera;
+	public var camBG:FlxCamera;
 
 	var filter:ShaderFilter;
 
@@ -105,14 +107,19 @@ class ResultsScreen extends MusicBeatSubstate
 	{
 		super();
 
-		//if (PlayState.replayMode)
-			//game = game.funkin.backend.Replay;
+		camBG = new FlxCamera();
+		camBG.bgColor.alpha = 0;
+		FlxG.cameras.add(camBG,false);
 
-		cameras = [FlxG.cameras.list[FlxG.cameras.list.length - 1]];
+		camBase = new FlxCamera();
+		camBase.bgColor.alpha = 0;
+		FlxG.cameras.add(camBase,false);
+
+		cameras = [camBase];
 
 		camOther = new FlxCamera();
 		camOther.bgColor.alpha = 0;
-		FlxG.cameras.add(camOther, false);
+		FlxG.cameras.add(camOther,false);		
 
 		var extraLoad:Bool = false;
 		var filesLoad = 'data/' + game.songName + '/background';
@@ -126,18 +133,17 @@ class ResultsScreen extends MusicBeatSubstate
 			extraLoad = false;
 		}
 
-		background = new FlxSprite(0, 0).loadGraphic(Paths.image(filesLoad, null, true, extraLoad));
+		background = new FlxSprite(0, 0).loadGraphic(Paths.imageEX(filesLoad, null, false, false));
 		background.scale.x = FlxG.width * 1.05 / background.width;
 		background.scale.y = FlxG.height * 1.05 / background.height;
 		background.updateHitbox();
 		background.antialiasing = ClientPrefs.data.antialiasing;
-		add(background);
 		background.screenCenter();
-		
-		var blurFilter:BlurFilter = new BlurFilter(10, 10, 3);
-		var filterFrames = FlxFilterFrames.fromFrames(background.frames, Std.int(background.width), Std.int(background.height), [blurFilter]);
-		filterFrames.applyToSprite(background, false, true);
-		background.alpha = 0;
+		background.camera = camBG;
+		add(background);
+
+		var bgBlur = new BlurFilter(15.0);
+		bgBlur.apply(camBG);
 
 		//--------------------------
 
@@ -165,7 +171,7 @@ class ResultsScreen extends MusicBeatSubstate
 		add(modsText);
 		modsText.x += modsBG.width / 2 - modsText.width / 2;
 		if (modsText.width > 600)
-			modsText.scale.x = 600 / modsText.width; // fix width problem
+			modsText.scale.x = 600 / modsText.width;
 		modsText.offset.x = 0;
 
 		//-------------------------
@@ -303,13 +309,15 @@ class ResultsScreen extends MusicBeatSubstate
 
 		//-------------------------
 
-		replayRect = new PressButton(20 + 640, 20 + 300 + 20 + 300 + 20, 290, 60, 'Replay', 0.5, replayFunction);
-		replayRect.cameras = [camOther];
+		replayRect = new PressButton(20 + 640, 20 + 300 + 20 + 300 + 20, 190, 60, 'Replay', 0.5, replayFunction);
 		replayRect.alpha = 0;
 		add(replayRect);
 
-		backRect = new PressButton(20 + 640 + 310, 20 + 300 + 20 + 300 + 20, 290, 60, 'Back', 0.5, backFunction);
-		backRect.cameras = [camOther];
+		saveReplayRect = new PressButton(20 + 640 + 190 + 10, 20 + 300 + 20 + 300 + 20, 190, 60, 'Save Rep.', 0.5, saveFunction);
+		saveReplayRect.alpha = 0;
+		add(saveReplayRect);
+
+		backRect = new PressButton(20 + 640 + 190 + 10 + 190 + 10, 20 + 300 + 20 + 300 + 20, 190, 60, 'Back', 0.5, backFunction);
 		backRect.alpha = 0;
 		add(backRect);
 
@@ -331,12 +339,27 @@ class ResultsScreen extends MusicBeatSubstate
 	{
 		super.update(elapsed);
 
-		if (!closeCheck && (FlxG.keys.justPressed.ENTER #if android || FlxG.android.justReleased.BACK #end))
+		if (!closeCheck)
 		{
-			if (choose == 1)
-				backFunction();
-			else
-				replayFunction();
+			if (FlxG.keys.justPressed.LEFT)
+			{
+				choose = FlxMath.wrap(choose - 1, 0, 2);
+				FlxG.sound.play(Paths.sound('scrollMenu'));
+			}
+			if (FlxG.keys.justPressed.RIGHT)
+			{
+				choose = FlxMath.wrap(choose + 1, 0, 2);
+				FlxG.sound.play(Paths.sound('scrollMenu'));
+			}
+			if (FlxG.keys.justPressed.ENTER #if android || FlxG.android.justReleased.BACK #end)
+			{
+				switch (choose)
+				{
+					case 0: replayFunction();
+					case 1: saveFunction();
+					case 2: backFunction();
+				}
+			}
 		}
 	}
 
@@ -348,6 +371,7 @@ class ResultsScreen extends MusicBeatSubstate
 			return;
 		if (getReadyReplay)
 		{
+			saveReplayData();
 			NewCustomFadeTransition(true);
 			PlayState.replayMode = true;
 			closeCheck = true;
@@ -370,6 +394,54 @@ class ResultsScreen extends MusicBeatSubstate
 				getReadyReplay = false;
 			});
 		}
+	}
+
+	function saveFunction()
+	{
+		if (closeCheck)
+			return;
+		saveReplayData();
+		FlxG.sound.play(Paths.sound('scrollMenu'));
+		saveReplayRect.text.text = 'Saved!';
+		saveReplayRect.text.x = saveReplayRect.x + saveReplayRect.background.width / 2 - saveReplayRect.text.width / 2;
+		saveReplayRect.text.y = saveReplayRect.y + saveReplayRect.background.height / 2 - saveReplayRect.text.height / 2;
+
+		new FlxTimer().start(1, function(tmr:FlxTimer)
+		{
+			saveReplayRect.text.text = 'Save Rep.';
+			saveReplayRect.text.x = saveReplayRect.x + saveReplayRect.background.width / 2 - saveReplayRect.text.width / 2;
+			saveReplayRect.text.y = saveReplayRect.y + saveReplayRect.background.height / 2 - saveReplayRect.text.height / 2;
+		});
+	}
+
+	function saveReplayData()
+	{
+		if (game.replayExam == null) return;
+
+		var record:StateRecord = {
+			songName: game.songName,
+			difficulty: Difficulty.getString().toUpperCase(),
+			songLength: game.songLength,
+			playDate: Date.now().toString(),
+			songSpeed: game.songSpeed,
+			playbackRate: game.playbackRate,
+			healthGain: game.healthGain,
+			healthLoss: game.healthLoss,
+			cpuControlled: game.cpuControlled,
+			practiceMode: game.practiceMode,
+			instakillOnMiss: game.instakillOnMiss,
+			playOpponent: ClientPrefs.data.playOpponent,
+			flipChart: ClientPrefs.data.flipChart,
+			songScore: game.songScore,
+			ratingPercent: game.ratingPercent,
+			ratingFC: game.ratingFC,
+			songHits: game.songHits,
+			highestCombo: game.highestCombo,
+			songMisses: game.songMisses,
+			hitMapTime: game.NoteTime,
+			hitMapMs: game.NoteMs
+		};
+		game.replayExam.savePlayRecord(record);
 	}
 
 	var getReadyBack:Bool = false;
@@ -714,6 +786,7 @@ class ResultsScreen extends MusicBeatSubstate
 		new FlxTimer().start(1, function(tmr:FlxTimer)
 		{
 			FlxTween.tween(backRect, {alpha: 1}, 0.5);
+			FlxTween.tween(saveReplayRect, {alpha: 1}, 0.5);
 			FlxTween.tween(replayRect, {alpha: 1}, 0.5);
 		});
 	}
