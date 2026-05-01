@@ -115,11 +115,42 @@ class MobileControls extends FlxTypedSpriteGroup<FlxMobileInputManager>
 
 	public static function setExtraCustomMode(virtualPad:FlxVirtualPad):Void
 	{
+		if (FlxG.save.data.extraButtons == null)
+		{
+			FlxG.save.data.extraButtons = new Array();
+			for (btn in virtualPad.extraKeys)
+				FlxG.save.data.extraButtons.push(FlxPoint.get(btn.x, btn.y));
+		}
+		else
+		{
+			var tempCount:Int = 0;
+			for (btn in virtualPad.extraKeys)
+			{
+				FlxG.save.data.extraButtons[tempCount] = FlxPoint.get(btn.x, btn.y);
+				tempCount++;
+			}
+		}
+
 		FlxG.save.flush();
 	}
 
 	public static function getExtraCustomMode(virtualPad:FlxVirtualPad):FlxVirtualPad
 	{
+		var tempCount:Int = 0;
+
+		if (FlxG.save.data.extraButtons == null)
+			return virtualPad;
+
+		for (btn in virtualPad.extraKeys)
+		{
+			if (FlxG.save.data.extraButtons[tempCount] != null)
+			{
+				btn.x = FlxG.save.data.extraButtons[tempCount].x;
+				btn.y = FlxG.save.data.extraButtons[tempCount].y;
+			}
+			tempCount++;
+		}
+
 		return virtualPad;
 	}
 

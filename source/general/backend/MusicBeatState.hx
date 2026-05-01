@@ -92,7 +92,11 @@ class MusicBeatState extends FlxUIState
 	{
 		if (virtualPad != null)
 		{
-			vpadCam = new FlxCamera();
+			var stage = Lib.current.stage;
+			var scale:Float = Math.min((stage.stageWidth / FlxG.width), (stage.stageHeight / FlxG.height));
+			var newWidth:Int = Std.int(stage.stageWidth / scale);
+			var newHeight:Int = Std.int(stage.stageHeight / scale);
+			vpadCam = new FlxCamera(0, 0, newWidth, newHeight);
 			vpadCam.bgColor.alpha = 0;
 			FlxG.cameras.add(vpadCam, DefaultDrawTarget);
 			virtualPad.cameras = [vpadCam];

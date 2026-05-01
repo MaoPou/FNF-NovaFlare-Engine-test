@@ -37,6 +37,8 @@ class VideoSprite extends FlxSpriteGroup
 		this.videoName = videoName;
 		scrollFactor.set();
 		cameras = [FlxG.cameras.list[FlxG.cameras.list.length - 1]];
+		this.x -= cameras.x;
+		this.y -= cameras.y;
 
 		waiting = isWaiting;
 		if (!waiting)

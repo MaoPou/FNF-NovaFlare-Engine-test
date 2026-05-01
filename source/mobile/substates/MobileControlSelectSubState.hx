@@ -22,6 +22,10 @@ class MobileControlSelectSubState extends MusicBeatSubstate
 	var downPozition:FlxText;
 	var leftPozition:FlxText;
 	var rightPozition:FlxText;
+	var extra1Pozition:FlxText;
+	var extra2Pozition:FlxText;
+	var extra3Pozition:FlxText;
+	var extra4Pozition:FlxText;
 	var inputvari:FlxText;
 	var funitext:FlxText;
 	var leftArrow:FlxSprite;
@@ -114,6 +118,17 @@ class MobileControlSelectSubState extends MusicBeatSubstate
 				else
 				{
 				}
+
+				if (virtualPadd.extraKeys.length >= 4)
+				{
+					var BTN:Int = 130;
+					var ratio:Float = 1.01;
+					for (i in 0...virtualPadd.extraKeys.length)
+					{
+						virtualPadd.extraKeys[i].x = FlxG.width - (BTN * (1 + i) * ratio);
+						virtualPadd.extraKeys[i].y = FlxG.height - (BTN * 4 * ratio);
+					}
+				}
 			}
 		});
 		resetButton.color = FlxColor.RED;
@@ -183,6 +198,26 @@ class MobileControlSelectSubState extends MusicBeatSubstate
 		upPozition.setFormat('VCR OSD Mono', 16, FlxColor.WHITE, LEFT, FlxTextBorderStyle.OUTLINE, FlxColor.BLACK);
 		upPozition.borderSize = 2.4;
 		add(upPozition);
+
+		extra1Pozition = new FlxText(10, FlxG.height - 124, 0, '', 16);
+		extra1Pozition.setFormat('VCR OSD Mono', 16, FlxColor.WHITE, LEFT, FlxTextBorderStyle.OUTLINE, FlxColor.BLACK);
+		extra1Pozition.borderSize = 2.4;
+		add(extra1Pozition);
+
+		extra2Pozition = new FlxText(10, FlxG.height - 144, 0, '', 16);
+		extra2Pozition.setFormat('VCR OSD Mono', 16, FlxColor.WHITE, LEFT, FlxTextBorderStyle.OUTLINE, FlxColor.BLACK);
+		extra2Pozition.borderSize = 2.4;
+		add(extra2Pozition);
+
+		extra3Pozition = new FlxText(10, FlxG.height - 164, 0, '', 16);
+		extra3Pozition.setFormat('VCR OSD Mono', 16, FlxColor.WHITE, LEFT, FlxTextBorderStyle.OUTLINE, FlxColor.BLACK);
+		extra3Pozition.borderSize = 2.4;
+		add(extra3Pozition);
+
+		extra4Pozition = new FlxText(10, FlxG.height - 184, 0, '', 16);
+		extra4Pozition.setFormat('VCR OSD Mono', 16, FlxColor.WHITE, LEFT, FlxTextBorderStyle.OUTLINE, FlxColor.BLACK);
+		extra4Pozition.borderSize = 2.4;
+		add(extra4Pozition);
 
 		daFunny = new FlxText(0, 75, 0, 'Pad-Extras is not a control mode\nPlease selecte a valid mode such as hitbox, Pad-Left...', 35);
 		daFunny.setFormat('VCR OSD Mono', 35, FlxColor.WHITE, LEFT, FlxTextBorderStyle.OUTLINE, FlxColor.BLACK);
@@ -267,6 +302,28 @@ class MobileControlSelectSubState extends MusicBeatSubstate
 						moveButton(touch, bindButton);
 				}
 			}
+
+			if (virtualPadd.visible == true)
+			{
+				if (buttonBinded)
+				{
+					if (touch.justReleased)
+					{
+						bindButton = null;
+						buttonBinded = false;
+					}
+					else
+						moveButton(touch, bindButton);
+				}
+				else
+				{
+					for (ek in virtualPadd.extraKeys)
+					{
+						if (ek != null && ek.justPressed)
+							moveButton(touch, ek);
+					}
+				}
+			}
 		}
 
 		if (virtualPadd.visible == true)
@@ -282,6 +339,21 @@ class MobileControlSelectSubState extends MusicBeatSubstate
 
 			if (virtualPadd.buttonRight != null)
 				rightPozition.text = 'Button Right X:' + virtualPadd.buttonRight.x + ' Y:' + virtualPadd.buttonRight.y;
+
+			for (i in 0...virtualPadd.extraKeys.length)
+			{
+				var ek = virtualPadd.extraKeys[i];
+				if (ek != null)
+				{
+					switch (i)
+					{
+						case 0: extra1Pozition.text = 'Extra 1 X:' + ek.x + ' Y:' + ek.y;
+						case 1: extra2Pozition.text = 'Extra 2 X:' + ek.x + ' Y:' + ek.y;
+						case 2: extra3Pozition.text = 'Extra 3 X:' + ek.x + ' Y:' + ek.y;
+						case 3: extra4Pozition.text = 'Extra 4 X:' + ek.x + ' Y:' + ek.y;
+					}
+				}
+			}
 		}
 	}
 
@@ -383,6 +455,12 @@ class MobileControlSelectSubState extends MusicBeatSubstate
 		downPozition.visible = daChoice == 'Pad-Custom';
 		leftPozition.visible = daChoice == 'Pad-Custom';
 		rightPozition.visible = daChoice == 'Pad-Custom';
+
+		var showExtras:Bool = daChoice != 'Keyboard' && daChoice != 'Hitbox';
+		extra1Pozition.visible = showExtras;
+		extra2Pozition.visible = showExtras;
+		extra3Pozition.visible = showExtras;
+		extra4Pozition.visible = showExtras;
 	}
 
 	function moveButton(touch:FlxTouch, button:FlxButton):Void

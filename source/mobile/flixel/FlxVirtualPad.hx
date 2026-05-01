@@ -6,6 +6,8 @@ import flixel.input.keyboard.FlxKey;
 import mobile.flixel.input.FlxMobileInputManager;
 import mobile.flixel.FlxButton;
 
+import general.backend.InputFormatter;
+
 import openfl.display.Shape;
 import openfl.display.BitmapData;
 
@@ -201,9 +203,18 @@ class FlxVirtualPad extends FlxMobileInputManager
 				add(buttonZ = createButton(rx(1), by(2), BTN, BTN, 'z', null, 0xCCB98E));
 				add(buttonA = createButton(rx(1), by(1), BTN, BTN, 'a', keybindSet('accept'), 0xFF0000));
 			case controlExtend:
-				for (key in 0...ClientPrefs.data.extraKey)
-					extraKeys.push(createButton(0, 0, BTN, BTN, '1', null, 0xFFFFFF));
-				
+				var keyNames:Array<String> = [
+					ClientPrefs.data.extraKeyReturn1,
+					ClientPrefs.data.extraKeyReturn2,
+					ClientPrefs.data.extraKeyReturn3,
+					ClientPrefs.data.extraKeyReturn4
+				];
+				for (i in 0...ClientPrefs.data.extraKey)
+				{
+					var btn = createButton(rx(1 + i), by(4), BTN, BTN, keyNames[i], keyboardSet(keyNames[i]), 0xFFAA66CC);
+					extraKeys.push(btn);
+					add(btn);
+				}
 			case OptionStateC:
 				add(buttonLeft = createButton(rx(2), by(2), BTN, BTN, "left", keybindSet('ui_left'), 0xFF00FF));
 				add(buttonRight = createButton(rx(1), by(2), BTN, BTN, "right", keybindSet('ui_right'), 0xFF0000));
@@ -345,6 +356,11 @@ class FlxVirtualPad extends FlxMobileInputManager
 		return [];
 	}
 
+	private function keyboardSet(keyName:String):Array<FlxKey>
+	{
+		return [InputFormatter.getFlxKey(keyName)];
+	}
+
 	override public function destroy():Void
 	{
 		super.destroy();
@@ -370,5 +386,9 @@ class FlxVirtualPad extends FlxMobileInputManager
 		buttonY = FlxDestroyUtil.destroy(buttonY);
 		buttonZ = FlxDestroyUtil.destroy(buttonZ);
 		buttonP = FlxDestroyUtil.destroy(buttonP);
+
+		for (btn in extraKeys)
+			FlxDestroyUtil.destroy(btn);
+		extraKeys = [];
 	}
 }
