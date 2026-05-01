@@ -49,13 +49,6 @@ class BackButton extends FlxSpriteGroup {
 
         
         if (Controls.instance.justPressed('back')) {
-            if (FreeplayState.instance.searchButton.isFocused()) {
-                if (FlxG.keys.justPressed.ESCAPE) {
-                    PsychUIInputText.focusOn = null;
-                    FlxG.sound.play(Paths.sound('cancelMenu'));
-                }
-                return;
-            }
             if (FreeplayState.instance.keyboardState == 0) {
                 back2MainMenu();
             } else {

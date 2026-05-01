@@ -152,18 +152,6 @@ class SongRect extends FlxSpriteGroup {
         
         if (onFocus) selectLight.alpha = 0.1;
 
-        if (filterOffsetXTar == 0) {
-            filterOffsetX = FlxMath.lerp(0, filterOffsetX, Math.exp(-elapsed * 4));
-        } else {
-            var p = filterOffsetX / SongRect.fixWidth;
-            filterOffsetX += (SongRect.fixWidth - filterOffsetX) * Math.min(1, elapsed * (p * p * 26 + 0.2));
-        }
-        if (Math.abs(filterOffsetX - filterOffsetXTar) < 0.5) {
-            filterOffsetX = filterOffsetXTar;
-            if (filterOffsetXTar >= SongRect.fixWidth - 5 && this.id < FreeplayState.instance._songFilterVisible.length && !FreeplayState.instance._songFilterVisible[this.id])
-                visible = false;
-        }
-
         super.update(elapsed);
 
         if (light.alpha > 0) {
@@ -180,16 +168,6 @@ class SongRect extends FlxSpriteGroup {
     }
 
     public function changeSelectAll(imme:Bool = false) {
-        if (openRect != null && openRect != this && openRect.diffRectGroup != null) {
-            openRect.signDesDiff();
-            openRect.destroyDiff();
-            openRect.diffAdded = false;
-            for (mem in FreeplayState.instance.songGroup) {
-                mem.addInterY(0, true);
-                mem.addDiffY(false, true);
-            }
-        }
-        this.diffAdded = false;
         openRect = this;
         selectLight.alpha = 0.6;
 	    FreeplayState.curSelected = this.id;
@@ -201,7 +179,7 @@ class SongRect extends FlxSpriteGroup {
         FlxTimer.wait(0.001, () -> {
             createDiff(imme);
         });
-        FreeplayState.instance.songsMove.tweenData = FlxG.height * 0.5 - SongRect.fixHeight * 0.5 - FreeplayState.instance.positionIndex(FreeplayState.curSelected) * SongRect.fixHeight * FreeplayState.instance.rectInter - (FreeplayState.curDifficulty+1) * DiffRect.fixHeight * 1.05;
+        FreeplayState.instance.songsMove.tweenData = FlxG.height * 0.5 - SongRect.fixHeight * 0.5 - FreeplayState.curSelected * SongRect.fixHeight * FreeplayState.instance.rectInter - (FreeplayState.curDifficulty+1) * DiffRect.fixHeight * 1.05;
         FreeplayState.instance.initSongsData();
     }
 	
@@ -272,7 +250,7 @@ class SongRect extends FlxSpriteGroup {
         });
     }
     
-    public function signDesDiff() {
+    private function signDesDiff() {
         if (!diffAdded) return;
         if (diffRectGroup.members.length > 0) {
             for (member in diffRectGroup.members)
@@ -383,11 +361,8 @@ class SongRect extends FlxSpriteGroup {
         if (imme) diffY = diffYTar;
     }
 
-    public var filterOffsetX:Float = 0;
-    public var filterOffsetXTar:Float = 0;
-
     override function draw() {
-        this.x = realX + filterOffsetX;
+        this.x = realX;
         this.y = realY;
         super.draw();
     }

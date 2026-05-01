@@ -112,8 +112,9 @@ class StrumNote extends FlxSprite
 			initialWidth = width;
 			//trace(initialWidth);
 
-			setGraphicSize((width * (ExtraKeysHandler.instance.data.pixelScales[mania] + 0.3)) * PlayState.daPixelZoom);
-			trackedScale = ExtraKeysHandler.instance.data.pixelScales[mania];
+			var pixelScale:Float = ExtraKeysHandler.instance.data.pixelScales != null && mania < ExtraKeysHandler.instance.data.pixelScales.length ? ExtraKeysHandler.instance.data.pixelScales[mania] : 0.7;
+			setGraphicSize((width * (pixelScale + 0.3)) * PlayState.daPixelZoom);
+			trackedScale = pixelScale;
 
 			var noteAnimInt = getAnimSet(getIndex(mania, noteData)).pixel;
 
@@ -140,7 +141,7 @@ class StrumNote extends FlxSprite
 			initialWidth = width;	//我勒个一行造成死循环————卡昔233
 
 			antialiasing = ClientPrefs.data.antialiasing;
-			trackedScale = ExtraKeysHandler.instance.data.scales[mania];
+			trackedScale = ExtraKeysHandler.instance.data.scales != null && mania < ExtraKeysHandler.instance.data.scales.length ? ExtraKeysHandler.instance.data.scales[mania] : 0.7;
 			setGraphicSize(width * trackedScale);
 
 			animation.addByPrefix('static', 'arrow${getAnimSet(getIndex(mania, noteData)).strum}');

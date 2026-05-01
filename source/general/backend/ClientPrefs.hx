@@ -214,10 +214,10 @@ class ClientPrefs
 	// Every key has two binds, add your key bind down here and then add your control on options/ControlsSubState.hx and Controls.hx
 	public static var keyBinds:Map<String, Array<FlxKey>> = [
 		// Key Bind, Name for ControlsSubState
-		'note_left' => [D, LEFT],
-		'note_down' => [F, DOWN],
-		'note_up' => [J, UP],
-		'note_right' => [K, RIGHT],
+		'note_left' => [A, LEFT],
+		'note_down' => [S, DOWN],
+		'note_up' => [K, UP],
+		'note_right' => [L, RIGHT],
 
 		'0_key_0' => [SPACE],
 
@@ -437,27 +437,50 @@ class ClientPrefs
 			{
 				if (key == 'arrowRGB' || key == 'arrowRGBPixel' || key == 'modsData')
 					continue;
+				if (key == 'gameplaySettings')
+				{
+					data.gameplaySettings.clear();
+					for (k => v in defaultData.gameplaySettings)
+						data.gameplaySettings.set(k, v);
+					FlxG.save.data.gameplaySettings = data.gameplaySettings;
+					continue;
+				}
 				Reflect.setField(data, key, Reflect.field(defaultData, key));
 				Reflect.setField(FlxG.save.data, key, Reflect.field(defaultData, key));
 			}
 			FlxG.save.data.modsData = modsData;
+
+			#if (!html5 && !switch)
+			final refreshRate:Int = FlxG.stage.application.window.displayMode.refreshRate;
+			data.framerate = Std.int(FlxMath.bound(refreshRate * 2, 60, 1000));
+			data.drawFramerate = Std.int(FlxMath.bound(refreshRate, 60, 1000));
+			Reflect.setField(FlxG.save.data, 'framerate', data.framerate);
+			Reflect.setField(FlxG.save.data, 'drawFramerate', data.drawFramerate);
+			#end
+
 			FlxG.save.flush();
 
-			if (defaultKeys != null)
-				for (name => arr in keyBinds)
-				{
-					arr.resize(0);
-					for (i in defaultKeys.get(name))
-						arr.push(i);
-				}
-			else
+			#if sys
+			if (FileSystem.exists('arrowRGB.json')) FileSystem.deleteFile('arrowRGB.json');
+			if (FileSystem.exists('arrowRGBPixel.json')) FileSystem.deleteFile('arrowRGBPixel.json');
+			#end
+			loadArrowRGBData('arrowRGB.json', false, ExtraKeysHandler.instance.data.colors);
+			loadArrowRGBData('arrowRGBPixel.json', true, ExtraKeysHandler.instance.data.pixelNoteColors);
+
+			if (defaultKeys == null)
 				loadDefaultKeys();
+
+			keyBinds.clear();
+			for (name => keys in defaultKeys)
+				keyBinds.set(name, keys.copy());
 
 			var controlSave:FlxSave = new FlxSave();
 			controlSave.bind('controls_v4', CoolUtil.getSavePath());
-			controlSave.data.keyboard = keyBinds;
-			controlSave.flush();
-
+			if (controlSave != null)
+			{
+				controlSave.data.keyboard = defaultKeys;
+				controlSave.flush();
+			}
 			reloadVolumeKeys();
 		}
 		else

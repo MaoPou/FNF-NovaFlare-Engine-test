@@ -40,10 +40,6 @@ class FreeplayState extends MusicBeatState
 	static public var curFuncBack:Int = 0;
 
 	public var keyboardState:Int = 0;
-	var searchFilterText:String = '';
-	public var _songFilterVisible:Array<Bool> = [];
-	var _compactIndices:Array<Int> = [];
-	var _showCompactIndex:Array<Float> = [];
 
 	public var stopAll:Bool = false;
 
@@ -106,7 +102,7 @@ class FreeplayState extends MusicBeatState
 	///////////////////////////////////////////////////////////////////////////////////////////////
 
 	var selectedBG:SkewRoundRect;
-	public var searchButton:SearchButton;
+	var searchButton:SearchButton;
 
 	override function create()
 	{
@@ -311,14 +307,7 @@ class FreeplayState extends MusicBeatState
 								songMoveEvent);
 		songsMove.useLerp = true;
 		songsMove.lerpSmooth = 8;
-		songsMove.forceUpdateEvent = true;
 		add(songsMove);
-
-		for (i in 0...songGroup.length) {
-			_songFilterVisible.push(true);
-			_compactIndices.push(i);
-			_showCompactIndex.push(i);
-		}
 
 		////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 		
@@ -331,7 +320,6 @@ class FreeplayState extends MusicBeatState
 		searchButton = new SearchButton(695, 5);
 		add(searchButton);
 		searchButton.cameras = [camAfter];
-		searchButton.onSearchChange = applySearchFilter;
 
 		//////////////////////////////////////////////////////////////////////////////////////////
 
@@ -364,7 +352,6 @@ class FreeplayState extends MusicBeatState
 		//////////////////////////////////////////////////////////////////////////////////////////
 
 		WeekData.setDirectoryFromWeek();
-		SongRect.openRect = null;
 		songGroup[curSelected].changeSelectAll(true);
 	}
 
@@ -422,10 +409,7 @@ class FreeplayState extends MusicBeatState
 	public function songMoveEvent(){
 		if (songGroup.length <= 0) return;
 		for (i in 0...songGroup.length) {
-			var id = songGroup[i].id;
-			_showCompactIndex[id] = FlxMath.lerp(_compactIndices[id], _showCompactIndex[id], Math.exp(-songsMove.saveElapsed * songsMove.lerpSmooth));
-			var posIdx:Float = _showCompactIndex[id];
-			songGroup[i].moveY(songPosiData + posIdx * SongRect.fixHeight * rectInter);
+			songGroup[i].moveY(songPosiData + (songGroup[i].id) * SongRect.fixHeight * rectInter);
 			updateSongVisibility(songGroup[i]);
 			if (songGroup[i].visible) songGroup[i].calcX();
 		}
@@ -442,18 +426,8 @@ class FreeplayState extends MusicBeatState
 		
 		if (stopAll) return;
 
-		if (searchButton.isFocused())
-			return;
-
 		if (keyboardState == 0) 
 		{
-			if (FlxG.keys.justPressed.T)
-			{
-				searchButton.focus();
-				FlxG.sound.play(Paths.sound('scrollMenu'));
-				return;
-			}
-
 			if (FlxG.keys.justPressed.M)
 			{
 				keyboardState = 2;
@@ -470,13 +444,13 @@ class FreeplayState extends MusicBeatState
 			{
 				if (FlxG.keys.justPressed.HOME)
 				{
-					curSelected = firstVisibleId();
+					curSelected = 0;
 					changeSelection();
 					holdTime = 0;
 				}
 				else if (FlxG.keys.justPressed.END)
 				{
-					curSelected = lastVisibleId();
+					curSelected = songGroup.length - 1;
 					changeSelection();
 					holdTime = 0;
 				}
@@ -484,30 +458,30 @@ class FreeplayState extends MusicBeatState
 				{
 					holdTime = 0;
 					if (curSelected != SongRect.openRect.id) {
-						skipHiddenSelection(-shiftMult);
-						if (curSelected == SongRect.openRect.id) {
+						var newCurSelected:Int = FlxMath.wrap(curSelected - shiftMult, 0, songGroup.length - 1);
+						if (newCurSelected == SongRect.openRect.id) {
 							curDifficulty = Difficulty.list.length - 1;
-							songGroup[curSelected].diffFouceUpdate();
+							songGroup[newCurSelected].diffFouceUpdate();
+							curSelected = newCurSelected;
 							FlxG.sound.play(Paths.sound('scrollMenu'), 0.4);
 							changeSelection();
-							songsMove.tweenData = FlxG.height * 0.5 - SongRect.fixHeight * 0.5 - _showCompactIndex[curSelected] * SongRect.fixHeight * rectInter - (curDifficulty+1) * DiffRect.fixHeight * 1.05;
+							songsMove.tweenData = FlxG.height * 0.5 - SongRect.fixHeight * 0.5 - curSelected * SongRect.fixHeight * rectInter - (curDifficulty+1) * DiffRect.fixHeight * 1.05;
 						} else {
 							curDifficulty = -1;
 							songGroup[curSelected].diffFouceUpdate();
-							changeSelection();
+							changeSelection(-shiftMult);
 						}
 					} else {
 						if (curDifficulty >= 0) {
 							curDifficulty--;
 							songGroup[curSelected].diffFouceUpdate();
 							FlxG.sound.play(Paths.sound('scrollMenu'), 0.4);
-							if (curDifficulty >= 0) songsMove.tweenData = FlxG.height * 0.5 - SongRect.fixHeight * 0.5 - _showCompactIndex[curSelected] * SongRect.fixHeight * rectInter - (curDifficulty+1) * DiffRect.fixHeight * 1.05;
-							else songsMove.tweenData = FlxG.height * 0.5 - SongRect.fixHeight * 0.5 - _showCompactIndex[curSelected] * SongRect.fixHeight * rectInter;
+							if (curDifficulty >= 0) songsMove.tweenData = FlxG.height * 0.5 - SongRect.fixHeight * 0.5 - curSelected * SongRect.fixHeight * rectInter - (curDifficulty+1) * DiffRect.fixHeight * 1.05;
+							else songsMove.tweenData = FlxG.height * 0.5 - SongRect.fixHeight * 0.5 - curSelected * SongRect.fixHeight * rectInter;
 						} else {
 							curDifficulty = -1;
 							songGroup[curSelected].diffFouceUpdate();
-							skipHiddenSelection(-shiftMult);
-							changeSelection();
+							changeSelection(-shiftMult);
 						}
 					}
 				}
@@ -521,7 +495,7 @@ class FreeplayState extends MusicBeatState
 							curDifficulty++;
 							songGroup[curSelected].diffFouceUpdate();
 							FlxG.sound.play(Paths.sound('scrollMenu'), 0.4);
-							songsMove.tweenData = FlxG.height * 0.5 - SongRect.fixHeight * 0.5 - _showCompactIndex[curSelected] * SongRect.fixHeight * rectInter - (curDifficulty+1) * DiffRect.fixHeight * 1.05;
+							songsMove.tweenData = FlxG.height * 0.5 - SongRect.fixHeight * 0.5 - curSelected * SongRect.fixHeight * rectInter - (curDifficulty+1) * DiffRect.fixHeight * 1.05;
 						} else {
 							curDifficulty = -1;
 							songGroup[curSelected].diffFouceUpdate();
@@ -845,16 +819,12 @@ class FreeplayState extends MusicBeatState
 
 	public function changeSelection(change:Int = 0, playSound:Bool = true)
 	{
-		if (change != 0 && searchFilterText != '') {
-			skipHiddenSelection(change);
-		} else if (change != 0) {
-			curSelected = FlxMath.wrap(curSelected + change, 0, songGroup.length - 1);
-		}
+		curSelected = FlxMath.wrap(curSelected + change, 0, songGroup.length - 1);
 
 		Mods.currentModDirectory = songsData[curSelected].folder;
 		PlayState.storyWeek = songsData[curSelected].week;
 
-		songsMove.tweenData = FlxG.height * 0.5 - SongRect.fixHeight * 0.5 - _showCompactIndex[curSelected] * SongRect.fixHeight * rectInter - (curSelected <= SongRect.openRect.id ? 0 : Difficulty.list.length * DiffRect.fixHeight * 1.05 + SongRect.fixHeight * (0.1 * 2));
+		songsMove.tweenData = FlxG.height * 0.5 - SongRect.fixHeight * 0.5 - curSelected * SongRect.fixHeight * rectInter - (curSelected <= SongRect.openRect.id ? 0 : Difficulty.list.length * DiffRect.fixHeight * 1.05 + SongRect.fixHeight * (0.1 * 2));
 		
 		if (playSound) FlxG.sound.play(Paths.sound('scrollMenu'), 0.4);
 
@@ -868,40 +838,6 @@ class FreeplayState extends MusicBeatState
 		}
 
 		////////////////////////////////////////////////////////////
-	}
-
-	function skipHiddenSelection(change:Int) {
-		var dir:Int = change > 0 ? 1 : -1;
-		var steps:Int = Std.int(Math.abs(change));
-		var start:Int = curSelected;
-		for (s in 0...steps) {
-			do {
-				start = FlxMath.wrap(start + dir, 0, songGroup.length - 1);
-			} while (!_songFilterVisible[start] && start != curSelected);
-		}
-		curSelected = start;
-	}
-
-	public function positionIndex(id:Int):Float {
-		return _showCompactIndex[id];
-	}
-
-	function firstVisibleId():Int {
-		for (song in songGroup) {
-			if (_songFilterVisible[song.id])
-				return song.id;
-		}
-		return 0;
-	}
-
-	function lastVisibleId():Int {
-		var i = songGroup.length - 1;
-		while (i >= 0) {
-			if (_songFilterVisible[songGroup[i].id])
-				return songGroup[i].id;
-			i--;
-		}
-		return 0;
 	}
 
 	public function updateSongLayerOrder():Void
@@ -938,55 +874,8 @@ class FreeplayState extends MusicBeatState
 	public function updateSongVisibility(r:SongRect):Void {
 		if (r != null) {
 			var ons:Bool = rectOnScreen(r);
-			if (ons && searchFilterText != '') {
-				ons = _songFilterVisible[r.id];
-			}
-			if (searchFilterText != '' && r.filterOffsetXTar > 0) {
-				ons = true;
-			}
 			r.visible = r.active = ons;
 		}
-	}
-	
-	public function applySearchFilter(text:String):Void {
-		searchFilterText = text.toLowerCase();
-		for (song in songGroup) {
-			var matches:Bool = (searchFilterText == '' || song.songNameSt.toLowerCase().indexOf(searchFilterText) != -1);
-			var prevVisible:Bool = _songFilterVisible[song.id];
-			if (matches != prevVisible) {
-				if (matches) {
-					song.visible = true;
-					song.filterOffsetXTar = 0;
-				} else {
-					song.filterOffsetXTar = SongRect.fixWidth;
-				}
-			}
-			_songFilterVisible[song.id] = matches;
-		}
-		var firstVisible:Int = recalcCompactIndices();
-		if (firstVisible >= 0) {
-			curSelected = firstVisible;
-			songGroup[curSelected].changeSelectAll(true);
-			songsMove.tweenData = FlxG.height * 0.5 - SongRect.fixHeight * 0.5 - (curDifficulty + 1) * DiffRect.fixHeight * 1.05;
-		}
-	}
-
-	function recalcCompactIndices():Int {
-		var idx = 0;
-		var firstId = -1;
-		for (song in songGroup) {
-			if (_songFilterVisible[song.id]) {
-				if (firstId < 0) firstId = song.id;
-				_compactIndices[song.id] = idx++;
-			}
-		}
-		var visibleCount = idx;
-		for (song in songGroup) {
-			if (!_songFilterVisible[song.id])
-				_compactIndices[song.id] = idx++;
-		}
-		songsMove.moveLimit[0] = songPosiStart - (visibleCount + 1) * SongRect.fixHeight * rectInter;
-		return firstId;
 	}
 	
 	function changeDiff(change:Int = 0)
