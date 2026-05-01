@@ -1,4 +1,4 @@
-﻿package options;
+package options;
 
 import states.MainMenuState;
 import states.freeplayState.FreeplayState;
@@ -10,6 +10,7 @@ import mobile.substates.MobileExtraControl;
 import mobile.states.CopyState;
 
 import games.backend.StageData;
+import general.backend.ui.PsychUIInputText;
 
 class OptionsState extends MusicBeatState
 {
@@ -216,6 +217,17 @@ class OptionsState extends MusicBeatState
 				cata.follow.cataChoose = true;
 				break;
 			}
+		}
+
+		if (controls.BACK)
+		{
+			if (PsychUIInputText.focusOn != null)
+			{
+				PsychUIInputText.focusOn = null;
+				FlxG.sound.play(Paths.sound('cancelMenu'));
+			}
+			else
+				backMenu();
 		}
 	}
 

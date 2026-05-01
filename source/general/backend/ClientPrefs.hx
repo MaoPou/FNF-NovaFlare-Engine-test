@@ -13,6 +13,9 @@ import lime.system.Display;
 // Add a variable here and it will get automatically saved
 @:structInit class SaveVariables
 {
+	// Version - used to detect breaking changes and reset prefs
+	public var prefsVersion:Int = 120;
+
 	// General
 	public var framerate:Int = 60;
 	public var drawFramerate:Int = 60;
@@ -426,23 +429,76 @@ class ClientPrefs
 	{
 		#if ACHIEVEMENTS_ALLOWED Achievements.load(); #end
 
-		for (key in Reflect.fields(data))
-			if (key != 'gameplaySettings' && 
-				key != 'arrowRGB' &&
-				key != 'arrowRGBPixel' && Reflect.hasField(FlxG.save.data, key))
-				Reflect.setField(data, key, Reflect.field(FlxG.save.data, key));
-			else if (key == 'arrowRGB') 
+		if (FlxG.save.data.prefsVersion != data.prefsVersion)
+		{
+			data = {};
+			modsData = [];
+			for (key in Reflect.fields(defaultData))
 			{
-				loadArrowRGBData('arrowRGB.json', false, ExtraKeysHandler.instance.data.colors);
-			} 
-			else if (key == 'arrowRGBPixel') 
-			{
-				loadArrowRGBData('arrowRGBPixel.json', true, ExtraKeysHandler.instance.data.pixelNoteColors);
+				if (key == 'arrowRGB' || key == 'arrowRGBPixel' || key == 'modsData')
+					continue;
+				Reflect.setField(data, key, Reflect.field(defaultData, key));
+				Reflect.setField(FlxG.save.data, key, Reflect.field(defaultData, key));
 			}
+			FlxG.save.data.modsData = modsData;
+			FlxG.save.flush();
 
-		if (FlxG.save.data.modsData != null)
-			modsData = FlxG.save.data.modsData;
-		else modsData = [];
+			if (defaultKeys != null)
+				for (name => arr in keyBinds)
+				{
+					arr.resize(0);
+					for (i in defaultKeys.get(name))
+						arr.push(i);
+				}
+			else
+				loadDefaultKeys();
+
+			var controlSave:FlxSave = new FlxSave();
+			controlSave.bind('controls_v4', CoolUtil.getSavePath());
+			controlSave.data.keyboard = keyBinds;
+			controlSave.flush();
+
+			reloadVolumeKeys();
+		}
+		else
+		{
+			for (key in Reflect.fields(data))
+				if (key != 'gameplaySettings' && 
+					key != 'arrowRGB' &&
+					key != 'arrowRGBPixel' && Reflect.hasField(FlxG.save.data, key))
+					Reflect.setField(data, key, Reflect.field(FlxG.save.data, key));
+				else if (key == 'arrowRGB') 
+				{
+					loadArrowRGBData('arrowRGB.json', false, ExtraKeysHandler.instance.data.colors);
+				} 
+				else if (key == 'arrowRGBPixel') 
+				{
+					loadArrowRGBData('arrowRGBPixel.json', true, ExtraKeysHandler.instance.data.pixelNoteColors);
+				}
+
+			if (FlxG.save.data.modsData != null)
+				modsData = FlxG.save.data.modsData;
+			else modsData = [];
+
+			var save:FlxSave = new FlxSave();
+			save.bind('controls_v4', CoolUtil.getSavePath());
+			if (save != null)
+			{
+				if (save.data.keyboard != null)
+				{
+					var loadedControls:Map<String, Array<FlxKey>> = save.data.keyboard;
+					for (control => keys in loadedControls)
+						if (keyBinds.exists(control))
+						{
+							var arr = keyBinds.get(control);
+							arr.resize(0);
+							for (i in keys)
+								arr.push(i);
+						}
+				}
+				reloadVolumeKeys();
+			}
+		}
 
 		if (Main.fpsVar != null)
 			Main.fpsVar.visible = data.showFPS;
@@ -516,27 +572,6 @@ class ClientPrefs
 		#if DISCORD_ALLOWED
 		DiscordClient.check();
 		#end
-
-		// controls on a separate save file
-		var save:FlxSave = new FlxSave();
-		save.bind('controls_v4', CoolUtil.getSavePath());
-		if (save != null)
-		{
-			if (save.data.keyboard != null)
-			{
-				var loadedControls:Map<String, Array<FlxKey>> = save.data.keyboard;
-				for (control => keys in loadedControls)
-					if (keyBinds.exists(control))
-					{
-						var arr = keyBinds.get(control);
-						arr.resize(0);
-						for (i in keys)
-							arr.push(i);
-					}
-			}
-
-			reloadVolumeKeys();
-		}
 	}
 
 	inline public static function getGameplaySetting(name:String, defaultValue:Dynamic = null, ?customDefaultValue:Bool = false):Dynamic

@@ -43,10 +43,10 @@ class NaviGroup extends FlxSpriteGroup
         add(background);
 
         specRect = new Rect(0, 0, 5, height * 0.5, 5, 5, EngineSet.mainColor);
-        specRect.x += height * 0.25;
-        specRect.y += height * 0.25;
-		specRect.alpha = 1;
-		specRect.scale.y = 1;
+		specRect.x += height * 0.25;
+		specRect.y += height * 0.25;
+		specRect.alpha = 0;
+		specRect.scale.y = 0;
 		specRect.antialiasing = ClientPrefs.data.antialiasing;
 		add(specRect);
 
@@ -98,10 +98,9 @@ class NaviGroup extends FlxSpriteGroup
                 focusTime += elapsed;
             }
         } else {
-            if (focusTime > 0) focusTime -= elapsed * 2;
-            if (focusTime < 0) focusTime = 0;
-            if (specRect.alpha > 0)  specRect.alpha -= EngineSet.FPSfix(0.12);
-		    if (specRect.scale.y > 0) specRect.scale.y -= EngineSet.FPSfix(0.12);
+            focusTime = 0;
+            if (specRect.alpha > 0)  specRect.alpha -= EngineSet.FPSfix(0.2);
+		    if (specRect.scale.y > 0) specRect.scale.y -= EngineSet.FPSfix(0.2);
         }
 
 		if (onFocus) {

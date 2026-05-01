@@ -42,7 +42,7 @@ class MobileControls extends FlxTypedSpriteGroup<FlxMobileInputManager>
 		current = new CurrentManager(this);
 		// Options related stuff
 		// alpha = ClientPrefs.data.controlsAlpha;
-		updateButtonsColors();
+		if (forcedControl != 5) updateButtonsColors();
 	}
 
 	private function initControler(virtualPadMode:Int = 0):Void

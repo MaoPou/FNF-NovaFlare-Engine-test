@@ -1,4 +1,4 @@
-﻿package options.base;
+package options.base;
 
 import flixel.addons.display.FlxBackdrop;
 import flixel.addons.display.FlxGridOverlay;
@@ -314,6 +314,18 @@ class ControlsSubState extends MusicBeatSubstate
 				updateText(-1);
 			else if (controls.UI_DOWN_P)
 				updateText(1);
+
+			var resetPressed:Bool = FlxG.keys.justPressed.R || virtualPad.buttonC.justPressed;
+			if (resetPressed)
+			{
+				ClientPrefs.resetKeys(false);
+				ClientPrefs.reloadVolumeKeys();
+				var lastSel:Int = curSelected;
+				createTexts();
+				curSelected = lastSel;
+				updateText();
+				FlxG.sound.play(Paths.sound('cancelMenu'));
+			}
 
 			if (controls.ACCEPT)
 			{
