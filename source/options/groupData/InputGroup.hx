@@ -18,10 +18,8 @@ class InputGroup extends OptionCata
 		var option:Option = new Option(this, 'TouchMain', TEXT);
 		addOption(option);
 
-		#if desktop
 		var option:Option = new Option(this, 'needMobileControl', BOOL);
 		addOption(option);
-		#end
 
 		var option:Option = new Option(this, 'controlsAlpha', FLOAT, [0, 1, 1]);
 		addOption(option);

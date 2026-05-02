@@ -12,6 +12,10 @@ class PsychUIDropDownMenu extends PsychUIInputText
 	public var selectedLabel(default, set):String = null;
 
 	var _curFilter:Array<String>;
+	#if FLX_TOUCH
+	var _touchLastY:Map<Int, Float> = [];
+	var _touchAccumY:Map<Int, Float> = [];
+	#end
 
 	public function new(x:Float, y:Float, list:Array<String>, callback:Int->String->Void, ?width:Float = 100)
 	{
@@ -115,43 +119,7 @@ class PsychUIDropDownMenu extends PsychUIInputText
 			if (FlxG.keys.justPressed.DOWN)
 				wheel--;
 			#if FLX_TOUCH
-			for (touch in FlxG.touches.list)
-			{
-				var moveY:Int = 0;
-				var addition:Int = 0;
-				var curY:Int = 0;
-				var prevY:Int = 0;
-
-				if (touch.pressed)
-				{
-					curY = touch.y;
-
-					// these might need to be swaped idk i can't test
-					if (curY > prevY)
-						addition++;
-					else
-						addition--;
-
-					// change the option every 10 pixels you move
-					if (addition >= 10 || addition <= 10)
-					{
-						// these here might also need to be swapped
-						if (addition >= 10)
-							moveY++
-						else
-							moveY--;
-
-						addition = 0;
-					}
-
-					prevY = curY;
-				}
-
-				wheel += moveY;
-
-				if (touch.justReleased)
-					moveY = addition = curY = prevY = 0;
-			}
+			handleTouchScroll();
 			#end
 			if (wheel != 0)
 				showDropDown(true, curScroll - wheel, _curFilter);
@@ -167,6 +135,60 @@ class PsychUIDropDownMenu extends PsychUIInputText
 					item.update(0);
 		}
 	}
+
+	#if FLX_TOUCH
+	function handleTouchScroll():Void
+	{
+		for (touch in FlxG.touches.list)
+		{
+			var id = touch.touchPointID;
+			if (touch.justPressed)
+			{
+				_touchLastY.set(id, touch.y);
+				_touchAccumY.set(id, 0);
+				continue;
+			}
+
+			if (touch.pressed)
+			{
+				var lastY = _touchLastY.get(id);
+				if (lastY == null)
+				{
+					_touchLastY.set(id, touch.y);
+					_touchAccumY.set(id, 0);
+					continue;
+				}
+
+				var accum = _touchAccumY.get(id);
+				if (accum == null)
+					accum = 0;
+
+				var dy = touch.y - lastY;
+				accum += dy;
+				_touchLastY.set(id, touch.y);
+
+				while (accum >= 10)
+				{
+					showDropDown(true, curScroll - 1, _curFilter);
+					accum -= 10;
+				}
+				while (accum <= -10)
+				{
+					showDropDown(true, curScroll + 1, _curFilter);
+					accum += 10;
+				}
+
+				_touchAccumY.set(id, accum);
+			}
+
+			if (touch.justReleased)
+			{
+				_touchLastY.remove(id);
+				_touchAccumY.remove(id);
+			}
+		}
+	}
+	#end
 
 	public function showDropDown(vis:Bool = true, scroll:Int = 0, onlyAllowed:Array<String> = null)
 	{

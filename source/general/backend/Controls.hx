@@ -140,8 +140,6 @@ class Controls
 	public function justPressed(key:String)
 	{
 		var result:Bool = (FlxG.keys.anyJustPressed(keyboardBinds[key]) == true);
-		if (result)
-			controllerMode = false;
 
 		return result;
 	}
@@ -149,8 +147,6 @@ class Controls
 	public function pressed(key:String)
 	{
 		var result:Bool = (FlxG.keys.anyPressed(keyboardBinds[key]) == true);
-		if (result)
-			controllerMode = false;
 
 		return result;
 	}
@@ -158,13 +154,13 @@ class Controls
 	public function justReleased(key:String)
 	{
 		var result:Bool = (FlxG.keys.anyJustReleased(keyboardBinds[key]) == true);
-		if (result)
-			controllerMode = false;
 
 		return result;
 	}
 
-	public var controllerMode:Bool = false;
+	public var controllerMode(get, set):Bool;
+	private function get_controllerMode():Bool return ClientPrefs.data.needMobileControl;
+	private function set_controllerMode(value:Bool):Bool return value;
 
 	public var isInSubstate:Bool = false; // don't worry about this it becomes true and false on it's own in MusicBeatSubstate
 	public var requested(get, default):Dynamic; // is set to MusicBeatState or MusicBeatSubstate when the constructor is called
