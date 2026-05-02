@@ -6,7 +6,7 @@ import openfl.errors.Error;
 
 import flixel.FlxSubState;
 
-import states.MainMenuState;
+import states.MamainmenuState;
 
 import substates.ErrorSubState;
 
@@ -48,7 +48,7 @@ class CrashHandler
 		var stack = haxe.CallStack.exceptionStack();
 		var stackLabelArr:Array<String> = [];
 		var stackLabel:String = "";
-		var errorText:String = "Oh Shit! - " + states.MainMenuState.novaFlareEngineCommit;
+		var errorText:String = "Oh Shit! - " + states.MamainmenuState.novaFlareEngineCommit;
 		for (e in stack)
 		{
 			switch (e)
@@ -77,7 +77,7 @@ class CrashHandler
 		{
 			if (!FileSystem.exists('crash'))
 				FileSystem.createDirectory('crash');
-			var saveError = states.MainMenuState.novaFlareEngineCommit + '\n' + '$m\n$stackLabel';
+			var saveError = states.MamainmenuState.novaFlareEngineCommit + '\n' + '$m\n$stackLabel';
 
 			File.saveContent('crash/' + Date.now().toString().replace(' ', '-').replace(':', "'") + '.txt', saveError);
 			errorText = Std.string(saveError);
@@ -85,7 +85,7 @@ class CrashHandler
 		}
 		catch (e:haxe.Exception)
 			trace('Couldn\'t save error message. (${e.message})');
-			trace(Std.string(states.MainMenuState.novaFlareEngineCommit + '\n' + '$m\n$stackLabel'));
+			trace(Std.string(states.MamainmenuState.novaFlareEngineCommit + '\n' + '$m\n$stackLabel'));
 		#end
 
 		// mobile.backend.SUtil.showPopUp('$m\n$stackLabel', "Error!");

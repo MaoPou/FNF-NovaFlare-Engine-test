@@ -187,7 +187,7 @@ class ChooseRect extends FlxSpriteGroup {
         add(bg);
 
         textDis = new FlxText(0, 0, 0, displayName, Std.int(height * 0.15));
-		textDis.setFormat(Paths.font(Language.get('fontName', 'ma') + '.ttf'), Std.int(height * 0.45), 0xffffff, LEFT, FlxTextBorderStyle.OUTLINE, 0xFFFFFFFF);
+		textDis.setFormat(Paths.font(Language.get('fontName', 'main') + '.ttf'), Std.int(height * 0.45), 0xffffff, LEFT, FlxTextBorderStyle.OUTLINE, 0xFFFFFFFF);
         textDis.borderStyle = NONE;
 		textDis.antialiasing = ClientPrefs.data.antialiasing;
         textDis.y += (height - textDis.height) * 0.5;

@@ -13,7 +13,7 @@ class ResetButton extends FlxSpriteGroup
 		add(rect);
 
 		text = new FlxText(0, 0, 0, Language.get('Reset'), 25);
-		text.font = Paths.font(Language.get('fontName', 'ma') + '.ttf');
+		text.font = Paths.font(Language.get('fontName', 'main') + '.ttf');
 		text.antialiasing = ClientPrefs.data.antialiasing;
 		text.y += rect.height / 2 - text.height / 2;
 		text.x += rect.width / 2 - text.width / 2;
@@ -44,7 +44,7 @@ class ResetButton extends FlxSpriteGroup
 	}
 
 	public function changeLanguage() {
-		text.text = Language.get('Reset', 'op');
-		text.font = Paths.font(Language.get('fontName', 'ma') + '.ttf');
+		text.text = Language.get('Reset', 'options');
+		text.font = Paths.font(Language.get('fontName', 'main') + '.ttf');
 	}
 }

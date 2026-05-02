@@ -59,7 +59,7 @@ class PauseSubState extends MusicBeatSubstate
 	var skipTimeText:FlxText;
 	var curTime:Float = Math.max(0, Conductor.songPosition);
 
-	var stayinMenu:String = 'isChanging'; // base, difficulty, debug, isChanging or options
+	var staymainmenu:String = 'isChanging'; // base, difficulty, debug, isChanging or options
 
 	// isChanging = in transition animation
 	var options:Array<String> = ['Continues', 'Restart', 'Difficulty', 'Debug', 'Editor', 'Options', 'Exit'];
@@ -109,7 +109,7 @@ class PauseSubState extends MusicBeatSubstate
 
 	override function create()
 	{
-		font = Paths.font(Language.get('fontName', 'ma') + '.ttf');
+		font = Paths.font(Language.get('fontName', 'main') + '.ttf');
 		FlxG.sound.play(Paths.sound('scrollMenu'), 0.4);
 		pauseMusic = new FlxSound();
 		try
@@ -273,7 +273,7 @@ class PauseSubState extends MusicBeatSubstate
 
 		for (i in 0...options.length)
 		{
-			var optionText:FlxText = new FlxText(0, 0, 0, Language.get(options[i].toLowerCase(), 'pa'), 50);
+			var optionText:FlxText = new FlxText(0, 0, 0, Language.get(options[i].toLowerCase(), 'pause'), 50);
 
 			optionText.x = -1000;
 			optionText.y = (i - curSelected) * 180 + 325;
@@ -381,7 +381,7 @@ class PauseSubState extends MusicBeatSubstate
 
 		new FlxTimer().start(0.4, function(tmr:FlxTimer)
 		{
-			stayinMenu = 'base';
+			staymainmenu = 'base';
 			changeOptions(0);
 		});
 
@@ -436,7 +436,7 @@ class PauseSubState extends MusicBeatSubstate
 		var rightP = controls.UI_RIGHT_P;
 		var accept = controls.ACCEPT;
 
-		switch (stayinMenu)
+		switch (staymainmenu)
 		{
 			case 'base':
 				for (i in 0...options.length)
@@ -466,7 +466,7 @@ class PauseSubState extends MusicBeatSubstate
 				}
 
 				var text = debugAlphabet[debugCurSelected];
-				if ((text.text == 'Botplay' || text.text == 'Practice') && stayinMenu == 'debug')
+				if ((text.text == 'Botplay' || text.text == 'Practice') && staymainmenu == 'debug')
 				{
 					boolText.x = text.x + text.width + 5;
 					boolText.y = text.y;
@@ -474,7 +474,7 @@ class PauseSubState extends MusicBeatSubstate
 				else
 					boolText.y = 1000;
 
-				if (text.text == 'Skip Time' && stayinMenu == 'debug')
+				if (text.text == 'Skip Time' && staymainmenu == 'debug')
 				{
 					skipTimeText.x = text.x + text.width + 125;
 					skipTimeText.y = text.y + 7.5;
@@ -535,7 +535,7 @@ class PauseSubState extends MusicBeatSubstate
 
 	function changeOptions(num:Int)
 	{
-		switch (stayinMenu)
+		switch (staymainmenu)
 		{
 			case 'base':
 				curSelected += num;
@@ -584,7 +584,7 @@ class PauseSubState extends MusicBeatSubstate
 
 	function doEvent()
 	{
-		if (stayinMenu == 'base')
+		if (staymainmenu == 'base')
 		{
 			var daChoice:String = options[curSelected];
 			switch (daChoice)
@@ -596,11 +596,11 @@ class PauseSubState extends MusicBeatSubstate
 					for (i in optionsAlphabet)
 						FlxTween.tween(i, {x: -1000}, 0.5, {ease: FlxEase.quartIn});
 
-					stayinMenu = 'isChanging';
+					staymainmenu = 'isChanging';
 					setBackButton(false);
 					new FlxTimer().start(0.5, function(tmr:FlxTimer)
 					{
-						stayinMenu = 'difficulty';
+						staymainmenu = 'difficulty';
 						changeOptions(0);
 					});
 				case 'Debug':
@@ -610,11 +610,11 @@ class PauseSubState extends MusicBeatSubstate
 					for (i in optionsAlphabet)
 						FlxTween.tween(i, {x: -1000}, 0.5, {ease: FlxEase.quartIn});
 
-					stayinMenu = 'isChanging';
+					staymainmenu = 'isChanging';
 					setBackButton(false);
 					new FlxTimer().start(0.5, function(tmr:FlxTimer)
 					{
-						stayinMenu = 'debug';
+						staymainmenu = 'debug';
 						changeOptions(0);
 						changeOptions(0);
 					});
@@ -659,7 +659,7 @@ class PauseSubState extends MusicBeatSubstate
 					PlayState.chartingMode = true;
 			}
 		}
-		else if (stayinMenu == 'debug')
+		else if (staymainmenu == 'debug')
 		{
 			var daChoice:String = debugType[debugCurSelected];
 			switch (daChoice)
@@ -700,11 +700,11 @@ class PauseSubState extends MusicBeatSubstate
 					for (i in debugAlphabet)
 						FlxTween.tween(i, {x: -1000}, 0.5, {ease: FlxEase.quartIn});
 
-					stayinMenu = 'isChanging';
+					staymainmenu = 'isChanging';
 					setBackButton(true);
 					new FlxTimer().start(0.5, function(tmr:FlxTimer)
 					{
-						stayinMenu = 'base';
+						staymainmenu = 'base';
 						for (i in debugAlphabet)
 							i.y += (debugAlphabet.length - 1) * 180;
 						debugCurSelected = 0;
@@ -713,7 +713,7 @@ class PauseSubState extends MusicBeatSubstate
 					FlxG.sound.play(Paths.sound('cancelMenu'), 0.4);
 			}
 		}
-		else if (stayinMenu == 'difficulty')
+		else if (staymainmenu == 'difficulty')
 		{
 			if (difficultyChoices[difficultyCurSelected] == 'Back')
 			{
@@ -723,11 +723,11 @@ class PauseSubState extends MusicBeatSubstate
 				for (i in difficultyAlphabet)
 					FlxTween.tween(i, {x: -1000}, 0.5, {ease: FlxEase.quartIn});
 
-				stayinMenu = 'isChanging';
+				staymainmenu = 'isChanging';
 				setBackButton(true);
 				new FlxTimer().start(0.5, function(tmr:FlxTimer)
 				{
-					stayinMenu = 'base';
+					staymainmenu = 'base';
 					for (i in difficultyAlphabet)
 						i.y += (difficultyAlphabet.length - 1) * 180;
 					difficultyCurSelected = 0;
@@ -800,7 +800,7 @@ class PauseSubState extends MusicBeatSubstate
 			curText++;
 		}, menuText.length);
 
-		stayinMenu = 'isChanging';
+		staymainmenu = 'isChanging';
 
 		FlxG.sound.play(Paths.sound('confirmMenu'), 0.4);
 

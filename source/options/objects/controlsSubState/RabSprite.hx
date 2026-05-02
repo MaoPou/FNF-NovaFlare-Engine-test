@@ -19,7 +19,7 @@ class RabSprite extends FlxSpriteGroup
 
         text = new FlxText(x, y, wwidth, label);
         text.autoSize = true;
-        text.setFormat(Paths.font(Language.get('fontName', 'ma') + '.ttf'), 16, FlxColor.WHITE, CENTER);
+        text.setFormat(Paths.font(Language.get('fontName', 'main') + '.ttf'), 16, FlxColor.WHITE, CENTER);
         text.fieldHeight = hheight;
         text.updateHitbox();
         add(text);

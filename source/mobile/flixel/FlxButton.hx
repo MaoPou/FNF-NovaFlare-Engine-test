@@ -92,7 +92,7 @@ class FlxButton extends FlxTypedButton<FlxText>
 		{
 			label = new FlxText(x, y, 80, Text);
 			label.antialiasing = true;
-			label.setFormat(Paths.font(Language.get('fontName', 'ma') + '.ttf'), Std.int(8), 0xFFFFFF, CENTER, FlxTextBorderStyle.OUTLINE, 0x00FFFFFF);
+			label.setFormat(Paths.font(Language.get('fontName', 'main') + '.ttf'), Std.int(8), 0xFFFFFF, CENTER, FlxTextBorderStyle.OUTLINE, 0x00FFFFFF);
 			label.borderStyle = NONE;
 			label.alpha = 1;
 			label.drawFrame(true);
@@ -109,7 +109,7 @@ class FlxButton extends FlxTypedButton<FlxText>
 
 		if (label != null)
 		{
-			label.setFormat(Paths.font(Language.get('fontName', 'ma') + '.ttf'), Std.int(owidth / 4), 0xFFFFFF, CENTER, FlxTextBorderStyle.OUTLINE, 0x00FFFFFF);
+			label.setFormat(Paths.font(Language.get('fontName', 'main') + '.ttf'), Std.int(owidth / 4), 0xFFFFFF, CENTER, FlxTextBorderStyle.OUTLINE, 0x00FFFFFF);
 			label.borderStyle = NONE;
 			label.fieldWidth = owidth;
 			label.x += owidth / 2 - label.fieldWidth / 2;

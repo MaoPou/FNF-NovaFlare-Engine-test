@@ -63,7 +63,7 @@ class ControlsSprite extends FlxSpriteGroup
         {
             text = new FlxText(PADDING + x, PADDING + y - 5, width, label);
             text.autoSize = true;
-            text.setFormat(Paths.font(Language.get('fontName', 'ma') + '.ttf'), 17, FlxColor.WHITE, LEFT);
+            text.setFormat(Paths.font(Language.get('fontName', 'main') + '.ttf'), 17, FlxColor.WHITE, LEFT);
             text.fieldHeight = height;
             text.antialiasing = true;
             add(text);
@@ -78,7 +78,7 @@ class ControlsSprite extends FlxSpriteGroup
         background.visible = false;
 
         text = new FlxText(PADDING + background.x, PADDING + background.y - 5, 300, labels);
-        text.setFormat(Paths.font(Language.get('fontName', 'ma') + '.ttf'), 32, FlxColor.WHITE, CENTER);
+        text.setFormat(Paths.font(Language.get('fontName', 'main') + '.ttf'), 32, FlxColor.WHITE, CENTER);
         text.screenCenter(X);
         text.antialiasing = true;
         add(text);
@@ -399,7 +399,7 @@ class ControlsSprite extends FlxSpriteGroup
 
     public function centerTextX(size:Int = 16)
     {
-        text.setFormat(Paths.font(Language.get('fontName', 'ma') + '.ttf'), size, FlxColor.WHITE, CENTER);
+        text.setFormat(Paths.font(Language.get('fontName', 'main') + '.ttf'), size, FlxColor.WHITE, CENTER);
         text.screenCenter(X);
         text.updateHitbox();
 
@@ -498,7 +498,7 @@ class ControlsNoteSprite extends FlxSpriteGroup
             var text:FlxText = new FlxText(PADDING + x - xPos, PADDING + y);
             text.text = key;
             //text.autoSize = true;
-            text.setFormat(Paths.font(Language.get('fontName', 'ma') + '.ttf'), 16, FlxColor.WHITE, CENTER);
+            text.setFormat(Paths.font(Language.get('fontName', 'main') + '.ttf'), 16, FlxColor.WHITE, CENTER);
             //text.fieldHeight = height;
             text.antialiasing = true;
             text.updateHitbox();

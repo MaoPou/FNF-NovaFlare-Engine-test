@@ -1,38 +1,39 @@
 package general.backend.language;
 
-import general.backend.language.locales.*;
-
 class Language
 {
-	public static function get(value:String, type:String = 'op'):String
+	static var groups:Map<String, CustomLangGroup> = [];
+
+	public static function get(value:String, type:String = 'options'):String
 	{
-		switch (type)
-		{
-			case 'mm':
-				return MainMenuLang.get(value);
-			case 'ma':
-				return MainLang.get(value);
-			case 'fp':
-				return FreePlayLang.get(value);
-			case 'op':
-				return OptionsLang.get(value);
-			case 'opTip':
-				return OptionsTipLang.get(value);
-			case 'pa':
-				return PauseLang.get(value);
-		}
-		return "error";
+		var group = groups.get(type);
+		if (group != null)
+			return group.get(value);
+		return ClientPrefs.data.developerMode ? value + ' (404)' : value;
 	}
 
 	public static function resetData()
 	{
 		check();
-		MainMenuLang.updateLang();
-		MainLang.updateLang();
-		FreePlayLang.updateLang();
-		OptionsLang.updateLang();
-		OptionsTipLang.updateLang();
-		PauseLang.updateLang();
+		discoverGroups();
+		for (group in groups)
+			group.updateLang();
+	}
+
+	static function discoverGroups()
+	{
+		var basePath = Paths.getPath('language') + '/' + ClientPrefs.data.language;
+		if (!FileSystem.isDirectory(basePath))
+			return;
+
+		for (entry in FileSystem.readDirectory(basePath))
+		{
+			if (FileSystem.isDirectory(basePath + '/' + entry))
+			{
+				if (!groups.exists(entry))
+					groups.set(entry, new CustomLangGroup(entry));
+			}
+		}
 	}
 
 	public static function check()
@@ -41,22 +42,18 @@ class Language
 			ClientPrefs.data.language = 'English';
 	}
 
-	public static function setupData(follow:Dynamic, directoryPath:Array<String>)
+	public static function setupData(follow:CustomLangGroup, directoryPath:Array<String>)
 	{
 		for (path in 0...directoryPath.length) {
 			if (FileSystem.isDirectory(directoryPath[path])) {
-				//trace('found language folder: ' + directoryPath[path]);
 				for (file in FileSystem.readDirectory(directoryPath[path])) {
 					if (file.toLowerCase().endsWith('.lang')) {
-						//trace(directoryPath[path] + file);
 						var outputData = CoolUtil.coolTextFile(directoryPath[path] + '/' + file);
-						//trace(outputData);
 						for (list in 0...outputData.length) {
 							var line = outputData[list];
 							if (line.length > 0 && line.indexOf(' => ') != -1) {
 								var key:String = line.substr(0, line.indexOf(' => '));
 								var value:String = line.substr(line.indexOf(' => ') + 4, line.length);
-								//trace(key + '2' + value);
 								if (path == 0)
 									follow.defaultData.set(key, value);
 								else

@@ -18,7 +18,7 @@ class SearchButton extends FlxSpriteGroup
 		search = new PsychUIInputText(round, 0, Std.int(width - round * 2), '', Std.int(height / 2));
 		search.bg.visible = false;
 		search.behindText.alpha = 0;
-		search.textObj.font = Paths.font(Language.get('fontName', 'ma') + '.ttf');
+		search.textObj.font = Paths.font(Language.get('fontName', 'main') + '.ttf');
 		search.textObj.antialiasing = ClientPrefs.data.antialiasing;
 		search.textObj.color = FlxColor.WHITE;
 		search.caret.color = 0x727E7E7E;
@@ -33,8 +33,8 @@ class SearchButton extends FlxSpriteGroup
 		}
 		add(search);
 
-		tapText = new FlxText(round, 0, 0, Language.get('tapToSearch', 'op'), Std.int(height / 2));
-		tapText.font = Paths.font(Language.get('fontName', 'ma') + '.ttf');
+		tapText = new FlxText(round, 0, 0, Language.get('tapToSearch', 'options'), Std.int(height / 2));
+		tapText.font = Paths.font(Language.get('fontName', 'main') + '.ttf');
 		tapText.antialiasing = ClientPrefs.data.antialiasing;
 		tapText.alpha = 0.6;
         tapText.y += (bg.height - tapText.height) / 2;
@@ -57,9 +57,9 @@ class SearchButton extends FlxSpriteGroup
 	} 
 
 	public function changeLanguage() {
-		tapText.text = Language.get('tapToSearch', 'op');
-		tapText.font = Paths.font(Language.get('fontName', 'ma') + '.ttf');
+		tapText.text = Language.get('tapToSearch', 'options');
+		tapText.font = Paths.font(Language.get('fontName', 'main') + '.ttf');
 
-		search.textObj.font = Paths.font(Language.get('fontName', 'ma') + '.ttf');
+		search.textObj.font = Paths.font(Language.get('fontName', 'main') + '.ttf');
 	}
 }

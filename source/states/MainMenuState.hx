@@ -28,7 +28,7 @@ import cpp.Lib;
 
 @:access(flixel.sound.FlxSound._sound)
 @:access(openfl.media.Sound.__buffer)
-class MainMenuState extends MusicBeatState
+class MamainmenuState extends MusicBeatState
 {
 	public static var psychEngineVersion:String = '0.7.3'; // This is also used for Discord RPC
 	public static var novaFlareEngineDataVersion:Float = 2.6;
@@ -125,8 +125,6 @@ class MainMenuState extends MusicBeatState
 
 		persistentUpdate = persistentDraw = true;
 
-		//Language.resetData();
-
 		var yScroll:Float = Math.max(0.25 - (0.05 * (optionShit.length - 4)), 0.1);
 		var bg:FlxSprite = new FlxSprite(-80).loadGraphic(Paths.image('menuBG', null, false));
 		bg.scrollFactor.set(0, 0);
@@ -174,7 +172,7 @@ class MainMenuState extends MusicBeatState
 			var menuItem:FlxSprite = new FlxSprite(-600, 0);
 			menuItem.scale.x = scale;
 			menuItem.scale.y = scale;
-			menuItem.frames = Paths.getSparrowAtlas('mainmenu/menu_' + optionShit[i]);
+			menuItem.frames = Paths.getSparrowAtlas('mamainmenu/menu_' + optionShit[i]);
 			menuItem.animation.addByPrefix('idle', optionShit[i] + " basic", 24);
 			menuItem.animation.addByPrefix('selected', optionShit[i] + " white", 24);
 			menuItem.animation.play('idle');
@@ -247,7 +245,7 @@ class MainMenuState extends MusicBeatState
 				updateShit.cameras = [camHUD];
 
 				StatusIcon = new FlxSprite(0, 0);
-				StatusIcon.frames = Paths.getSparrowAtlas('menuExtend/MainMenu/gitAction', null, false);
+				StatusIcon.frames = Paths.getSparrowAtlas('menuExtend/Mamainmenu/gitAction', null, false);
 				StatusIcon.updateHitbox();
 
 				StatusIcon.animation.addByPrefix('in_progress', "in_progress", 24);
@@ -299,15 +297,15 @@ class MainMenuState extends MusicBeatState
 			}
 		}); */
 
-		var versionShit:FlxText = new FlxText(12, FlxG.height - 44, 400, Language.get('novaFlareEngine', 'mm') + " v " + novaFlareEngineVersion, 12);
+		var versionShit:FlxText = new FlxText(12, FlxG.height - 44, 400, Language.get('novaFlareEngine', 'mainmenu') + " v " + novaFlareEngineVersion, 12);
 		versionShit.scrollFactor.set();
-		versionShit.setFormat(Paths.font(Language.get('fontName', 'ma') + '.ttf'), 16, FlxColor.WHITE, LEFT, FlxTextBorderStyle.OUTLINE, FlxColor.BLACK);
+		versionShit.setFormat(Paths.font(Language.get('fontName', 'main') + '.ttf'), 16, FlxColor.WHITE, LEFT, FlxTextBorderStyle.OUTLINE, FlxColor.BLACK);
 		versionShit.antialiasing = ClientPrefs.data.antialiasing;
 		add(versionShit);
 		versionShit.cameras = [camHUD];
-		var versionShit:FlxText = new FlxText(12, FlxG.height - 24, 0, Language.get('fridayNightFunkin', 'mm') + " v " + '0.2.8', 12);
+		var versionShit:FlxText = new FlxText(12, FlxG.height - 24, 0, Language.get('fridayNightFunkin', 'mainmenu') + " v " + '0.2.8', 12);
 		versionShit.scrollFactor.set();
-		versionShit.setFormat(Paths.font(Language.get('fontName', 'ma') + '.ttf'), 16, FlxColor.WHITE, LEFT, FlxTextBorderStyle.OUTLINE, FlxColor.BLACK);
+		versionShit.setFormat(Paths.font(Language.get('fontName', 'main') + '.ttf'), 16, FlxColor.WHITE, LEFT, FlxTextBorderStyle.OUTLINE, FlxColor.BLACK);
 		add(versionShit);
 		versionShit.antialiasing = ClientPrefs.data.antialiasing;
 		versionShit.cameras = [camHUD];
@@ -331,7 +329,7 @@ class MainMenuState extends MusicBeatState
 		FlxG.mouse.visible = false;
 		#end
 
-		addVirtualPad(MainMenuStateC, A_B_E);
+		addVirtualPad(MamainmenuStateC, A_B_E);
 		virtualPad.cameras = [camHUD];
 
 		/*
@@ -637,8 +635,8 @@ class MainMenuState extends MusicBeatState
 			http.onData = function(data:String)
 			{
 				var actionJson = Json.parse(data);
-				MainMenuState.NovaFlareGithubAction = actionJson.workflow_runs[0].display_title;
-				MainMenuState.createTime = 'UTC-' + actionJson.workflow_runs[0].updated_at + '\nBy ' + actionJson.workflow_runs[0].actor.login;
+				MamainmenuState.NovaFlareGithubAction = actionJson.workflow_runs[0].display_title;
+				MamainmenuState.createTime = 'UTC-' + actionJson.workflow_runs[0].updated_at + '\nBy ' + actionJson.workflow_runs[0].actor.login;
 				var Sus = actionJson.workflow_runs[0].status;
 				var Con = actionJson.workflow_runs[0].conclusion;
 				callback({status: Sus, conclusion: Con});
@@ -646,7 +644,7 @@ class MainMenuState extends MusicBeatState
 
 			http.onError = function(error)
 			{
-				MainMenuState.NovaFlareGithubAction = '$error';
+				MamainmenuState.NovaFlareGithubAction = '$error';
 				trace('error: $error');
 				callback({status: "error", conclusion: "error"});
 			};

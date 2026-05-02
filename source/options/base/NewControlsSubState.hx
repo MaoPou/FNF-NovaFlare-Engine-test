@@ -171,13 +171,13 @@ class NewControlsSubState extends MusicBeatSubstate
         add(background);
 
         optionText = new FlxText(background.x, background.y, 600, optionTextStrStatic);
-        optionText.setFormat(Paths.font(Language.get('fontName', 'ma') + '.ttf'), 25, FlxColor.BLACK, "center");
+        optionText.setFormat(Paths.font(Language.get('fontName', 'main') + '.ttf'), 25, FlxColor.BLACK, "center");
         add(optionText);
 		optionText.antialiasing = true;
 		optionText.screenCenter(X);
 
 		setOptionText = new FlxText(0, 0, 1000, "");
-        setOptionText.setFormat((Language.get('fontName', 'ma') + '.ttf'), 51, FlxColor.WHITE, "left");
+        setOptionText.setFormat((Language.get('fontName', 'main') + '.ttf'), 51, FlxColor.WHITE, "left");
 		setOptionText.scale.x = 0.3;
 		setOptionText.antialiasing = true;
 		add(setOptionText);

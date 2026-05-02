@@ -15,7 +15,7 @@ import flixel.input.keyboard.FlxKey;
 import flixel.input.gamepad.FlxGamepadInputID;
 import flixel.math.FlxMatrix;
 
-import states.MainMenuState;
+import states.MamainmenuState;
 import states.StoryMenuState;
 import states.freeplayState.FreeplayState;
 
@@ -134,7 +134,7 @@ class FunkinLua
 		set('rating', 0);
 		set('ratingName', '');
 		set('ratingFC', '');
-		set('version', MainMenuState.psychEngineVersion.trim());
+		set('version', MamainmenuState.psychEngineVersion.trim());
 
 		set('inGameOver', false);
 		set('mustHitSection', false);

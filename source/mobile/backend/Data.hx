@@ -30,7 +30,7 @@ enum FlxDPadMode
 	BOTH_GAME;
 	PauseSubstateC;
 	OptionStateC;
-	MainMenuStateC;
+	MamainmenuStateC;
 	ChartingStateC;
 	DIALOGUE_PORTRAIT;
 	MENU_CHARACTER;

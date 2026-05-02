@@ -15,7 +15,7 @@ class StateButton extends FlxSpriteGroup{
 		add(bg);
 
 		stateName = new FlxText(0, 0, 0, follow.description, Std.int(bg.width / 20));
-		stateName.setFormat(Paths.font(Language.get('fontName', 'ma') + '.ttf'), Std.int(bg.width / 20), 0xffffff, CENTER, FlxTextBorderStyle.OUTLINE, 0xFFFFFFFF);
+		stateName.setFormat(Paths.font(Language.get('fontName', 'main') + '.ttf'), Std.int(bg.width / 20), 0xffffff, CENTER, FlxTextBorderStyle.OUTLINE, 0xFFFFFFFF);
         stateName.antialiasing = ClientPrefs.data.antialiasing;
 		stateName.borderStyle = NONE;
 		stateName.x += (bg.width - stateName.width) / 2;

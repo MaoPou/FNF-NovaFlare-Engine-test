@@ -35,7 +35,7 @@ class StarRect extends FlxSpriteGroup{
         add(star);
 
         text = new FlxText(0, 0, 0, '0.99', Std.int(height * 0.25));
-		text.setFormat(Paths.font(Language.get('fontName', 'ma') + '.ttf'), Std.int(height * 0.6), 0x242A2E, CENTER, FlxTextBorderStyle.OUTLINE, 0xFFFFFFFF);
+		text.setFormat(Paths.font(Language.get('fontName', 'main') + '.ttf'), Std.int(height * 0.6), 0x242A2E, CENTER, FlxTextBorderStyle.OUTLINE, 0xFFFFFFFF);
         text.borderStyle = NONE;
 		text.antialiasing = ClientPrefs.data.antialiasing;
 		text.x = star.x + star.width * 0.9;

@@ -73,8 +73,8 @@ class Option extends FlxSpriteGroup
 
 		this.variable = variable;
 		this.type = type;
-		this.description = Language.get(variable, 'op');
-		this.tips = Language.get(variable, 'opTip');
+		this.description = Language.get(variable, 'options');
+		this.tips = Language.get(variable, 'optionTips');
 
 		///////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -273,7 +273,7 @@ class Option extends FlxSpriteGroup
 		baseBGAdd(true);
 
 		valueText = new FlxText(0, 0, 0, defaultValue + ' ' + extraDisplay, Std.int(baseBG.width / 20 / 2));
-		valueText.setFormat(Paths.font(Language.get('fontName', 'ma') + '.ttf'), Std.int(baseBG.width / 30 / 2), 0xffffff, RIGHT, FlxTextBorderStyle.OUTLINE, 0xFFFFFFFF);
+		valueText.setFormat(Paths.font(Language.get('fontName', 'main') + '.ttf'), Std.int(baseBG.width / 30 / 2), 0xffffff, RIGHT, FlxTextBorderStyle.OUTLINE, 0xFFFFFFFF);
         valueText.antialiasing = ClientPrefs.data.antialiasing;
 		valueText.borderStyle = NONE;
 		valueText.x += baseBG.width - valueText.textField.textWidth - baseBG.mainRound;
@@ -306,7 +306,7 @@ class Option extends FlxSpriteGroup
 		baseBGAdd();
 
 		valueText = new FlxText(0, 0, 0, defaultValue + ' ' + extraDisplay, Std.int(baseBG.width / 20 / 2));
-		valueText.setFormat(Paths.font(Language.get('fontName', 'ma') + '.ttf'), Std.int(baseBG.width / 30), 0xffffff, RIGHT, FlxTextBorderStyle.OUTLINE, 0xFFFFFFFF);
+		valueText.setFormat(Paths.font(Language.get('fontName', 'main') + '.ttf'), Std.int(baseBG.width / 30), 0xffffff, RIGHT, FlxTextBorderStyle.OUTLINE, 0xFFFFFFFF);
         valueText.antialiasing = ClientPrefs.data.antialiasing;
 		valueText.borderStyle = NONE;
 		valueText.x += baseBG.width - valueText.textField.textWidth - baseBG.mainRound;
@@ -329,7 +329,7 @@ class Option extends FlxSpriteGroup
 	function addTip()
 	{
 		tipsText = new FlxText(0, 0, 0, description, Std.int(follow.width / 10));
-		tipsText.setFormat(Paths.font(Language.get('fontName', 'ma') + '.ttf'), Std.int(follow.bg.realWidth / 45), 0xffffff, LEFT, FlxTextBorderStyle.OUTLINE, 0xFFFFFFFF);
+		tipsText.setFormat(Paths.font(Language.get('fontName', 'main') + '.ttf'), Std.int(follow.bg.realWidth / 45), 0xffffff, LEFT, FlxTextBorderStyle.OUTLINE, 0xFFFFFFFF);
         tipsText.antialiasing = ClientPrefs.data.antialiasing;
 		tipsText.borderStyle = NONE;
 		tipsText.color = EngineSet.minorColor;
@@ -357,7 +357,7 @@ class Option extends FlxSpriteGroup
 	function addTitle()
 	{
 		title = new FlxText(0, 0, 0, description, Std.int(follow.width / 10));
-		title.setFormat(Paths.font(Language.get('fontName', 'ma') + '.ttf'), Std.int(follow.bg.realWidth / 30), 0xffffff, LEFT, FlxTextBorderStyle.OUTLINE, 0xFFFFFFFF);
+		title.setFormat(Paths.font(Language.get('fontName', 'main') + '.ttf'), Std.int(follow.bg.realWidth / 30), 0xffffff, LEFT, FlxTextBorderStyle.OUTLINE, 0xFFFFFFFF);
         title.antialiasing = ClientPrefs.data.antialiasing;
 		title.borderStyle = NONE;
 		title.x += follow.bg.mainRound;
@@ -427,8 +427,8 @@ class Option extends FlxSpriteGroup
 		baseBG = new Rect(0, 0, calcWidth, calcHeight, calcWidth / 75 / mult, calcWidth / 75 / mult, 0x000000, 0.3);
 		add(baseBG);
 
-		baseTar = new FlxText(0, 0, 0, Language.get('Target', 'op') + ': ' + variable, Std.int(baseBG.width / 20 / mult));
-		baseTar.setFormat(Paths.font(Language.get('fontName', 'ma') + '.ttf'), Std.int(baseBG.width / 30 / mult), 0xffffff, LEFT, FlxTextBorderStyle.OUTLINE, 0xFFFFFFFF);
+		baseTar = new FlxText(0, 0, 0, Language.get('Target', 'options') + ': ' + variable, Std.int(baseBG.width / 20 / mult));
+		baseTar.setFormat(Paths.font(Language.get('fontName', 'main') + '.ttf'), Std.int(baseBG.width / 30 / mult), 0xffffff, LEFT, FlxTextBorderStyle.OUTLINE, 0xFFFFFFFF);
         baseTar.antialiasing = ClientPrefs.data.antialiasing;
 		baseTar.borderStyle = NONE;
 		baseTar.x += baseBG.mainRound;
@@ -444,7 +444,7 @@ class Option extends FlxSpriteGroup
 		var calcWidth = baseBG.width * 0.58;
 		if (double) calcWidth = baseBG.width * 0.5;
 		baseDesc = new FlxText(0, baseTar.height + baseLine.height, calcWidth, description, Std.int(follow.width / 10));
-		baseDesc.setFormat(Paths.font(Language.get('fontName', 'ma') + '.ttf'), Std.int(baseBG.width / 25 / mult), 0xffffff, LEFT, FlxTextBorderStyle.OUTLINE, 0xFFFFFFFF);
+		baseDesc.setFormat(Paths.font(Language.get('fontName', 'main') + '.ttf'), Std.int(baseBG.width / 25 / mult), 0xffffff, LEFT, FlxTextBorderStyle.OUTLINE, 0xFFFFFFFF);
         baseDesc.antialiasing = ClientPrefs.data.antialiasing;
 		baseDesc.borderStyle = NONE;
 		baseDesc.active = false;
@@ -464,8 +464,8 @@ class Option extends FlxSpriteGroup
 	////////////////////////////////////////////////////////////////////////////
 
 	public function changeLanguage() {
-		this.description = Language.get(variable, 'op');
-		this.tips = Language.get(variable, 'opTip');
+		this.description = Language.get(variable, 'options');
+		this.tips = Language.get(variable, 'optionTips');
 		alreadyShowTip = false;
 		switch (type)
 		{
@@ -477,28 +477,28 @@ class Option extends FlxSpriteGroup
 				baseChangeLanguage();
 			case TITLE:
 				title.text = description;
-				title.setFormat(Paths.font(Language.get('fontName', 'ma') + '.ttf'), Std.int(follow.bg.realWidth / 30), EngineSet.minorColor, LEFT, FlxTextBorderStyle.OUTLINE, 0xFFFFFFFF);
+				title.setFormat(Paths.font(Language.get('fontName', 'main') + '.ttf'), Std.int(follow.bg.realWidth / 30), EngineSet.minorColor, LEFT, FlxTextBorderStyle.OUTLINE, 0xFFFFFFFF);
 				title.borderStyle = NONE;
 			case TEXT:
 				tipsText.text = description;
-				tipsText.setFormat(Paths.font(Language.get('fontName', 'ma') + '.ttf'), Std.int(follow.bg.realWidth / 45), EngineSet.minorColor, LEFT, FlxTextBorderStyle.OUTLINE, 0xFFFFFFFF);
+				tipsText.setFormat(Paths.font(Language.get('fontName', 'main') + '.ttf'), Std.int(follow.bg.realWidth / 45), EngineSet.minorColor, LEFT, FlxTextBorderStyle.OUTLINE, 0xFFFFFFFF);
 				tipsText.borderStyle = NONE;
 				
 			case STATE:
 				stateButton.stateName.text = description;
-				stateButton.stateName.setFormat(Paths.font(Language.get('fontName', 'ma') + '.ttf'), Std.int(stateButton.bg.width / 20), 0xffffff, CENTER, FlxTextBorderStyle.OUTLINE, 0xFFFFFFFF);
+				stateButton.stateName.setFormat(Paths.font(Language.get('fontName', 'main') + '.ttf'), Std.int(stateButton.bg.width / 20), 0xffffff, CENTER, FlxTextBorderStyle.OUTLINE, 0xFFFFFFFF);
 				stateButton.stateName.borderStyle = NONE;
 			default:
 		}
 	}
 
 	function baseChangeLanguage() {
-		baseTar.text = Language.get('Target', 'op') + ': ' + variable;
-		baseTar.setFormat(Paths.font(Language.get('fontName', 'ma') + '.ttf'), Std.int(baseBG.width / 30 / mult), 0xffffff, LEFT, FlxTextBorderStyle.OUTLINE, 0xFFFFFFFF);
+		baseTar.text = Language.get('Target', 'options') + ': ' + variable;
+		baseTar.setFormat(Paths.font(Language.get('fontName', 'main') + '.ttf'), Std.int(baseBG.width / 30 / mult), 0xffffff, LEFT, FlxTextBorderStyle.OUTLINE, 0xFFFFFFFF);
 		baseTar.borderStyle = NONE;
 
 		baseDesc.text = description;
-		baseDesc.setFormat(Paths.font(Language.get('fontName', 'ma') + '.ttf'), Std.int(baseBG.width / 25 / mult), 0xffffff, LEFT, FlxTextBorderStyle.OUTLINE, 0xFFFFFFFF);
+		baseDesc.setFormat(Paths.font(Language.get('fontName', 'main') + '.ttf'), Std.int(baseBG.width / 25 / mult), 0xffffff, LEFT, FlxTextBorderStyle.OUTLINE, 0xFFFFFFFF);
 		baseDesc.borderStyle = NONE;
 	}
 

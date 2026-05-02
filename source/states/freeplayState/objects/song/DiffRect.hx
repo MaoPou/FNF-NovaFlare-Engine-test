@@ -58,7 +58,7 @@ class DiffRect extends FlxSpriteGroup {
         add(light);
 
         diffName = new FlxText(20 + 10, 0, 0, name, Std.int(fixHeight * 0.4));
-        diffName.setFormat(Paths.font(Language.get('fontName', 'ma') + '.ttf'), Std.int(fixHeight * 0.4), FlxColor.WHITE, LEFT, FlxTextBorderStyle.OUTLINE, 0x00FFFFFF);
+        diffName.setFormat(Paths.font(Language.get('fontName', 'main') + '.ttf'), Std.int(fixHeight * 0.4), FlxColor.WHITE, LEFT, FlxTextBorderStyle.OUTLINE, 0x00FFFFFF);
         diffName.borderSize = 0;
         diffName.x -= (diffName.width - diffName.textField.textWidth) / 2;
         diffName.antialiasing = ClientPrefs.data.antialiasing;
@@ -66,7 +66,7 @@ class DiffRect extends FlxSpriteGroup {
         add(diffName);
 
         charterName = new FlxText(20 + 10 + 10 + diffName.textField.textWidth, 0, 0, 'Charter: ' + charter, Std.int(fixHeight * 0.4));
-        charterName.setFormat(Paths.font(Language.get('fontName', 'ma') + '.ttf'), Std.int(fixHeight * 0.4), FlxColor.WHITE, LEFT, FlxTextBorderStyle.OUTLINE, 0x00393939);
+        charterName.setFormat(Paths.font(Language.get('fontName', 'main') + '.ttf'), Std.int(fixHeight * 0.4), FlxColor.WHITE, LEFT, FlxTextBorderStyle.OUTLINE, 0x00393939);
         charterName.borderSize = 0;
         charterName.x -= (charterName.width - charterName.textField.textWidth) / 2;
         charterName.antialiasing = ClientPrefs.data.antialiasing;
@@ -83,7 +83,7 @@ class DiffRect extends FlxSpriteGroup {
     }
 
     override function update(elapsed:Float) {
-        if (allowSelect && !FreeplayState.instance.stopAll) {
+        if (allowSelect && !FreeplayState.instance.stopAll && follow.searchMatch) {
             var mouse = FreeplayState.instance.mouseEvent;
 
             if (FlxG.mouse.y < FlxG.height - 65 && FlxG.mouse.y > 70) {
@@ -175,7 +175,7 @@ class DiffRect extends FlxSpriteGroup {
         FreeplayState.curDifficulty = this.id;
         follow.diffFouceUpdate();
         FlxG.sound.play(Paths.sound('scrollMenu'), 0.4);
-        FreeplayState.instance.songsMove.tweenData = FlxG.height * 0.5 - SongRect.fixHeight * 0.5 - FreeplayState.curSelected * SongRect.fixHeight * FreeplayState.instance.rectInter - (FreeplayState.curDifficulty+1) * DiffRect.fixHeight * 1.05;
+        FreeplayState.instance.songsMove.tweenData = FlxG.height * 0.5 - SongRect.fixHeight * 0.5 - FreeplayState.instance.getEffectiveId(FreeplayState.curSelected) * SongRect.fixHeight * FreeplayState.instance.rectInter - (FreeplayState.curDifficulty+1) * DiffRect.fixHeight * 1.05;
     }
 
     ////////////////////////////////////////////////////////////////////////////////////
@@ -191,7 +191,7 @@ class DiffRect extends FlxSpriteGroup {
         if (Math.abs(chooseX - chooseTar) > 0.01) chooseX = FlxMath.lerp(chooseTar, chooseX, Math.exp(-FreeplayState.instance.songsMove.saveElapsed * FreeplayState.instance.songsMove.lerpSmooth));
         else chooseX = chooseTar;
         
-        realX = FlxG.width - fixWidth * 0.85 + startX + chooseX;
+        realX = FlxG.width - fixWidth * 0.85 + startX + chooseX + follow.searchOffset;
     }
 
     public var realY:Float = 0;

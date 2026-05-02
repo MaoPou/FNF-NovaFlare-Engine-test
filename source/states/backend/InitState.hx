@@ -15,7 +15,7 @@ import flixel.input.gamepad.FlxGamepad;
 
 import states.StoryMenuState;
 import states.backend.OutdatedState;
-import states.MainMenuState;
+import states.MamainmenuState;
 import states.freeplayState.FreeplayState;
 import states.TitleState;
 
@@ -134,8 +134,8 @@ class InitState extends MusicBeatState
 					http.onData = function(data:String)
 					{
 						updateVersion = data.split('\n')[0].trim();
-						var curVersion:Float = MainMenuState.novaFlareEngineDataVersion;
-						trace('version online: ' + data.split('\n')[0].trim() + ', your version: ' + MainMenuState.novaFlareEngineVersion);
+						var curVersion:Float = MamainmenuState.novaFlareEngineDataVersion;
+						trace('version online: ' + data.split('\n')[0].trim() + ', your version: ' + MamainmenuState.novaFlareEngineVersion);
 						if (Std.parseFloat(updateVersion) > curVersion)
 						{
 							trace('versions arent matching!');
@@ -167,13 +167,13 @@ class InitState extends MusicBeatState
         // 检查assets/version.txt存不存在且里面保存的上一个版本号与当前的版本号一不一致，如果不一致或不存在，强制启动copy。
         if (!FileSystem.exists(Paths.getSharedPath('version.txt')))
         {
-            sys.io.File.saveContent(Paths.getSharedPath('version.txt'), 'now version: ' + Std.string(states.MainMenuState.novaFlareEngineVersion) + '\n' + 'commit: ' + Std.string(states.MainMenuState.novaFlareEngineCommit));
+            sys.io.File.saveContent(Paths.getSharedPath('version.txt'), 'now version: ' + Std.string(states.MamainmenuState.novaFlareEngineVersion) + '\n' + 'commit: ' + Std.string(states.MamainmenuState.novaFlareEngineCommit));
             FlxG.switchState(new CopyState(true));
             return;
         }
         else
         {
-            var expectedContent = 'now version: ' + Std.string(states.MainMenuState.novaFlareEngineVersion) + '\n' + 'commit: ' + Std.string(states.MainMenuState.novaFlareEngineCommit);
+            var expectedContent = 'now version: ' + Std.string(states.MamainmenuState.novaFlareEngineVersion) + '\n' + 'commit: ' + Std.string(states.MamainmenuState.novaFlareEngineCommit);
             var actualContent = sys.io.File.getContent(Paths.getSharedPath('version.txt'));
             
             if (actualContent != expectedContent)

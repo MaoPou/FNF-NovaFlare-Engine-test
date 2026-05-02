@@ -27,7 +27,7 @@ class StringRect extends FlxSpriteGroup{
         add(bg);
 
         disText = new FlxText(0, 0, 0, 'Tap to choose', Std.int(bg.width / 20 / 2));
-		disText.setFormat(Paths.font(Language.get('fontName', 'ma') + '.ttf'), Std.int(bg.height / 2), 0xffffff, LEFT, FlxTextBorderStyle.OUTLINE, 0xFFFFFFFF);
+		disText.setFormat(Paths.font(Language.get('fontName', 'main') + '.ttf'), Std.int(bg.height / 2), 0xffffff, LEFT, FlxTextBorderStyle.OUTLINE, 0xFFFFFFFF);
         disText.antialiasing = ClientPrefs.data.antialiasing;
 		disText.borderStyle = NONE;
 		disText.x += bg.mainRound;

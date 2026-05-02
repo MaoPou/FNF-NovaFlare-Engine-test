@@ -20,7 +20,7 @@ class TipButton extends FlxSpriteGroup
         
 
         textDis = new AlphaText(0, 0, 0, 'text', Std.int(height * 0.32));
-		textDis.setFormat(Paths.font(Language.get('fontName', 'ma') + '.ttf'), Std.int(height * 0.32), EngineSet.mainColor, LEFT, FlxTextBorderStyle.OUTLINE, 0xFFFFFFFF);
+		textDis.setFormat(Paths.font(Language.get('fontName', 'main') + '.ttf'), Std.int(height * 0.32), EngineSet.mainColor, LEFT, FlxTextBorderStyle.OUTLINE, 0xFFFFFFFF);
 		textDis.antialiasing = ClientPrefs.data.antialiasing;
         add(textDis);
         var fixX = (textDis.minorText.textField.textWidth - textDis.width) + background.mainRound;
@@ -43,6 +43,6 @@ class TipButton extends FlxSpriteGroup
     }
 
     public function changeLanguage() {
-        textDis.setFormat(Paths.font(Language.get('fontName', 'ma') + '.ttf'), Std.int(saveHeight * 0.32), EngineSet.mainColor, LEFT, FlxTextBorderStyle.OUTLINE, 0xFFFFFFFF);
+        textDis.setFormat(Paths.font(Language.get('fontName', 'main') + '.ttf'), Std.int(saveHeight * 0.32), EngineSet.mainColor, LEFT, FlxTextBorderStyle.OUTLINE, 0xFFFFFFFF);
     }
 }

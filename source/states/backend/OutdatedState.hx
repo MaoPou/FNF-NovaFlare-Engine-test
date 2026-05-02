@@ -1,6 +1,6 @@
 package states.backend;
 
-import states.MainMenuState;
+import states.MamainmenuState;
 
 class OutdatedState extends MusicBeatState
 {
@@ -21,7 +21,7 @@ class OutdatedState extends MusicBeatState
 		{
 			guh = "Sup kiddo, looks like you're running an   \n
 			outdated version of NovaFlare Engine ("
-				+ MainMenuState.novaFlareEngineVersion
+				+ MamainmenuState.novaFlareEngineVersion
 				+ "),\n
 			please update to "
 				+ TitleState.updateVersion
@@ -34,7 +34,7 @@ class OutdatedState extends MusicBeatState
 		{
 			guh = "Sup bro, looks like you're running an   \n
 			outdated version of NovaFlare Engine ("
-				+ MainMenuState.novaFlareEngineVersion
+				+ MamainmenuState.novaFlareEngineVersion
 				+ "),\n
 			please update to "
 				+ TitleState.updateVersion
@@ -72,7 +72,7 @@ class OutdatedState extends MusicBeatState
 				FlxTween.tween(warnText, {alpha: 0}, 1, {
 					onComplete: function(twn:FlxTween)
 					{
-						MusicBeatState.switchState(new MainMenuState());
+						MusicBeatState.switchState(new MamainmenuState());
 					}
 				});
 			}

@@ -37,7 +37,7 @@ class PressButton extends FlxSpriteGroup
 		add(background);
 
 		text = new FlxText(0, 0, 0, texts, 25);
-		text.font = Paths.font(Language.get('fontName', 'ma') + '.ttf');
+		text.font = Paths.font(Language.get('fontName', 'main') + '.ttf');
 		text.antialiasing = ClientPrefs.data.antialiasing;
 		add(text);
 

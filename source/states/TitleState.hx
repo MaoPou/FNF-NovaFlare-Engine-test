@@ -14,7 +14,7 @@ import flixel.input.gamepad.FlxGamepad;
 import general.shaders.ColorSwap;
 
 import states.StoryMenuState;
-import states.MainMenuState;
+import states.MamainmenuState;
 import states.backend.FlashingState;
 import states.backend.OutdatedState;
 
@@ -398,7 +398,7 @@ class TitleState extends MusicBeatState
 					if (mustUpdate) {
 						MusicBeatState.switchState(new OutdatedState());
 					} else {
-						MusicBeatState.switchState(new MainMenuState());
+						MusicBeatState.switchState(new MamainmenuState());
 					}
 					closedState = true;
 				});

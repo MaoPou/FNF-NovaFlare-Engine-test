@@ -26,6 +26,9 @@ class SongRect extends FlxSpriteGroup {
 
     static public var openRect:SongRect;
 
+    public var searchMatch:Bool = true;
+    public var searchOffset:Float = 0;
+
     public var selectShow:Rect;
     private var bg:FlxSprite;
     private var light:SegmentGradientRoundRect;
@@ -80,14 +83,14 @@ class SongRect extends FlxSpriteGroup {
 		add(icon);
 
         songName = new FlxText(0, 0, 0, songNameSt, 20);
-		songName.setFormat(Paths.font(Language.get('fontName', 'ma') + '.ttf'), Std.int(selectShow.height * 0.3), 0xFFFFFFFF, LEFT, FlxTextBorderStyle.OUTLINE, 0xFFFFFFFF);
+		songName.setFormat(Paths.font(Language.get('fontName', 'main') + '.ttf'), Std.int(selectShow.height * 0.3), 0xFFFFFFFF, LEFT, FlxTextBorderStyle.OUTLINE, 0xFFFFFFFF);
         songName.borderStyle = NONE;
 		songName.antialiasing = ClientPrefs.data.antialiasing;
 		songName.x += bg.height / 2 - icon.height / 2 + icon.width * 1.1;
 		add(songName);
 
         musican = new FlxText(0, 0, 0, songMusican, 20);
-		musican.setFormat(Paths.font(Language.get('fontName', 'ma') + '.ttf'), Std.int(selectShow.height * 0.2), 0xFFFFFFFF, LEFT, FlxTextBorderStyle.OUTLINE, 0xFFFFFFFF);
+		musican.setFormat(Paths.font(Language.get('fontName', 'main') + '.ttf'), Std.int(selectShow.height * 0.2), 0xFFFFFFFF, LEFT, FlxTextBorderStyle.OUTLINE, 0xFFFFFFFF);
         musican.borderStyle = NONE;
 		musican.antialiasing = ClientPrefs.data.antialiasing;
 		musican.x += bg.height / 2 - icon.height / 2 + icon.width * 1.1;
@@ -139,7 +142,7 @@ class SongRect extends FlxSpriteGroup {
 
         selectLight.alpha -= elapsed;
 
-        if (FlxG.mouse.y < FlxG.height - 65 && FlxG.mouse.y > 70 && !FreeplayState.instance.stopAll) {
+        if (FlxG.mouse.y < FlxG.height - 65 && FlxG.mouse.y > 70 && !FreeplayState.instance.stopAll && searchMatch) {
             var mouse = FreeplayState.instance.mouseEvent;
 
             if (mouse.overlaps(this.black)) {
@@ -179,7 +182,7 @@ class SongRect extends FlxSpriteGroup {
         FlxTimer.wait(0.001, () -> {
             createDiff(imme);
         });
-        FreeplayState.instance.songsMove.tweenData = FlxG.height * 0.5 - SongRect.fixHeight * 0.5 - FreeplayState.curSelected * SongRect.fixHeight * FreeplayState.instance.rectInter - (FreeplayState.curDifficulty+1) * DiffRect.fixHeight * 1.05;
+        FreeplayState.instance.songsMove.tweenData = FlxG.height * 0.5 - SongRect.fixHeight * 0.5 - FreeplayState.instance.getEffectiveId(FreeplayState.curSelected) * SongRect.fixHeight * FreeplayState.instance.rectInter - (FreeplayState.curDifficulty+1) * DiffRect.fixHeight * 1.05;
         FreeplayState.instance.initSongsData();
     }
 	
@@ -305,8 +308,12 @@ class SongRect extends FlxSpriteGroup {
         var diffTar = diffAdded ? -50 : 0;
         if (Math.abs(diffX - diffTar) > 1) diffX = FlxMath.lerp(diffTar, diffX, Math.exp(-FreeplayState.instance.songsMove.saveElapsed * FreeplayState.instance.songsMove.lerpSmooth));
         else diffX = diffTar;
+
+        var searchTar = searchMatch ? 0 : FlxG.width;
+        if (Math.abs(searchOffset - searchTar) > 1) searchOffset = FlxMath.lerp(searchTar, searchOffset, Math.exp(-FreeplayState.instance.songsMove.saveElapsed * FreeplayState.instance.songsMove.lerpSmooth));
+        else searchOffset = searchTar;
         
-        realX = FlxG.width - this.selectShow.width + 80 + moveX + chooseX + diffX;
+        realX = FlxG.width - this.selectShow.width + 80 + moveX + chooseX + diffX + searchOffset;
         diffCalcX();
     }
 

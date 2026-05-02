@@ -1,5 +1,7 @@
 package states.freeplayState.objects.down;
 
+import flixel.input.keyboard.FlxKey;
+
 class BackButton extends FlxSpriteGroup {
     var pressRect:Rect;
     var disRect:SkewRoundRect;
@@ -24,7 +26,7 @@ class BackButton extends FlxSpriteGroup {
         add(disRect);
 
         text = new FlxText(0, 0, 0, 'Back');
-        text.setFormat(Paths.font(Language.get('fontName', 'ma') + '.ttf'), 24, 0xFFFFFFFF, CENTER, FlxTextBorderStyle.OUTLINE, 0xFFFFFFFF);
+        text.setFormat(Paths.font(Language.get('fontName', 'main') + '.ttf'), 24, 0xFFFFFFFF, CENTER, FlxTextBorderStyle.OUTLINE, 0xFFFFFFFF);
         text.borderStyle = NONE;
 		text.antialiasing = ClientPrefs.data.antialiasing;
         add(text);
@@ -43,14 +45,22 @@ class BackButton extends FlxSpriteGroup {
 
         if (overlaps) {
             if (mouse.justReleased) {
-                back2MainMenu();                 
+                back2Mamainmenu();                 
             }
         }
 
         
         if (Controls.instance.justPressed('back')) {
-            if (FreeplayState.instance.keyboardState == 0) {
-                back2MainMenu();
+            if (FreeplayState.instance.searchJustUnfocused) {
+                FreeplayState.instance.searchJustUnfocused = false;
+                FlxG.sound.play(Paths.sound('cancelMenu'));
+            } else if (FreeplayState.instance.searchButton.hasFocus) {
+                if (FlxG.keys.anyJustPressed([ESCAPE])) {
+                    FreeplayState.instance.searchButton.unfocusSearch();
+                    FlxG.sound.play(Paths.sound('cancelMenu'));
+                }
+            } else if (FreeplayState.instance.keyboardState == 0) {
+                back2Mamainmenu();
             } else {
                 FreeplayState.instance.keyboardState = 0;
                 FreeplayState.instance.curFunc = -1;
@@ -61,13 +71,13 @@ class BackButton extends FlxSpriteGroup {
         super.update(elapsed);
     }
 
-    function back2MainMenu() {
+    function back2Mamainmenu() {
         FreeplayState.instance.stopAll = true;
         Mods.loadTopMod();
         BackendThread.run(() -> {
             FreeplayState.destroyFreeplayVocals();
             FlxG.sound.playMusic(Paths.music('freakyMenu'), 0);
         });
-        MusicBeatState.switchState(new MainMenuState());
+        MusicBeatState.switchState(new MamainmenuState());
     }
 }

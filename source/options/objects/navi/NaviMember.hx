@@ -41,8 +41,8 @@ class NaviMember extends FlxSpriteGroup
 		specRect.antialiasing = ClientPrefs.data.antialiasing;
 		add(specRect);
 
-        textDis = new FlxText(0, 0, 0, Language.get(name, 'op'), Std.int(mainHeight * 0.15));
-		textDis.setFormat(Paths.font(Language.get('fontName', 'ma') + '.ttf'), Std.int(mainHeight * 0.35), EngineSet.mainColor, LEFT, FlxTextBorderStyle.OUTLINE, 0xFFFFFFFF);
+        textDis = new FlxText(0, 0, 0, Language.get(name, 'options'), Std.int(mainHeight * 0.15));
+		textDis.setFormat(Paths.font(Language.get('fontName', 'main') + '.ttf'), Std.int(mainHeight * 0.35), EngineSet.mainColor, LEFT, FlxTextBorderStyle.OUTLINE, 0xFFFFFFFF);
         textDis.borderStyle = NONE;
 		textDis.antialiasing = ClientPrefs.data.antialiasing;
         textDis.x += mainHeight * 0.6;
@@ -91,8 +91,8 @@ class NaviMember extends FlxSpriteGroup
 	}
 
     public function changeLanguage() {
-        textDis.text = Language.get(name, 'op');
-        textDis.setFormat(Paths.font(Language.get('fontName', 'ma') + '.ttf'), Std.int(mainHeight * 0.35), EngineSet.mainColor, LEFT, FlxTextBorderStyle.OUTLINE, 0xFFFFFFFF);
+        textDis.text = Language.get(name, 'options');
+        textDis.setFormat(Paths.font(Language.get('fontName', 'main') + '.ttf'), Std.int(mainHeight * 0.35), EngineSet.mainColor, LEFT, FlxTextBorderStyle.OUTLINE, 0xFFFFFFFF);
         textDis.borderStyle = NONE;
     }
 }

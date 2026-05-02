@@ -31,8 +31,8 @@ class GeneralBack extends FlxSpriteGroup
 			button.flipX = true;
 		add(button);
 
-		text = new FlxText(40, 0, 0, Language.get(texts, 'ma'), 25);
-		text.font = Paths.font(Language.get('fontName', 'ma') + '.ttf');
+		text = new FlxText(40, 0, 0, Language.get(texts, 'in'), 25);
+		text.font = Paths.font(Language.get('fontName', 'main') + '.ttf');
 		text.antialiasing = ClientPrefs.data.antialiasing;
 		add(text);
 
@@ -80,6 +80,6 @@ class GeneralBack extends FlxSpriteGroup
 
 	public function changeLanguage() {
 		text.text = saveString;
-		text.font = Paths.font(Language.get('fontName', 'ma') + '.ttf');
+		text.font = Paths.font(Language.get('fontName', 'main') + '.ttf');
 	}
 }

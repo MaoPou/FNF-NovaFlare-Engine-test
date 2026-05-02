@@ -48,7 +48,7 @@ class FuncButton extends FlxSpriteGroup {
         add(icon);
 
         text = new FlxText(0, 0, 0, name, Std.int(rect.height * 0.25));
-		text.setFormat(Paths.font(Language.get('fontName', 'ma') + '.ttf'), Std.int(rect.height * 0.25), 0xFFFFFFFF, CENTER, FlxTextBorderStyle.OUTLINE, 0xFFFFFFFF);
+		text.setFormat(Paths.font(Language.get('fontName', 'main') + '.ttf'), Std.int(rect.height * 0.25), 0xFFFFFFFF, CENTER, FlxTextBorderStyle.OUTLINE, 0xFFFFFFFF);
         text.borderStyle = NONE;
 		text.antialiasing = ClientPrefs.data.antialiasing;
 		text.x = rect.width / 2 - text.width / 2;

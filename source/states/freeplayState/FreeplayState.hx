@@ -11,7 +11,7 @@ import developer.editors.ChartingState;
 
 import options.OptionsState;
 
-import states.MainMenuState;
+import states.MamainmenuState;
 import states.freeplayState.shader.BlurFilter;
 import states.freeplayState.backend.*;
 import states.freeplayState.objects.detail.*;
@@ -93,7 +93,7 @@ class FreeplayState extends MusicBeatState
 
 	///////////////////////////////////////////////////////////////////////////////////////////////
 
-	var funcData:Array<String> = ['option', 'mod', 'changer', 'editor', 'reset', 'random'];
+	var funcData:Array<String> = ['options', 'mod', 'changer', 'editor', 'reset', 'random'];
 	var funcColors:Array<FlxColor> = [0x63d6ff, 0xd1fc52, 0xff354e, 0xff617e, 0xfd6dff, 0x6dff6d];
 	var downBG:Rect;
 	var backRect:BackButton;
@@ -102,7 +102,12 @@ class FreeplayState extends MusicBeatState
 	///////////////////////////////////////////////////////////////////////////////////////////////
 
 	var selectedBG:SkewRoundRect;
-	var searchButton:SearchButton;
+	public var searchButton:SearchButton;
+
+	public var isSearchActive:Bool = false;
+	public var searchJustUnfocused:Bool = false;
+
+	var noMatchText:FlxText;
 
 	override function create()
 	{
@@ -178,7 +183,7 @@ class FreeplayState extends MusicBeatState
 		add(detailRect);
 
 		detailSongName = new FlxText(0, 0, 0, 'songName', Std.int(detailRect.bg1.height * 0.25));
-		detailSongName.setFormat(Paths.font(Language.get('fontName', 'ma') + '.ttf'), Std.int(detailRect.bg1.height * 0.15), 0xFFFFFFFF, LEFT, FlxTextBorderStyle.OUTLINE, 0xFFFFFFFF);
+		detailSongName.setFormat(Paths.font(Language.get('fontName', 'main') + '.ttf'), Std.int(detailRect.bg1.height * 0.15), 0xFFFFFFFF, LEFT, FlxTextBorderStyle.OUTLINE, 0xFFFFFFFF);
         detailSongName.borderStyle = NONE;
 		detailSongName.antialiasing = ClientPrefs.data.antialiasing;
 		detailSongName.x = 10;
@@ -186,7 +191,7 @@ class FreeplayState extends MusicBeatState
 		add(detailSongName);
 
 		detailMusican = new FlxText(0, 0, 0, 'musican', Std.int(detailRect.bg1.height * 0.25));
-		detailMusican.setFormat(Paths.font(Language.get('fontName', 'ma') + '.ttf'), Std.int(detailRect.bg1.height * 0.09), 0xFFFFFFFF, LEFT, FlxTextBorderStyle.OUTLINE, 0xFFFFFFFF);
+		detailMusican.setFormat(Paths.font(Language.get('fontName', 'main') + '.ttf'), Std.int(detailRect.bg1.height * 0.09), 0xFFFFFFFF, LEFT, FlxTextBorderStyle.OUTLINE, 0xFFFFFFFF);
         detailMusican.borderStyle = NONE;
 		detailMusican.antialiasing = ClientPrefs.data.antialiasing;
 		detailMusican.x = detailSongName.x;
@@ -205,7 +210,7 @@ class FreeplayState extends MusicBeatState
 		add(detailPlaySign);
 
 		detailPlayText = new FlxText(0, 0, 0, '0', Std.int(detailRect.bg1.height * 0.25));
-		detailPlayText.setFormat(Paths.font(Language.get('fontName', 'ma') + '.ttf'), Std.int(detailRect.bg1.height * 0.09), 0xFFFFFFFF, LEFT, FlxTextBorderStyle.OUTLINE, 0xFFFFFFFF);
+		detailPlayText.setFormat(Paths.font(Language.get('fontName', 'main') + '.ttf'), Std.int(detailRect.bg1.height * 0.09), 0xFFFFFFFF, LEFT, FlxTextBorderStyle.OUTLINE, 0xFFFFFFFF);
         detailPlayText.borderStyle = NONE;
 		detailPlayText.antialiasing = ClientPrefs.data.antialiasing;
 		detailPlayText.x = detailPlaySign.x + detailPlaySign.width + 5;
@@ -224,7 +229,7 @@ class FreeplayState extends MusicBeatState
 		add(detailTimeSign);
 
 		detailTimeText = new FlxText(0, 0, 0, '1:00', Std.int(detailRect.bg1.height * 0.25));
-		detailTimeText.setFormat(Paths.font(Language.get('fontName', 'ma') + '.ttf'), Std.int(detailRect.bg1.height * 0.09), 0xFFFFFFFF, LEFT, FlxTextBorderStyle.OUTLINE, 0xFFFFFFFF);
+		detailTimeText.setFormat(Paths.font(Language.get('fontName', 'main') + '.ttf'), Std.int(detailRect.bg1.height * 0.09), 0xFFFFFFFF, LEFT, FlxTextBorderStyle.OUTLINE, 0xFFFFFFFF);
         detailTimeText.borderStyle = NONE;
 		detailTimeText.antialiasing = ClientPrefs.data.antialiasing;
 		detailTimeText.x = detailTimeSign.x + detailTimeSign.width + 5;
@@ -243,7 +248,7 @@ class FreeplayState extends MusicBeatState
 		add(detailBpmSign);
 
 		detailBpmText = new FlxText(0, 0, 0, '300', Std.int(detailRect.bg1.height * 0.25));
-		detailBpmText.setFormat(Paths.font(Language.get('fontName', 'ma') + '.ttf'), Std.int(detailRect.bg1.height * 0.09), 0xFFFFFFFF, LEFT, FlxTextBorderStyle.OUTLINE, 0xFFFFFFFF);
+		detailBpmText.setFormat(Paths.font(Language.get('fontName', 'main') + '.ttf'), Std.int(detailRect.bg1.height * 0.09), 0xFFFFFFFF, LEFT, FlxTextBorderStyle.OUTLINE, 0xFFFFFFFF);
         detailBpmText.borderStyle = NONE;
 		detailBpmText.antialiasing = ClientPrefs.data.antialiasing;
 		detailBpmText.x = detailBpmSign.x + detailBpmSign.width + 5;
@@ -256,7 +261,7 @@ class FreeplayState extends MusicBeatState
 		add(detailRate);
 
 		detailMapper = new FlxText(0, 0, 0, 'Rate 0.99 mapped by test', Std.int(detailRect.bg1.height * 0.25));
-		detailMapper.setFormat(Paths.font(Language.get('fontName', 'ma') + '.ttf'), Std.int((detailRect.bg2.height - detailRect.bg3.height) * 0.7 * 0.6), 0xFFFFFFFF, LEFT, FlxTextBorderStyle.OUTLINE, 0xFFFFFFFF);
+		detailMapper.setFormat(Paths.font(Language.get('fontName', 'main') + '.ttf'), Std.int((detailRect.bg2.height - detailRect.bg3.height) * 0.7 * 0.6), 0xFFFFFFFF, LEFT, FlxTextBorderStyle.OUTLINE, 0xFFFFFFFF);
         detailMapper.borderStyle = NONE;
 		detailMapper.antialiasing = ClientPrefs.data.antialiasing;
 		detailMapper.x = detailRate.x + detailRate.width + 10;
@@ -320,6 +325,16 @@ class FreeplayState extends MusicBeatState
 		searchButton = new SearchButton(695, 5);
 		add(searchButton);
 		searchButton.cameras = [camAfter];
+		searchButton.onSearchChange = startSearch;
+
+		noMatchText = new FlxText(searchButton.x, searchButton.y + searchButton.height + 15, 0, 'No songs matched', 24);
+		noMatchText.setFormat(Paths.font(Language.get('fontName', 'main') + '.ttf'), 24, 0xFFFFFFFF, LEFT, FlxTextBorderStyle.OUTLINE, 0xFFFFFFFF);
+		noMatchText.borderStyle = NONE;
+		noMatchText.antialiasing = ClientPrefs.data.antialiasing;
+		noMatchText.alpha = 0.6;
+		noMatchText.cameras = [camAfter];
+		noMatchText.visible = false;
+		add(noMatchText);
 
 		//////////////////////////////////////////////////////////////////////////////////////////
 
@@ -365,7 +380,7 @@ class FreeplayState extends MusicBeatState
 
 	function outputEvent(name:String):() -> Void {
 		switch (name) {
-			case 'option':
+			case 'options':
 				return function() { 
 				stopAll = true; 
 				OptionsState.stateType = 1; 
@@ -409,10 +424,19 @@ class FreeplayState extends MusicBeatState
 	public function songMoveEvent(){
 		if (songGroup.length <= 0) return;
 		for (i in 0...songGroup.length) {
-			songGroup[i].moveY(songPosiData + (songGroup[i].id) * SongRect.fixHeight * rectInter);
+			songGroup[i].moveY(songPosiData + getEffectiveId(songGroup[i].id) * SongRect.fixHeight * rectInter);
 			updateSongVisibility(songGroup[i]);
-			if (songGroup[i].visible) songGroup[i].calcX();
+			songGroup[i].calcX();
 		}
+	}
+
+	public function getEffectiveId(id:Int):Int {
+		if (!isSearchActive) return id;
+		var count = 0;
+		for (j in 0...id) {
+			if (songGroup[j].searchMatch) count++;
+		}
+		return count;
 	}
 
 	var holdTime:Float = 0;
@@ -428,6 +452,12 @@ class FreeplayState extends MusicBeatState
 
 		if (keyboardState == 0) 
 		{
+			if (FlxG.keys.justPressed.T)
+			{
+				searchButton.focusSearch();
+				return;
+			}
+
 			if (FlxG.keys.justPressed.M)
 			{
 				keyboardState = 2;
@@ -465,7 +495,7 @@ class FreeplayState extends MusicBeatState
 							curSelected = newCurSelected;
 							FlxG.sound.play(Paths.sound('scrollMenu'), 0.4);
 							changeSelection();
-							songsMove.tweenData = FlxG.height * 0.5 - SongRect.fixHeight * 0.5 - curSelected * SongRect.fixHeight * rectInter - (curDifficulty+1) * DiffRect.fixHeight * 1.05;
+							songsMove.tweenData = FlxG.height * 0.5 - SongRect.fixHeight * 0.5 - getEffectiveId(curSelected) * SongRect.fixHeight * rectInter - (curDifficulty+1) * DiffRect.fixHeight * 1.05;
 						} else {
 							curDifficulty = -1;
 							songGroup[curSelected].diffFouceUpdate();
@@ -476,8 +506,8 @@ class FreeplayState extends MusicBeatState
 							curDifficulty--;
 							songGroup[curSelected].diffFouceUpdate();
 							FlxG.sound.play(Paths.sound('scrollMenu'), 0.4);
-							if (curDifficulty >= 0) songsMove.tweenData = FlxG.height * 0.5 - SongRect.fixHeight * 0.5 - curSelected * SongRect.fixHeight * rectInter - (curDifficulty+1) * DiffRect.fixHeight * 1.05;
-							else songsMove.tweenData = FlxG.height * 0.5 - SongRect.fixHeight * 0.5 - curSelected * SongRect.fixHeight * rectInter;
+							if (curDifficulty >= 0) songsMove.tweenData = FlxG.height * 0.5 - SongRect.fixHeight * 0.5 - getEffectiveId(curSelected) * SongRect.fixHeight * rectInter - (curDifficulty+1) * DiffRect.fixHeight * 1.05;
+							else songsMove.tweenData = FlxG.height * 0.5 - SongRect.fixHeight * 0.5 - getEffectiveId(curSelected) * SongRect.fixHeight * rectInter;
 						} else {
 							curDifficulty = -1;
 							songGroup[curSelected].diffFouceUpdate();
@@ -495,7 +525,7 @@ class FreeplayState extends MusicBeatState
 							curDifficulty++;
 							songGroup[curSelected].diffFouceUpdate();
 							FlxG.sound.play(Paths.sound('scrollMenu'), 0.4);
-							songsMove.tweenData = FlxG.height * 0.5 - SongRect.fixHeight * 0.5 - curSelected * SongRect.fixHeight * rectInter - (curDifficulty+1) * DiffRect.fixHeight * 1.05;
+							songsMove.tweenData = FlxG.height * 0.5 - SongRect.fixHeight * 0.5 - getEffectiveId(curSelected) * SongRect.fixHeight * rectInter - (curDifficulty+1) * DiffRect.fixHeight * 1.05;
 						} else {
 							curDifficulty = -1;
 							songGroup[curSelected].diffFouceUpdate();
@@ -559,6 +589,8 @@ class FreeplayState extends MusicBeatState
 				}
 			}
 		}
+
+		searchJustUnfocused = false;
 	}
 
 	public function initSongsData() {
@@ -819,12 +851,27 @@ class FreeplayState extends MusicBeatState
 
 	public function changeSelection(change:Int = 0, playSound:Bool = true)
 	{
-		curSelected = FlxMath.wrap(curSelected + change, 0, songGroup.length - 1);
+		if (isSearchActive && change != 0)
+		{
+			var step:Int = change > 0 ? 1 : -1;
+			var remaining:Int = Std.int(Math.abs(change));
+			var start:Int = curSelected;
+			while (remaining > 0)
+			{
+				curSelected = FlxMath.wrap(curSelected + step, 0, songGroup.length - 1);
+				if (curSelected == start) break;
+				if (songGroup[curSelected].searchMatch) remaining--;
+			}
+		}
+		else
+		{
+			curSelected = FlxMath.wrap(curSelected + change, 0, songGroup.length - 1);
+		}
 
 		Mods.currentModDirectory = songsData[curSelected].folder;
 		PlayState.storyWeek = songsData[curSelected].week;
 
-		songsMove.tweenData = FlxG.height * 0.5 - SongRect.fixHeight * 0.5 - curSelected * SongRect.fixHeight * rectInter - (curSelected <= SongRect.openRect.id ? 0 : Difficulty.list.length * DiffRect.fixHeight * 1.05 + SongRect.fixHeight * (0.1 * 2));
+		songsMove.tweenData = FlxG.height * 0.5 - SongRect.fixHeight * 0.5 - getEffectiveId(curSelected) * SongRect.fixHeight * rectInter - (curSelected <= SongRect.openRect.id ? 0 : Difficulty.list.length * DiffRect.fixHeight * 1.05 + SongRect.fixHeight * (0.1 * 2));
 		
 		if (playSound) FlxG.sound.play(Paths.sound('scrollMenu'), 0.4);
 
@@ -856,6 +903,44 @@ class FreeplayState extends MusicBeatState
 		for (rect in sorted) {
 			insert(idx, rect);
 			idx++;
+		}
+	}
+
+	public function startSearch(text:String)
+	{
+		isSearchActive = (text != '');
+
+		if (!isSearchActive)
+		{
+			noMatchText.visible = false;
+			for (song in songGroup)
+			{
+				song.searchMatch = true;
+			}
+			return;
+		}
+
+		var lowerText:String = text.toLowerCase();
+		var firstMatch:Int = -1;
+		var openStillMatches:Bool = false;
+
+		for (song in songGroup)
+		{
+			var match:Bool = song.songNameSt.toLowerCase().indexOf(lowerText) >= 0
+				|| song.songMusican.toLowerCase().indexOf(lowerText) >= 0;
+			song.searchMatch = match;
+			if (match && firstMatch < 0)
+				firstMatch = song.id;
+			if (match && song == SongRect.openRect && song.diffAdded)
+				openStillMatches = true;
+		}
+
+		noMatchText.visible = (firstMatch < 0);
+
+		if (!openStillMatches && firstMatch >= 0)
+		{
+			curSelected = firstMatch;
+			songGroup[firstMatch].changeSelectAll(true);
 		}
 	}
 

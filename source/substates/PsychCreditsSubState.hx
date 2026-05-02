@@ -97,7 +97,7 @@ class PsychCreditsSubState extends MusicBeatSubstate
 		intendedColor = bg.color;
 		changeSelection();
 
-		var back = new GeneralBack(0, 0, 250, 75, Language.get('back', 'ma'), 0x53b7ff, function() close());
+		var back = new GeneralBack(0, 0, 250, 75, Language.get('back', 'in'), 0x53b7ff, function() close());
 		back.y = FlxG.height - 75;
 		#if !mobile add(back); #end
 
