@@ -158,9 +158,7 @@ class Controls
 		return result;
 	}
 
-	public var controllerMode(get, set):Bool;
-	private function get_controllerMode():Bool return ClientPrefs.data.needMobileControl;
-	private function set_controllerMode(value:Bool):Bool return value;
+	public var controllerMode:Bool = false;
 
 	public var isInSubstate:Bool = false; // don't worry about this it becomes true and false on it's own in MusicBeatSubstate
 	public var requested(get, default):Dynamic; // is set to MusicBeatState or MusicBeatSubstate when the constructor is called
