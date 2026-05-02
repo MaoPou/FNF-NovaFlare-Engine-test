@@ -45,7 +45,7 @@ class BackButton extends FlxSpriteGroup {
 
         if (overlaps) {
             if (mouse.justReleased) {
-                back2Mamainmenu();                 
+                back2Mainmenu();                 
             }
         }
 
@@ -60,7 +60,7 @@ class BackButton extends FlxSpriteGroup {
                     FlxG.sound.play(Paths.sound('cancelMenu'));
                 }
             } else if (FreeplayState.instance.keyboardState == 0) {
-                back2Mamainmenu();
+                back2Mainmenu();
             } else {
                 FreeplayState.instance.keyboardState = 0;
                 FreeplayState.instance.curFunc = -1;
@@ -71,7 +71,7 @@ class BackButton extends FlxSpriteGroup {
         super.update(elapsed);
     }
 
-    function back2Mamainmenu() {
+    function back2Mainmenu() {
         FreeplayState.instance.stopAll = true;
         Mods.loadTopMod();
         BackendThread.run(() -> {

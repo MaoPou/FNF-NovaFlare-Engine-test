@@ -125,6 +125,8 @@ class MainMenuState extends MusicBeatState
 
 		persistentUpdate = persistentDraw = true;
 
+		//Language.resetData();
+
 		var yScroll:Float = Math.max(0.25 - (0.05 * (optionShit.length - 4)), 0.1);
 		var bg:FlxSprite = new FlxSprite(-80).loadGraphic(Paths.image('menuBG', null, false));
 		bg.scrollFactor.set(0, 0);
@@ -172,7 +174,7 @@ class MainMenuState extends MusicBeatState
 			var menuItem:FlxSprite = new FlxSprite(-600, 0);
 			menuItem.scale.x = scale;
 			menuItem.scale.y = scale;
-			menuItem.frames = Paths.getSparrowAtlas('mamainmenu/menu_' + optionShit[i]);
+			menuItem.frames = Paths.getSparrowAtlas('mainmenu/menu_' + optionShit[i]);
 			menuItem.animation.addByPrefix('idle', optionShit[i] + " basic", 24);
 			menuItem.animation.addByPrefix('selected', optionShit[i] + " white", 24);
 			menuItem.animation.play('idle');
@@ -245,7 +247,7 @@ class MainMenuState extends MusicBeatState
 				updateShit.cameras = [camHUD];
 
 				StatusIcon = new FlxSprite(0, 0);
-				StatusIcon.frames = Paths.getSparrowAtlas('menuExtend/Mamainmenu/gitAction', null, false);
+				StatusIcon.frames = Paths.getSparrowAtlas('menuExtend/MainMenu/gitAction', null, false);
 				StatusIcon.updateHitbox();
 
 				StatusIcon.animation.addByPrefix('in_progress', "in_progress", 24);
