@@ -505,7 +505,7 @@ class CreditsState extends MusicBeatState
 		if (!pressCheck)
 		{
 			pressCheck = true;
-			MusicBeatState.switchState(new MamainmenuState());
+			MusicBeatState.switchState(new MainMenuState());
 		}
 	}
 

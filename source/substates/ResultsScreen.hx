@@ -29,7 +29,7 @@ import general.objects.state.ResultShape;
 
 import states.freeplayState.FreeplayState;
 import states.freeplayState.shader.BlurFilter;
-import states.MamainmenuState;
+import states.MainMenuState;
 
 import games.backend.Highscore;
 import games.backend.diffCalc.DiffRating;
@@ -877,7 +877,7 @@ class ResultsScreen extends MusicBeatSubstate
 			loadLeft.setGraphicSize(FlxG.width, FlxG.height);
 			loadLeft.updateHitbox();
 
-			WaterMark = new FlxText(isTransIn ? 50 : -1230, 720 - 50 - 50 * 2, 0, 'NF ENGINE V' + MamainmenuState.novaFlareEngineVersion, 50);
+			WaterMark = new FlxText(isTransIn ? 50 : -1230, 720 - 50 - 50 * 2, 0, 'NF ENGINE V' + MainMenuState.novaFlareEngineVersion, 50);
 			WaterMark.scrollFactor.set();
 			WaterMark.setFormat(Assets.getFont("assets/fonts/loadText.ttf").fontName, 50, FlxColor.WHITE, LEFT, FlxTextBorderStyle.OUTLINE, FlxColor.BLACK);
 			WaterMark.antialiasing = ClientPrefs.data.antialiasing;
@@ -957,7 +957,7 @@ class ResultsScreen extends MusicBeatSubstate
 			loadAlpha.setGraphicSize(FlxG.width, FlxG.height);
 			loadAlpha.updateHitbox();
 
-			WaterMark = new FlxText(50, 720 - 50 - 50 * 2, 0, 'NF ENGINE V' + MamainmenuState.novaFlareEngineVersion, 50);
+			WaterMark = new FlxText(50, 720 - 50 - 50 * 2, 0, 'NF ENGINE V' + MainMenuState.novaFlareEngineVersion, 50);
 			WaterMark.scrollFactor.set();
 			WaterMark.setFormat(Assets.getFont("assets/fonts/loadText.ttf").fontName, 50, FlxColor.WHITE, LEFT, FlxTextBorderStyle.OUTLINE, FlxColor.BLACK);
 			WaterMark.antialiasing = ClientPrefs.data.antialiasing;

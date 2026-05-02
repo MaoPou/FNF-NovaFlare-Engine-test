@@ -78,6 +78,6 @@ class BackButton extends FlxSpriteGroup {
             FreeplayState.destroyFreeplayVocals();
             FlxG.sound.playMusic(Paths.music('freakyMenu'), 0);
         });
-        MusicBeatState.switchState(new MamainmenuState());
+        MusicBeatState.switchState(new MainMenuState());
     }
 }

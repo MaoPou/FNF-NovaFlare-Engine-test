@@ -1,6 +1,6 @@
 package options;
 
-import states.MamainmenuState;
+import states.MainMenuState;
 import states.freeplayState.FreeplayState;
 
 import options.base.NewControlsSubState;
@@ -479,7 +479,7 @@ class OptionsState extends MusicBeatState
 			switch (stateType)
 			{
 				case 0:
-					MusicBeatState.switchState(new MamainmenuState());
+					MusicBeatState.switchState(new MainMenuState());
 				case 1:
 						MusicBeatState.switchState(new FreeplayState());
 				case 2:

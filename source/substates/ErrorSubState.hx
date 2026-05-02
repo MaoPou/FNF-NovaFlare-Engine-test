@@ -3,7 +3,7 @@ package substates;
 import flixel.FlxSubState;
 
 import states.freeplayState.FreeplayState;
-import states.MamainmenuState;
+import states.MainMenuState;
 
 class ErrorSubState extends MusicBeatSubstate
 {
@@ -78,7 +78,7 @@ class ErrorSubState extends MusicBeatSubstate
 			if (Type.getClass(FlxG.state) == PlayState)
 				MusicBeatState.switchState(new FreeplayState());
 			else
-				MusicBeatState.switchState(new MamainmenuState());
+				MusicBeatState.switchState(new MainMenuState());
 
 			close();
 		}

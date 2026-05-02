@@ -11,7 +11,7 @@ import developer.editors.ChartingState;
 
 import options.OptionsState;
 
-import states.MamainmenuState;
+import states.MainMenuState;
 import states.freeplayState.shader.BlurFilter;
 import states.freeplayState.backend.*;
 import states.freeplayState.objects.detail.*;

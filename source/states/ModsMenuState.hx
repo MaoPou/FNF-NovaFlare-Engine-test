@@ -346,7 +346,7 @@ class ModsMenuState extends MusicBeatState
 			else
 			{
 				if (!isFreePlay)
-					MusicBeatState.switchState(new MamainmenuState());
+					MusicBeatState.switchState(new MainMenuState());
 				else
 				{
 					MusicBeatState.switchState(new states.freeplayState.FreeplayState());
@@ -406,7 +406,7 @@ class ModsMenuState extends MusicBeatState
 				FlxG.camera.fade(FlxColor.BLACK, 0.5, false, FlxG.resetGame, false);
 			}
 			else
-				MusicBeatState.switchState(new MamainmenuState());
+				MusicBeatState.switchState(new MainMenuState());
 
 			persistentUpdate = false;
 			FlxG.autoPause = ClientPrefs.data.autoPause;

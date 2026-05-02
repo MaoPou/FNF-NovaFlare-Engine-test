@@ -6,7 +6,7 @@ import flixel.util.FlxGradient;
 import flixel.FlxSubState;
 import flixel.FlxObject;
 
-import states.MamainmenuState;
+import states.MainMenuState;
 
 class CustomFadeTransition extends FlxSubState
 {
@@ -63,7 +63,7 @@ class CustomFadeTransition extends FlxSubState
 			loadLeft.setGraphicSize(FlxG.width, FlxG.height);
 			loadLeft.updateHitbox();
 
-			WaterMark = new FlxText(isTransIn ? 50 : -1230, 720 - 50 - 50 * 2, 0, 'NF ENGINE V' + MamainmenuState.novaFlareEngineVersion, 50);
+			WaterMark = new FlxText(isTransIn ? 50 : -1230, 720 - 50 - 50 * 2, 0, 'NF ENGINE V' + MainMenuState.novaFlareEngineVersion, 50);
 			WaterMark.scrollFactor.set();
 			WaterMark.setFormat(Assets.getFont("assets/fonts/loadText.ttf").fontName, 50, FlxColor.WHITE, LEFT, FlxTextBorderStyle.OUTLINE, FlxColor.BLACK);
 			WaterMark.antialiasing = ClientPrefs.data.antialiasing;
@@ -184,7 +184,7 @@ class CustomFadeTransition extends FlxSubState
 			loadAlpha.setGraphicSize(FlxG.width, FlxG.height);
 			loadAlpha.updateHitbox();
 
-			WaterMark = new FlxText(50, 720 - 50 - 50 * 2, 0, 'NF ENGINE V' + MamainmenuState.novaFlareEngineVersion, 50);
+			WaterMark = new FlxText(50, 720 - 50 - 50 * 2, 0, 'NF ENGINE V' + MainMenuState.novaFlareEngineVersion, 50);
 			WaterMark.scrollFactor.set();
 			WaterMark.setFormat(Assets.getFont("assets/fonts/loadText.ttf").fontName, 50, FlxColor.WHITE, LEFT, FlxTextBorderStyle.OUTLINE, FlxColor.BLACK);
 			WaterMark.antialiasing = ClientPrefs.data.antialiasing;

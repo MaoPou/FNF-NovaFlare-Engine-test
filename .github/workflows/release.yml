@@ -64,18 +64,18 @@ jobs:
           fi
           echo "Updated Project.xml version and build-number attributes"
 
-      - name: Update MamainmenuState.hx
+      - name: Update MainMenuState.hx
         run: |
-          echo "Updating MamainmenuState.hx..."
-          sed -i "s/\(public static var novaFlareEngineVersion:String = '\)[^']*/\1${{ steps.parse-version.outputs.version_name }}/" source/states/MamainmenuState.hx
-          sed -i "s/\(public static var novaFlareEngineDataVersion:Float = \)[0-9.]*/\1${{ steps.parse-version.outputs.version_number }}/" source/states/MamainmenuState.hx
-          echo "Updated MamainmenuState.hx version variables"
+          echo "Updating MainMenuState.hx..."
+          sed -i "s/\(public static var novaFlareEngineVersion:String = '\)[^']*/\1${{ steps.parse-version.outputs.version_name }}/" source/states/MainMenuState.hx
+          sed -i "s/\(public static var novaFlareEngineDataVersion:Float = \)[0-9.]*/\1${{ steps.parse-version.outputs.version_number }}/" source/states/MainMenuState.hx
+          echo "Updated MainMenuState.hx version variables"
 
       - name: Commit all changes
         run: |
           git config --local user.email "actions@github.com"
           git config --local user.name "GitHub Actions"
-          git add gitVersion.txt Project.xml source/states/MamainmenuState.hx
+          git add gitVersion.txt Project.xml source/states/MainMenuState.hx
           git commit -m "chore: Release version ${{ steps.parse-version.outputs.version_name }} ${{ steps.parse-version.outputs.version_number_int_with_timestamp }}"
           git push
           

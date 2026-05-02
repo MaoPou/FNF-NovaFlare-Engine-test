@@ -28,7 +28,7 @@ import cpp.Lib;
 
 @:access(flixel.sound.FlxSound._sound)
 @:access(openfl.media.Sound.__buffer)
-class MamainmenuState extends MusicBeatState
+class MainMenuState extends MusicBeatState
 {
 	public static var psychEngineVersion:String = '0.7.3'; // This is also used for Discord RPC
 	public static var novaFlareEngineDataVersion:Float = 2.6;
@@ -329,7 +329,7 @@ class MamainmenuState extends MusicBeatState
 		FlxG.mouse.visible = false;
 		#end
 
-		addVirtualPad(MamainmenuStateC, A_B_E);
+		addVirtualPad(MainMenuStateC, A_B_E);
 		virtualPad.cameras = [camHUD];
 
 		/*
@@ -635,8 +635,8 @@ class MamainmenuState extends MusicBeatState
 			http.onData = function(data:String)
 			{
 				var actionJson = Json.parse(data);
-				MamainmenuState.NovaFlareGithubAction = actionJson.workflow_runs[0].display_title;
-				MamainmenuState.createTime = 'UTC-' + actionJson.workflow_runs[0].updated_at + '\nBy ' + actionJson.workflow_runs[0].actor.login;
+				MainMenuState.NovaFlareGithubAction = actionJson.workflow_runs[0].display_title;
+				MainMenuState.createTime = 'UTC-' + actionJson.workflow_runs[0].updated_at + '\nBy ' + actionJson.workflow_runs[0].actor.login;
 				var Sus = actionJson.workflow_runs[0].status;
 				var Con = actionJson.workflow_runs[0].conclusion;
 				callback({status: Sus, conclusion: Con});
@@ -644,7 +644,7 @@ class MamainmenuState extends MusicBeatState
 
 			http.onError = function(error)
 			{
-				MamainmenuState.NovaFlareGithubAction = '$error';
+				MainMenuState.NovaFlareGithubAction = '$error';
 				trace('error: $error');
 				callback({status: "error", conclusion: "error"});
 			};

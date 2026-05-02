@@ -118,7 +118,7 @@ class InitScriptData {
         //Iris.proxyImports.set("states.FreeplayState", states.freeplayState.FreeplayState); 为啥要加注释啊 ——dmmchh
 
         Iris.proxyImports.set("states.LoadingState", states.loadingState.LoadingState);
-        Iris.proxyImports.set("states.MamainmenuState", states.MamainmenuState);
+        Iris.proxyImports.set("states.MainMenuState", states.MainMenuState);
         Iris.proxyImports.set("states.ModsMenuState", states.ModsMenuState);
         Iris.proxyImports.set("states.OutdatedState", states.backend.OutdatedState);
         Iris.proxyImports.set("states.ScaleSimulationState", states.backend.ScaleSimulationState);
@@ -239,7 +239,7 @@ class InitScriptData {
         Iris.proxyImports.set("FlashingState", states.backend.FlashingState);
         Iris.proxyImports.set("FreeplayState", states.freeplayState.FreeplayState);
         Iris.proxyImports.set("LoadingState", states.loadingState.LoadingState);
-        Iris.proxyImports.set("MamainmenuState", states.MamainmenuState);
+        Iris.proxyImports.set("MainMenuState", states.MainMenuState);
         Iris.proxyImports.set("ModsMenuState", states.ModsMenuState);
         Iris.proxyImports.set("OutdatedState", states.backend.OutdatedState);
         Iris.proxyImports.set("StoryMenuState", states.StoryMenuState);

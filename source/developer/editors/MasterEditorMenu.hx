@@ -1,6 +1,6 @@
 ﻿package developer.editors;
 
-import states.MamainmenuState;
+import states.MainMenuState;
 import states.freeplayState.FreeplayState;
 
 import games.backend.WeekData;
@@ -105,7 +105,7 @@ class MasterEditorMenu extends MusicBeatState
 
 		if (controls.BACK)
 		{
-			MusicBeatState.switchState(new MamainmenuState());
+			MusicBeatState.switchState(new MainMenuState());
 		}
 
 		if (controls.ACCEPT)

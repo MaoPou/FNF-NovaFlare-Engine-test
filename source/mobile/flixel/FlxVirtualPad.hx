@@ -121,7 +121,7 @@ class FlxVirtualPad extends FlxMobileInputManager
 			case OptionStateC:
 				add(buttonUp = createButton(0, by(2), BTN, BTN, "up", keybindSet('ui_up'), 0x00FF00));
 				add(buttonDown = createButton(0, by(1), BTN, BTN, "down", keybindSet('ui_down'), 0x00FFFF));
-			case MamainmenuStateC:
+			case MainMenuStateC:
 				add(buttonUp = createButton(rx(1), by(4), BTN, BTN, 'up', keybindSet('ui_up'), 0xFF12FA05));
 				add(buttonDown = createButton(rx(1), by(3), BTN, BTN, 'down', keybindSet('ui_down'), 0xFF00FFFF));
 			case ChartingStateC:
