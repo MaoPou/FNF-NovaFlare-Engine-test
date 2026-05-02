@@ -37,8 +37,6 @@ class VideoSprite extends FlxSpriteGroup
 		this.videoName = videoName;
 		scrollFactor.set();
 		cameras = [FlxG.cameras.list[FlxG.cameras.list.length - 1]];
-		this.x -= cameras[0].x;
-		this.y -= cameras[0].y;
 
 		waiting = isWaiting;
 		if (!waiting)
@@ -50,8 +48,10 @@ class VideoSprite extends FlxSpriteGroup
 			add(cover);
 		}
 
-		// initialize sprites
+		// initialize sprites0
 		videoSprite = new FlxVideoSprite();
+		videoSprite.bitmap.x -= FlxG.game.x;
+		videoSprite.bitmap.y -= FlxG.game.y;
 		videoSprite.antialiasing = ClientPrefs.data.antialiasing;
 		add(videoSprite);
 		if (canSkip)
